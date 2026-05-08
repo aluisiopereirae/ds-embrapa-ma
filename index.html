@@ -94,6 +94,9 @@ header {
   overflow-y: auto;
   padding: 16px 0;
 }
+.sidebar.collapsed {
+  width: 0; min-width: 0; overflow: hidden; padding: 0;
+}
 
 .sidebar-section { padding: 0 12px 8px; }
 .sidebar-label {
@@ -237,7 +240,7 @@ header {
 .table-wrap {
   background: var(--card); border: 1px solid var(--border);
   border-radius: 12px; overflow: hidden; margin-bottom: 20px;
-  max-height: 420px; overflow-y: auto;
+  max-height: 70vh; overflow-y: auto;
 }
 
 /* BADGE */
@@ -387,8 +390,13 @@ header {
 .hm-chip:hover { opacity: 0.9; }
 .hm-chip.active { font-weight: 600; color: #fff; }
 .hm-chip .swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.legend-item { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; font-size: 11px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); }
-.legend-grad { width: 60px; height: 8px; border-radius: 4px; }
+.legend-item { display: inline-flex; align-items: flex-start; gap: 10px; padding: 8px 12px; border-radius: 14px; font-size: 11px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); min-width: 240px; }
+.legend-content { display: flex; flex-direction: column; gap: 6px; }
+.legend-grad { width: 85px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+.legend-scale { display: flex; justify-content: space-between; gap: 6px; font-size: 10px; color: rgba(255,255,255,0.78); }
+.legend-scale span { flex: 1; text-align: center; }
+.legend-scale span:first-child { text-align: left; }
+.legend-scale span:last-child { text-align: right; }
 
 /* ACCORDION */
 .accordion-header {
@@ -460,6 +468,19 @@ header {
 
 /* Overview sub-tab border for active system indicator */
 #active-sys-display { font-size: 11px; white-space: nowrap; }
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .app { flex-direction: column; }
+  .sidebar { width: 100%; min-width: 100%; order: -1; }
+  .sidebar.collapsed { width: 100%; min-width: 100%; }
+  .main { width: 100%; }
+  .map-toolbar { flex-wrap: wrap; }
+  .data-table { font-size: 12px; }
+  .table-wrap { max-height: 50vh; }
+  .stat-grid { grid-template-columns: 1fr; }
+  .chart-card { margin-bottom: 16px; }
+}
 
 </style>
 </head>
@@ -564,6 +585,7 @@ header {
       <button class="sys-btn" id="hmbtn-quilombola" onclick="toggleHeatmapSidebar('quilombola')"><span class="icon">⚫</span> Quilombolas<span class="toggle-dot"></span></button>
       <button class="sys-btn" id="hmbtn-assentamentos" onclick="toggleHeatmapSidebar('assentamentos')"><span class="icon">🏘</span> Assentamentos<span class="toggle-dot"></span></button>
       <button class="sys-btn" id="hmbtn-bacia" onclick="toggleHeatmapSidebar('bacia')"><span class="icon">🏞</span> Bacias<span class="toggle-dot"></span></button>
+      <button class="sys-btn" id="hmbtn-caf" onclick="toggleHeatmapSidebar('caf')"><span class="icon">👩‍🌾</span> CAF Agricultura Familiar<span class="toggle-dot"></span></button>
       <button class="sys-btn" id="hmbtn-pib" onclick="toggleHeatmapSidebar('pib')"><span class="icon">💰</span> PIB<span class="toggle-dot"></span></button>
       <button class="sys-btn" id="hmbtn-populacao" onclick="toggleHeatmapSidebar('populacao')"><span class="icon">👥</span> População<span class="toggle-dot"></span></button>
       <button class="sys-btn" id="hmbtn-alfabetizacao" onclick="toggleHeatmapSidebar('alfabetizacao')"><span class="icon">📚</span> Alfabetização<span class="toggle-dot"></span></button></aside>
@@ -692,6 +714,7 @@ header {
     <div id="view-map" class="panel" style="padding:0; display:none; flex-direction:column;">
       <!-- ROW 1: Base layers + Add point -->
       <div class="map-toolbar" style="flex-wrap:wrap;gap:6px;">
+        <button class="map-btn" id="btn-toggle-sidebar" onclick="toggleSidebar()">☰ Menu</button>
         <button class="map-btn active" id="btn-map-normal" onclick="setMapLayer('normal')">🗺 Normal</button>
         <button class="map-btn" id="btn-map-satellite" onclick="setMapLayer('satellite')">🛰 Satélite</button>
         <button class="map-btn" id="btn-map-hybrid" onclick="setMapLayer('hybrid')">🗺🛰 Híbrido+Labels</button>
@@ -983,7 +1006,7 @@ header {
 // ═══════════════════════════════════════════════════════════
 // DATA STORE
 // ═══════════════════════════════════════════════════════════
-const STORAGE_KEY = 'agroeco_ma_v2';
+const STORAGE_KEY = 'ds_embrapa_ma_v2';
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
@@ -1067,6 +1090,9 @@ const INITIAL_DATA = [
   // MELIPONICULTURA
   { id:58, sistema:'meliponicultura', municipio:'Viana', mesorregiao:'Oeste Maranhense', lat:-3.2144, lng:-45.0022, area_total:2, ano_implantacao:2020, bioma:'Amazônia', altitude:38, temperatura_media:27.8, precipitacao:1900, renda_total:3200, balanco_carbono:-0.8, emissao_total_co2e:120, sequestro_carbono:0.6, num_colmeias:62, producao_mel:0.9, escala:'Familiar', status:'Ativo', produtor:'STTR Viana', obs:'Uruçu e Jandaíra, mel nativo'},
   { id:59, sistema:'meliponicultura', municipio:'Pinheiro', mesorregiao:'Oeste Maranhense', lat:-2.5261, lng:-45.0833, area_total:1.5, ano_implantacao:2021, bioma:'Amazônia', altitude:28, temperatura_media:27.5, precipitacao:2100, renda_total:2600, balanco_carbono:-0.5, emissao_total_co2e:95, sequestro_carbono:0.4, num_colmeias:45, producao_mel:0.65, escala:'Familiar', status:'Ativo', produtor:'Quilombo Jamary', obs:'Meliponicultura quilombola, turismo pedagógico'},
+
+
+
 
   // PISCICULTURA
   { id:60, sistema:'piscicultura', municipio:'Imperatriz', mesorregiao:'Oeste Maranhense', lat:-5.5100, lng:-47.4650, area_total:4.2, ano_implantacao:2018, bioma:'Amazônia', altitude:115, temperatura_media:28.0, precipitacao:1650, renda_total:12000, balanco_carbono:6.8, emissao_total_co2e:2800, sequestro_carbono:0, producao_peixe:18.5, area_lamina_agua:3.8, produtividade_ton_ha:4.9, densidade_estocagem:1.2, ph_agua:7.2, oxigenio_dissolvido:6.8, temperatura_agua:28.5, escala:'Comercial', status:'Ativo', produtor:'Piscicultura Vale do Tocantins', obs:'Tambaqui e tilápia, tanques escavados'},
@@ -1559,46 +1585,101 @@ const SYSTEM_ICONS = {
   piscicultura:'🐟', fruticultura:'🍎', roca:'🌾', sisteminha:'🐓', extrativismo:'🌰'
 };
 
-// Per-indicator color gradients — vibrant, distinct
+// Interpolate between two hex colors
+function lerpColor(c1, c2, t) {
+  const r1=parseInt(c1.slice(1,3),16), g1=parseInt(c1.slice(3,5),16), b1=parseInt(c1.slice(5,7),16);
+  const r2=parseInt(c2.slice(1,3),16), g2=parseInt(c2.slice(3,5),16), b2=parseInt(c2.slice(5,7),16);
+  const r=Math.round(r1*(1-t)+r2*t), g=Math.round(g1*(1-t)+g2*t), b=Math.round(b1*(1-t)+b2*t);
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+}
+
+// Per-indicator color gradients — vibrant, distinct with enhanced semantic colors
 const HM_CONFIG = {
   idh:          { label:'IDH Municipal',       icon:'📈', color:'#38bdf8', bg:'#0c4a6e',
-                  gradient:{0.0:'#000033',0.1:'#001a6b',0.3:'#0055aa',0.5:'#1a90d4',0.7:'#38bdf8',0.85:'#7dd3fc',0.95:'#bae6fd',1.0:'#e0f7ff'} },
+                  gradient:{0.0:'#000033',0.12:'#001a6b',0.25:'#0055aa',0.4:'#1a90d4',0.55:'#38bdf8',0.7:'#5dbaeb',0.85:'#7dd3fc',0.95:'#bae6fd',1.0:'#e0f7ff'} },
   desmatamento: { label:'Desmatamento',         icon:'🪓', color:'#d4d4d4', bg:'#1f2937',
-                  gradient:{0.0:'#111111',0.15:'#1f2937',0.35:'#374151',0.55:'#6b7280',0.75:'#9ca3af',0.9:'#d1d5db',1.0:'#f9fafb'} },
+                  gradient:{0.0:'#111111',0.15:'#1f2937',0.3:'#374151',0.45:'#6b7280',0.6:'#9ca3af',0.75:'#d1d5db',0.9:'#e5e7eb',1.0:'#f9fafb'} },
   precipitacao: { label:'Precipitação',         icon:'🌧', color:'#60a5fa', bg:'#1e3a5f',
-                  gradient:{0.0:'#001a40',0.1:'#00297a',0.3:'#1d4ed8',0.5:'#3b82f6',0.7:'#60a5fa',0.88:'#93c5fd',0.96:'#bfdbfe',1.0:'#dbeafe'} },
+                  gradient:{0.0:'#FFA500',0.1:'#FF8C00',0.25:'#4169E1',0.4:'#1E90FF',0.55:'#60a5fa',0.7:'#87CEEB',0.85:'#ADD8E6',1.0:'#001F5C'} },
   temperatura:  { label:'Temperatura',          icon:'🌡', color:'#fbbf24', bg:'#78350f',
-                  gradient:{0.0:'#ffffe0',0.15:'#fffaaa',0.35:'#ffd44f',0.55:'#fb923c',0.72:'#f97316',0.85:'#ef4444',0.93:'#dc2626',1.0:'#7f1d1d'} },
+                  gradient:{0.0:'#1565C0',0.25:'#1E88E5',0.4:'#FFB300',0.55:'#FF6F00',0.7:'#E65100',0.85:'#FF6B6B',0.95:'#C62828',1.0:'#7F1D1D'} },
   pobreza:      { label:'Pobreza',              icon:'💸', color:'#f472b6', bg:'#500724',
-                  gradient:{0.0:'#1a001a',0.1:'#3d0040',0.3:'#86198f',0.5:'#c026d3',0.7:'#e879f9',0.85:'#f0abfc',0.95:'#fae8ff',1.0:'#fdf2f8'} },
-  vegetacao:    { label:'Vegetação',            icon:'🌳', color:'#4ade80', bg:'#052e16',
-                  gradient:{0.0:'#f7fff7',0.15:'#bbf7d0',0.35:'#4ade80',0.55:'#22c55e',0.72:'#16a34a',0.85:'#166534',0.95:'#14532d',1.0:'#052e16'} },
-  queimadas:    { label:'Queimadas',            icon:'🔥', color:'#ef4444', bg:'#450a0a',
-                  gradient:{0.0:'#fffef0',0.1:'#fef9c3',0.25:'#fde047',0.45:'#fb923c',0.6:'#f97316',0.75:'#ef4444',0.9:'#991b1b',1.0:'#450a0a'} },
-  bacia:        { label:'Bacias Hidrográficas', icon:'🏞', color:'#22d3ee', bg:'#0c3a4a',
-                  gradient:{0.0:'#ecfeff',0.15:'#cffafe',0.35:'#67e8f9',0.55:'#22d3ee',0.72:'#06b6d4',0.87:'#0e7490',0.95:'#155e75',1.0:'#083344'} },
-  alfabetizacao:{ label:'Alfabetização',        icon:'📚', color:'#a78bfa', bg:'#2e1065',
-                  gradient:{0.0:'#f5f3ff',0.15:'#ede9fe',0.35:'#c4b5fd',0.55:'#8b5cf6',0.72:'#7c3aed',0.87:'#5b21b6',0.95:'#4c1d95',1.0:'#1e0050'} },
-  populacao:    { label:'População',            icon:'👥', color:'#fb923c', bg:'#431407',
-                  gradient:{0.0:'#fffbf5',0.15:'#ffedd5',0.35:'#fed7aa',0.55:'#fb923c',0.72:'#f97316',0.87:'#ea580c',0.95:'#c2410c',1.0:'#431407'} },
-  fome:         { label:'Inseg. Alimentar',     icon:'🍽', color:'#f87171', bg:'#450a0a',
-                  gradient:{0.0:'#fff0f0',0.15:'#ffe4e4',0.35:'#fca5a5',0.55:'#f87171',0.72:'#ef4444',0.87:'#dc2626',0.95:'#b91c1c',1.0:'#450a0a'} },
-  indigena:     { label:'Terras Indígenas',     icon:'🪶', color:'#d97706', bg:'#1c0a00',
-                  gradient:{0.0:'#fef9f0',0.15:'#fef3c7',0.35:'#fde68a',0.55:'#f59e0b',0.72:'#d97706',0.87:'#92400e',0.95:'#78350f',1.0:'#1c0a00'} },
-  quilombola:   { label:'Quilombolas',          icon:'⚫', color:'#9ca3af', bg:'#000000',
-                  gradient:{0.0:'#e5e7eb',0.2:'#9ca3af',0.4:'#6b7280',0.6:'#4b5563',0.78:'#374151',0.9:'#1f2937',0.97:'#111827',1.0:'#000000'} },
-  pib:          { label:'PIB per capita',       icon:'💰', color:'#34d399', bg:'#064e3b',
-                  gradient:{0.0:'#f0fdf4',0.15:'#dcfce7',0.35:'#6ee7b7',0.55:'#34d399',0.72:'#10b981',0.87:'#059669',0.95:'#065f46',1.0:'#022c22'} },
-  gee:          { label:'Emissões GEE',         icon:'☁', color:'#94a3b8', bg:'#0f172a',
-                  gradient:{0.0:'#f8fafc',0.15:'#e2e8f0',0.35:'#94a3b8',0.55:'#64748b',0.72:'#475569',0.87:'#334155',0.95:'#1e293b',1.0:'#0f172a'} },
-  lavoura:      { label:'Área de Lavoura',      icon:'🌾', color:'#eab308', bg:'#3a3a00',
-                  gradient:{0.0:'#fefce8',0.15:'#fef9c3',0.35:'#fde047',0.55:'#eab308',0.72:'#ca8a04',0.87:'#a16207',0.95:'#854d0e',1.0:'#3a3a00'} },
-  bovinos:      { label:'Rebanho Bovino',       icon:'🐄', color:'#f59e0b', bg:'#292109',
-                  gradient:{0.0:'#fffbeb',0.15:'#fef3c7',0.35:'#fcd34d',0.55:'#f59e0b',0.72:'#d97706',0.87:'#b45309',0.95:'#92400e',1.0:'#292109'} },
-  pesca:        { label:'Produção de Pesca',    icon:'🐟', color:'#22d3ee', bg:'#083344',
-                  gradient:{0.0:'#ecfeff',0.15:'#cffafe',0.35:'#a5f3fc',0.55:'#22d3ee',0.72:'#06b6d4',0.87:'#0891b2',0.95:'#0e7490',1.0:'#083344'} },
-  assentamentos:{ label:'Assentamentos',        icon:'🏘', color:'#f59e0b', bg:'#451a03',
-                  gradient:{0.0:'#fffbf5',0.15:'#fff7ed',0.35:'#fed7aa',0.55:'#fb923c',0.72:'#f59e0b',0.87:'#d97706',0.95:'#b45309',1.0:'#451a03'} },
+                  gradient:{0.0:'#1a001a',0.12:'#3d0040',0.25:'#86198f',0.4:'#a855f7',0.55:'#c026d3',0.7:'#e879f9',0.85:'#f0abfc',0.95:'#fae8ff',1.0:'#fdf2f8'} },
+  vegetacao:    { label:'Vegetação',            icon:'🌳', color:'#4ade80', bg:'#052e16', unit:'%',
+                  gradient:{0.0:'#f7fff7',0.15:'#d1fae5',0.3:'#a7f3d0',0.45:'#6ee7b7',0.6:'#4ade80',0.72:'#22c55e',0.82:'#16a34a',0.91:'#15803d',1.0:'#052e16'} },
+  queimadas:    { label:'Queimadas',            icon:'🔥', color:'#ef4444', bg:'#450a0a', unit:'ha',
+                  gradient:{0.0:'#fffacd',0.1:'#ffd700',0.2:'#ffb300',0.35:'#fb923c',0.5:'#f97316',0.65:'#ef4444',0.8:'#dc2626',0.92:'#991b1b',1.0:'#450a0a'} },
+  bacia:        { label:'Bacias Hidrográficas', icon:'🏞', color:'#22d3ee', bg:'#0c3a4a', unit:'score',
+                  gradient:{0.0:'#ecfeff',0.15:'#cffafe',0.3:'#a5f3fc',0.45:'#67e8f9',0.6:'#22d3ee',0.72:'#06b6d4',0.82:'#0891b2',0.92:'#0e7490',1.0:'#083344'} },
+  alfabetizacao:{ label:'Alfabetização',        icon:'📚', color:'#a78bfa', bg:'#2e1065', unit:'índice',
+                  gradient:{0.0:'#f5f3ff',0.15:'#ede9fe',0.3:'#ddd6fe',0.45:'#c4b5fd',0.6:'#a78bfa',0.72:'#8b5cf6',0.82:'#7c3aed',0.92:'#5b21b6',1.0:'#1e0050'} },
+  populacao:    { label:'População',            icon:'👥', color:'#fb923c', bg:'#431407', unit:'habitantes',
+                  gradient:{0.0:'#fffbf5',0.15:'#ffedd5',0.3:'#fed7aa',0.45:'#fdba74',0.6:'#fb923c',0.72:'#f97316',0.82:'#ea580c',0.92:'#c2410c',1.0:'#431407'} },
+  fome:         { label:'Inseg. Alimentar',     icon:'🍽', color:'#f87171', bg:'#450a0a', unit:'%',
+                  gradient:{0.0:'#fff0f0',0.15:'#ffe4e4',0.3:'#fecaca',0.45:'#fca5a5',0.6:'#f87171',0.72:'#ef4444',0.82:'#dc2626',0.92:'#991b1b',1.0:'#450a0a'} },
+  indigena:     { label:'Terras Indígenas',     icon:'🪶', color:'#d97706', bg:'#1c0a00', unit:'score',
+                  gradient:{0.0:'#fef9f0',0.15:'#fef3c7',0.3:'#fde68a',0.45:'#fed7aa',0.6:'#f59e0b',0.72:'#d97706',0.82:'#b45309',0.92:'#78350f',1.0:'#1c0a00'} },
+  quilombola:   { label:'Quilombolas',          icon:'⚫', color:'#9ca3af', bg:'#000000', unit:'score',
+                  gradient:{0.0:'#f3f4f6',0.15:'#e5e7eb',0.3:'#d1d5db',0.45:'#9ca3af',0.6:'#6b7280',0.72:'#4b5563',0.82:'#374151',0.92:'#1f2937',1.0:'#000000'} },
+  pib:          { label:'PIB per capita',       icon:'💰', color:'#34d399', bg:'#064e3b', unit:'R$',
+                  gradient:{0.0:'#f0fdf4',0.15:'#dcfce7',0.3:'#bbf7d0',0.45:'#86efac',0.6:'#4ade80',0.72:'#34d399',0.82:'#10b981',0.92:'#059669',1.0:'#022c22'} },
+  gee:          { label:'Emissões GEE',         icon:'☁', color:'#94a3b8', bg:'#0f172a', unit:'kt CO₂e',
+                  gradient:{0.0:'#f8fafc',0.15:'#e2e8f0',0.3:'#cbd5e1',0.45:'#94a3b8',0.6:'#64748b',0.72:'#475569',0.82:'#334155',0.92:'#1e293b',1.0:'#0f172a'} },
+  caf:          { label:'CAF Agricultura Familiar', icon:'👩‍🌾', color:'#22c55e', bg:'#062e17', unit:'score',
+                  gradient:{0.0:'#f0fdf4',0.12:'#dcfce7',0.25:'#bbf7d0',0.4:'#6ee7b7',0.55:'#4ade80',0.68:'#22c55e',0.8:'#16a34a',0.91:'#15803d',1.0:'#052e16'} },
+  lavoura:      { label:'Área de Lavoura',      icon:'🌾', color:'#eab308', bg:'#3a3a00', unit:'ha',
+                  gradient:{0.0:'#FFF176',0.15:'#FFEB3B',0.3:'#FDD835',0.45:'#FFB300',0.6:'#FF8F00',0.75:'#E65100',0.88:'#BF360C',1.0:'#3a3a00'} },
+  bovinos:      { label:'Rebanho Bovino',       icon:'🐄', color:'#f59e0b', bg:'#292109', unit:'unidades',
+                  gradient:{0.0:'#fffbeb',0.15:'#fef3c7',0.3:'#fde68a',0.45:'#fdc34d',0.6:'#f59e0b',0.72:'#d97706',0.82:'#b45309',0.92:'#854d0e',1.0:'#292109'} },
+  pesca:        { label:'Produção de Pesca',    icon:'🐟', color:'#22d3ee', bg:'#083344', unit:'t',
+                  gradient:{0.0:'#ecfeff',0.15:'#cffafe',0.3:'#a5f3fc',0.45:'#67e8f9',0.6:'#22d3ee',0.72:'#06b6d4',0.82:'#0891b2',0.92:'#0e7490',1.0:'#083344'} },
+  assentamentos:{ label:'Assentamentos',        icon:'🏘', color:'#f59e0b', bg:'#451a03', unit:'unidades',
+                  gradient:{0.0:'#fffbf5',0.15:'#fff7ed',0.3:'#fed7aa',0.45:'#fdba74',0.6:'#fb923c',0.72:'#f97316',0.82:'#d97706',0.92:'#b45309',1.0:'#451a03'} },
+};
+
+// Dynamic color functions for semantic gradients (map normalized value 0-1 to meaningful colors)
+const HEATMAP_COLOR_FN = {
+  // Precipitação: laranja (seco=baixo) → azul escuro (úmido=alto)
+  precipitacao: (t) => {
+    if (t < 0.4) {
+      const sub = t / 0.4;
+      return lerpColor('#FFA500', '#FF8C00', sub);
+    } else if (t < 0.7) {
+      const sub = (t - 0.4) / 0.3;
+      return lerpColor('#FF8C00', '#4169E1', sub);
+    } else {
+      const sub = (t - 0.7) / 0.3;
+      return lerpColor('#4169E1', '#001F5C', sub);
+    }
+  },
+  // Temperatura: Azul (<26.5) → amarelo (27-27.5) → laranja (27.5-28) → vermelho (>28)
+  temperatura: (t) => {
+    if (t < 0.3) return lerpColor('#1565C0', '#5E8FFF', t/0.3);
+    if (t < 0.55) return lerpColor('#5E8FFF', '#FFB300', (t-0.3)/0.25);
+    if (t < 0.75) return lerpColor('#FFB300', '#FF6F00', (t-0.55)/0.2);
+    return lerpColor('#FF6F00', '#C62828', (t-0.75)/0.25);
+  },
+  // Lavoura/Produção: Amarelo claro → laranja → laranja escuro → vermelho
+  lavoura: (t) => {
+    if (t < 0.3) return '#FFF176';
+    if (t < 0.6) return lerpColor('#FFF176', '#FFB300', (t-0.3)/0.3);
+    if (t < 0.85) return lerpColor('#FFB300', '#E65100', (t-0.6)/0.25);
+    return lerpColor('#E65100', '#BF360C', (t-0.85)/0.15);
+  },
+  // Bovinos/Produção Animal: Similar production gradient
+  bovinos: (t) => {
+    if (t < 0.25) return '#FFFACD';
+    if (t < 0.5) return lerpColor('#FFFACD', '#FFB300', (t-0.25)/0.25);
+    if (t < 0.75) return lerpColor('#FFB300', '#FF6F00', (t-0.5)/0.25);
+    return lerpColor('#FF6F00', '#D84315', (t-0.75)/0.25);
+  },
+  // Pesca: Oceanic blue gradients
+  pesca: (t) => {
+    if (t < 0.25) return '#E0F7FA';
+    if (t < 0.5) return lerpColor('#E0F7FA', '#80DEEA', (t-0.25)/0.25);
+    if (t < 0.75) return lerpColor('#80DEEA', '#4DD0E1', (t-0.5)/0.25);
+    return lerpColor('#4DD0E1', '#0097A7', (t-0.75)/0.25);
+  },
 };;
 
 function buildHeatmapPanel() {
@@ -1659,6 +1740,19 @@ function toggleSysPanel() {
   document.getElementById('btn-toggle-sys-panel').classList.toggle('active', sysPanelOpen);
 }
 
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const btn = document.getElementById('btn-toggle-sidebar');
+  const isCollapsed = sidebar.classList.contains('collapsed');
+  if (isCollapsed) {
+    sidebar.classList.remove('collapsed');
+    btn.textContent = '◀ ☰ Menu';
+  } else {
+    sidebar.classList.add('collapsed');
+    btn.textContent = '▶ ☰ Menu';
+  }
+}
+
 function toggleHeatmapKey(key, chip, cfg) {
   if (activeHeatmaps.has(key)) {
     activeHeatmaps.delete(key);
@@ -1685,9 +1779,21 @@ function toggleHeatmapKey(key, chip, cfg) {
 function addHeatLayer(key, cfg) {
   const pts = (HEATMAP_DATA[key]||[]).map(p => [p[0], p[1], p[2]]);
   if (!pts.length || !L.heatLayer) return;
+  
+  // Use dynamic color function if available, otherwise use static gradient
+  let gradient = cfg.gradient;
+  if (HEATMAP_COLOR_FN[key]) {
+    const fn = HEATMAP_COLOR_FN[key];
+    gradient = {};
+    for (let i = 0; i <= 10; i++) {
+      const t = i / 10;
+      gradient[t] = fn(t);
+    }
+  }
+  
   heatLayers[key] = L.heatLayer(pts, {
-    radius: 60, blur: 50, maxZoom: 12, minOpacity: 0.35, max: 1.0,
-    gradient: cfg.gradient
+    radius: 45, blur: 25, maxZoom: 12, minOpacity: 0.18, max: 1.6,
+    gradient: gradient
   }).addTo(map);
   setTimeout(updateMapLegendOverlay, 200);
 }
@@ -1723,16 +1829,39 @@ function clearAllHeatmaps() {
   showToast('✓ Mapa limpo — todas as seleções removidas', false);
 }
 
+function formatHeatmapLegendValue(value, unit) {
+  if (unit === '%') return `${value.toFixed(0)}%`;
+  if (unit === '°C') return `${value.toFixed(1)}°C`;
+  if (unit === 'R$') return `R$ ${Math.round(value).toLocaleString('pt-BR')}`;
+  if (unit === 'kt CO₂e') return `${Math.round(value).toLocaleString('pt-BR')} kt`;
+  if (unit === 'ha') return `${Math.round(value).toLocaleString('pt-BR')} ha`;
+  if (unit === 't') return `${Math.round(value).toLocaleString('pt-BR')} t`;
+  if (unit === 'habitantes' || unit === 'unidades') return `${Math.round(value).toLocaleString('pt-BR')}`;
+  if (unit === 'score' || unit === 'índice') return value.toFixed(2);
+  return `${value.toFixed(2)} ${unit}`.trim();
+}
+
 function updateLegend() {
   const leg = document.getElementById('heatmap-legend');
   if (!leg) return;
   leg.innerHTML = [...activeHeatmaps].map(k => {
     const c = HM_CONFIG[k];
-    const stops = Object.entries(c.gradient).map(([pos,col])=>`${col} ${Math.round(pos*100)}%`).join(',');
-    return `<span class="legend-item" style="color:${c.color}">
-      <span class="legend-grad" style="background:linear-gradient(to right,${stops})"></span>
-      ${c.icon} ${c.label}
-    </span>`;
+    const range = HEATMAP_RANGES[k] || { min: 0, max: 1 };
+    const interval = (range.max - range.min) / 4;
+    const stops = Object.entries(c.gradient).map(([pos,col]) => `${col} ${Math.round(pos*100)}%`).join(',');
+    const ticks = [0, 1, 2, 3, 4].map(i => formatHeatmapLegendValue(range.min + interval * i, c.unit));
+    return `<div class="legend-item" style="color:${c.color}">
+      <div class="legend-content">
+        <div style="display:flex;align-items:center;gap:8px;white-space:nowrap;">
+          <span class="legend-grad" style="background:linear-gradient(to right,${stops})"></span>
+          <strong style="font-size:11px;color:inherit;">${c.icon} ${c.label}</strong>
+        </div>
+        <div class="legend-scale">
+          ${ticks.map(v => `<span>${v}</span>`).join('')}
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.85);margin-top:4px;">${c.unit === 'score' ? 'Score' : c.unit}</div>
+      </div>
+    </div>`;
   }).join('');
   leg.style.display = activeHeatmaps.size ? 'flex' : 'none';
 }
@@ -1963,7 +2092,83 @@ const MUNIC_DATA = [
   ['Feira Nova do Maranhão',-7.660,-44.882,12000,18500,0.55,88,0.50,8.8,18000,1100,27.5,42000,112000,0.542,25,3,42,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
   ['Paco do Lumiar',-2.553,-44.103,155000,24000,0.42,5,0.30,0.5,120,1950,27.4,800,8000,0.650,18,0,380,'Transição','Grande São Luís','Gleissolo Háplico','Golfão Maranhense'],
   ['São José de Ribamar',-2.561,-44.055,198000,22000,0.44,8,0.34,0.8,200,1950,27.4,1200,12000,0.630,17,0,620,'Transição','Grande São Luís','Neossolo Quartzarênico','Golfão Maranhense'],
+
+
+  // Municípios da Baixada Reentrâncias Maranhenses (BRM) — dados mais recentes disponíveis
+  ['Humberto de Campos',-2.607,-43.459,28500,11200,0.72,15,0.68,1.5,1850,1400,28.2,8500,22000,0.538,22,8,1250,'Transição','Lençóis MA','Neossolo Quartzarênico','Rio Munim'],
+  ['Primeira Cruz',-2.521,-43.432,15000,10800,0.70,12,0.64,1.2,2400,1400,28.2,5200,14000,0.527,20,5,980,'Transição','Lençóis MA','Neossolo Quartzarênico','Rio Munim'],
+  ['Morros',-2.858,-44.040,18500,11500,0.68,14,0.62,1.4,1200,1950,27.6,8000,18000,0.530,20,4,820,'Transição','Grande São Luís','Argissolo Amarelo','Rio Itapecuru'],
+  ['Santa Helena',-2.221,-45.303,40000,14800,0.65,45,0.58,4.5,9800,1800,27.4,22000,48000,0.532,35,18,1050,'Amazônia','Noroeste MA','Argissolo Amarelo','Rio Pindaré'],
+  ['Bequimão',-2.429,-44.776,25000,11800,0.68,22,0.64,2.2,2800,1950,27.4,12000,28000,0.530,32,12,780,'Transição','Grande São Luís','Gleissolo Háplico','Golfão Maranhense'],
+  ['São Bento',-2.691,-44.818,32000,13200,0.66,25,0.60,2.5,3200,1800,27.6,15000,35000,0.533,28,10,620,'Transição','Itapecuru-Munim','Argissolo Amarelo','Rio Itapecuru'],
+  ['Pinheiro',-2.523,-45.083,88000,16800,0.68,55,0.60,5.5,12000,1800,27.2,28000,62000,0.548,35,25,1850,'Amazônia','Baixada Reentrâncias','Gleissolo Háplico','Rio Periçum'],
+  ['Mirinzal',-2.064,-44.780,22000,11500,0.67,28,0.62,2.8,3500,1950,27.4,10000,24000,0.528,35,15,1200,'Amazônia','Baixada Reentrâncias','Gleissolo Sálico','Reentrâncias MA'],
+  ['Porto Rico do Maranhão',-2.521,-44.365,8000,10800,0.65,10,0.60,1.0,850,1950,27.4,4000,10000,0.520,22,3,550,'Transição','Grande São Luís','Argissolo Amarelo','Rio Itapecuru'],
+  ['Presidente Médici',-2.697,-45.877,30000,13500,0.62,85,0.55,8.5,18500,1950,27.2,14000,45000,0.528,38,20,380,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
+  ['Alto Alegre do Maranhão',-3.847,-44.630,25000,12200,0.65,28,0.60,2.8,5200,1600,27.8,12000,30000,0.530,25,12,420,'Transição','Itapecuru-Munim','Plintossolo Háplico','Rio Itapecuru'],
+  ['Cajari',-3.456,-45.350,18000,11800,0.67,35,0.62,3.5,7200,1800,27.2,8000,20000,0.525,38,18,680,'Amazônia','Baixada Reentrâncias','Gleissolo Melânico','Rio Pindaré'],
+  ['Palmeirândia',-2.575,-44.867,20000,11200,0.66,18,0.60,1.8,2200,1950,27.4,9000,22000,0.525,32,10,580,'Transição','Grande São Luís','Gleissolo Háplico','Golfão Maranhense'],
+  ['Apicum-Açu',-2.085,-45.076,18000,10800,0.65,22,0.62,2.2,2800,1800,27.4,8000,18000,0.522,38,12,1100,'Amazônia','Baixada Reentrâncias','Gleissolo Sálico','Reentrâncias MA'],
+  ['Amapá do Maranhão',-2.088,-45.434,18000,11200,0.63,45,0.58,4.5,9500,1800,27.2,8000,22000,0.520,40,15,420,'Amazônia','Noroeste MA','Argissolo Amarelo','Rio Pindaré'],
+  ['Governador Nunes Freire',-1.920,-45.832,55000,13500,0.60,95,0.54,9.5,22000,1950,27.2,22000,62000,0.528,42,22,320,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
+  ['Centro Novo do Maranhão',-2.109,-45.969,28000,12200,0.60,75,0.55,7.5,18000,1950,27.0,12000,35000,0.521,42,18,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
+  ['Godofredo Viana',-1.820,-45.727,20000,11800,0.61,65,0.56,6.5,15000,1950,27.2,9000,28000,0.518,42,15,320,'Amazônia','Noroeste MA','Argissolo V-A','Rio Pindaré'],
+  ['Cândido Mendes',-1.446,-45.722,38000,13200,0.60,125,0.54,12.5,28000,1950,27.2,15000,48000,0.522,45,22,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Turiaçu'],
+  ['Carutapera',-1.196,-46.019,45000,12800,0.59,155,0.54,15.5,38000,1950,27.2,18000,55000,0.519,48,28,320,'Amazônia','Noroeste MA','Argissolo Amarelo','Rio Turiaçu'],
+  ['Luís Domingues',-1.239,-45.885,10000,11200,0.58,85,0.54,8.5,22000,1950,27.0,4000,12000,0.510,45,12,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Turiaçu'],
+  ['Junco do Maranhão',-1.430,-45.970,8000,10800,0.57,75,0.54,7.5,18000,1950,27.0,3000,10000,0.508,45,10,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Turiaçu'],
+  ['Maracaçumé',-2.046,-45.954,32000,12500,0.59,95,0.54,9.5,22000,1950,27.0,13000,40000,0.520,45,18,320,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Maracaçumé'],
+  ['Centro do Guilherme',-2.342,-46.028,18000,11800,0.60,85,0.55,8.5,20000,1950,27.0,7000,22000,0.518,43,15,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
+  ['Paragominas-Maranhão',-2.892,-46.188,8000,11200,0.59,65,0.55,6.5,16000,1950,27.0,3000,10000,0.515,42,10,320,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
+  ['São João do Paraíso',-6.052,-47.280,18000,20200,0.50,95,0.46,9.5,15000,1200,26.8,52000,125000,0.548,30,3,65,'Cerrado','Sudoeste MA','Latossolo Amarelo','Rio Tocantins'],
+  ['Estreito',-6.549,-47.449,28000,28500,0.46,85,0.38,8.5,12000,1400,26.6,42000,125000,0.612,25,4,185,'Cerrado/Amazônia','Sudoeste MA','Argissolo V-A','Rio Tocantins'],
+  ['Davinópolis',-5.729,-47.361,12000,22000,0.52,45,0.44,4.5,8500,1400,26.8,25000,65000,0.580,28,3,95,'Cerrado','Sudoeste MA','Latossolo Amarelo','Rio Tocantins'],
+  ['Lajeado Novo',-6.130,-47.120,6000,18500,0.50,38,0.45,3.8,7000,1200,27.0,18000,45000,0.542,25,2,55,'Cerrado','Sudoeste MA','Latossolo Amarelo','Rio Tocantins'],
+  ['Campestre do Maranhão',-5.990,-46.560,14000,19200,0.50,55,0.46,5.5,10000,1300,27.0,32000,78000,0.548,26,2,68,'Cerrado','Sudoeste MA','Latossolo Amarelo','Rio Tocantins'],
+  ['Amarante do Maranhão',-5.570,-46.765,35000,18500,0.56,95,0.52,9.5,22000,1400,27.0,42000,95000,0.558,28,8,120,'Cerrado','Centro MA','Latossolo Amarelo','Rio Mearim'],
+  ['Buritis',-4.280,-46.245,25000,14500,0.60,65,0.55,6.5,14000,1600,27.0,18000,45000,0.532,35,12,180,'Transição','Centro MA','Latossolo Amarelo','Rio Pindaré'],
+  ['Bom Lugar',-4.360,-45.590,12000,13800,0.62,42,0.56,4.2,8500,1600,27.0,8000,22000,0.530,32,10,220,'Transição','Centro MA','Plintossolo Háplico','Rio Mearim'],
+  ['São Luís Gonzaga do Maranhão',-3.620,-44.680,35000,13200,0.64,22,0.60,2.2,4200,1600,27.8,18000,42000,0.533,28,15,380,'Transição','Itapecuru-Munim','Argissolo Amarelo','Rio Itapecuru'],
+  ['Nina Rodrigues',-3.466,-43.918,14000,11500,0.65,18,0.60,1.8,2800,1400,28.2,7000,18000,0.528,22,8,420,'Transição','Itapecuru-Munim','Argissolo Amarelo','Rio Itapecuru'],
+  ['Afonso Cunha',-4.032,-43.698,10000,11200,0.63,15,0.60,1.5,2200,1400,28.2,6000,16000,0.525,22,5,380,'Transição','Itapecuru-Munim','Argissolo Amarelo','Rio Itapecuru'],
+  ['Cantanhede',-3.957,-44.372,18000,12500,0.64,20,0.58,2.0,3800,1500,28.0,9000,24000,0.527,24,8,420,'Transição','Itapecuru-Munim','Plintossolo Háplico','Rio Itapecuru'],
+  ['Lago dos Rodrigues',-4.730,-44.895,12000,12200,0.65,22,0.60,2.2,4500,1600,27.2,7000,18000,0.525,30,12,380,'Transição','Centro MA','Plintossolo Argilúvico','Rio Mearim'],
+  ['São Roberto',-4.427,-45.285,8000,11800,0.63,25,0.58,2.5,4800,1600,27.4,4000,12000,0.522,30,8,280,'Transição','Centro MA','Plintossolo Háplico','Rio Mearim'],
+  ['São Raimundo do Doca Bezerra',-5.423,-45.618,14000,13200,0.60,45,0.55,4.5,9000,1500,27.2,8000,20000,0.525,28,8,180,'Transição','Centro MA','Argissolo Amarelo','Rio Mearim'],
+  ['Formosa da Serra Negra',-5.720,-45.925,18000,14800,0.58,65,0.52,6.5,14000,1400,27.2,12000,32000,0.530,28,5,120,'Transição','Centro MA','Latossolo Amarelo','Rio Mearim'],
+  ['Sítio Novo',-5.855,-46.330,12000,15200,0.57,55,0.52,5.5,12000,1400,27.0,8000,22000,0.526,28,4,95,'Cerrado','Centro MA','Latossolo Amarelo','Rio Mearim'],
+  ['São Pedro dos Crentes',-7.590,-46.840,8000,17800,0.52,125,0.46,12.5,25000,1100,27.0,45000,95000,0.545,26,2,42,'Cerrado','Meridional MA','Latossolo V-A','Rio Parnaíba'],
+  ['Novo Jardim',-7.480,-46.420,8000,18200,0.52,115,0.46,11.5,22000,1100,27.0,42000,88000,0.542,25,2,42,'Cerrado','Meridional MA','Latossolo V-A','Rio Parnaíba'],
+  ['Mirador',-6.368,-44.368,28000,18500,0.55,88,0.50,8.8,18000,1300,27.5,58000,125000,0.548,24,4,65,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
+  ['Benedito Leite',-7.193,-44.545,12000,16800,0.53,95,0.47,9.5,18000,1100,27.5,38000,85000,0.540,25,2,48,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
+  ['São Domingos do Azeitão',-6.822,-44.646,8000,16200,0.52,88,0.47,8.8,16000,1200,27.5,32000,72000,0.535,24,2,42,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
+  ['Sucupira do Norte',-6.470,-44.180,15000,16500,0.54,72,0.48,7.2,14000,1300,27.5,42000,95000,0.542,24,3,55,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
+  ['Nova Iorque',-6.795,-44.062,12000,17200,0.54,78,0.48,7.8,15000,1200,27.5,38000,88000,0.540,24,2,48,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
+  ['Fernando Falcão',-6.906,-45.258,12000,14500,0.52,115,0.48,11.5,22000,1200,27.2,35000,78000,0.530,24,3,52,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
+  ['Buriti Bravo',-5.836,-43.820,28000,14800,0.58,35,0.52,3.5,7200,1300,27.8,28000,65000,0.540,22,8,95,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
+  ['Pastos Bons',-6.601,-44.072,25000,16200,0.55,48,0.50,4.8,9500,1300,27.5,38000,88000,0.542,24,5,62,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
+  ['Colinas',-6.022,-44.248,35000,16500,0.56,42,0.50,4.2,8500,1400,27.8,52000,115000,0.548,24,5,75,'Cerrado','Médio Parnaíba','Argissolo Amarelo','Rio Parnaíba'],
+  ['Mata Roma',-3.608,-43.112,24000,12200,0.64,18,0.60,1.8,3200,1400,28.5,14000,32000,0.530,22,8,480,'Cerrado','Leste MA','Argissolo Amarelo','Rio Preto'],
+  ['São Bernardo',-3.383,-42.416,32000,12800,0.63,15,0.60,1.5,2800,1200,28.5,18000,38000,0.535,20,6,580,'Cerrado','Leste MA','Argissolo Amarelo','Delta Parnaíba'],
+  ['Brejo de Areia',-3.866,-45.668,12000,12500,0.62,45,0.56,4.5,9500,1600,27.5,6000,16000,0.525,35,10,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
+  ['Satubinha',-4.048,-45.462,10000,12200,0.62,35,0.57,3.5,7200,1600,27.5,5000,14000,0.522,32,8,250,'Transição','Centro MA','Plintossolo Háplico','Rio Mearim'],
+  ['Poção de Pedras',-4.747,-44.943,18000,13500,0.63,28,0.58,2.8,5800,1600,27.2,10000,26000,0.528,30,10,350,'Transição','Centro MA','Plintossolo Argilúvico','Rio Mearim'],
+  ['São Mateus do Maranhão',-4.027,-44.519,42000,16500,0.65,30,0.60,3.0,5200,1400,28.0,28000,65000,0.545,28,12,420,'Transição','Itapecuru-Munim','Plintossolo Háplico','Rio Mearim'],
+  ['Olinda Nova do Maranhão',-2.982,-45.203,10000,11200,0.65,22,0.60,2.2,3200,1800,27.4,5000,13000,0.520,32,8,680,'Amazônia','Baixada Reentrâncias','Gleissolo Háplico','Rio Periçum'],
+  ['São Vicente Ferrer',-2.886,-44.875,32000,12500,0.66,20,0.60,2.0,3500,1800,27.6,16000,38000,0.530,30,12,620,'Transição','Itapecuru-Munim','Gleissolo Melânico','Rio Mearim'],
+  ['Cajapió',-2.984,-44.740,14000,11800,0.65,18,0.62,1.8,2800,1800,27.6,7000,18000,0.525,30,8,580,'Transição','Itapecuru-Munim','Gleissolo Háplico','Rio Mearim'],
+  ['São João Batista',-2.950,-44.802,32000,12800,0.68,25,0.62,2.5,4200,1800,27.4,14000,32000,0.531,30,15,620,'Transição','Baixada Reentrâncias','Gleissolo Melânico','Rio Mearim'],
+  ['Altamira do Maranhão',-4.083,-45.455,12000,13200,0.61,38,0.57,3.8,8000,1600,27.4,6000,16000,0.520,32,8,250,'Transição','Centro MA','Plintossolo Háplico','Rio Mearim'],
+  ['Olho d Água das Cunhãs',-4.190,-45.121,22000,12800,0.62,32,0.58,3.2,6500,1600,27.4,11000,28000,0.524,30,10,320,'Transição','Centro MA','Plintossolo Argilúvico','Rio Mearim'],
+  ['Igarapé Grande',-4.686,-44.797,14000,13000,0.63,28,0.58,2.8,5800,1600,27.2,8000,20000,0.525,28,10,350,'Transição','Centro MA','Plintossolo Háplico','Rio Mearim'],
+  ['São Luís Gonzaga',-3.620,-44.680,35000,13200,0.64,22,0.60,2.2,4200,1600,27.8,18000,42000,0.533,28,15,380,'Transição','Itapecuru-Munim','Argissolo Amarelo','Rio Itapecuru'],
+  ['Miranda do Norte',-3.563,-44.583,23864,27081,0.52,18,0.27,1.1,1450,2200,27.1,6800,18500,0.610,22,3,95,'Amazônia/Cerrado','Norte Maranhense','Latossolo Amarelo','Rio Mearim'],
+
+
+
 ];
+
+const HEATMAP_RANGES = {};
 
 // Build heatmap data from MUNIC_DATA — normalize each indicator across all municipalities
 function buildHeatmapData() {
@@ -2019,10 +2224,54 @@ function buildHeatmapData() {
     }),
   };
 
+  const rawValues = {
+    idh: getCol(14),
+    pobreza: getCol(5).map(v=>v*100),
+    desmatamento: getCol(6),
+    queimadas: getCol(9),
+    precipitacao: getCol(10),
+    temperatura: getCol(11),
+    fome: getCol(7).map(v=>v*100),
+    gee: getCol(8),
+    vegetacao: getCol(15),
+    populacao: getCol(3),
+    pib: getCol(4),
+    lavoura: getCol(12),
+    bovinos: getCol(13),
+    pesca: getCol(17),
+    assentamentos: getCol(16),
+    alfabetizacao: getCol(14),
+    indigena: getCol(14),
+    quilombola: getCol(14),
+    bacia: getCol(14),
+  };
+
   const result = {};
   Object.entries(cols).forEach(([key, vals]) => {
     result[key] = MUNIC_DATA.map((r, i) => [r[1], r[2], Math.max(0, Math.min(1, vals[i]))]);
+    const raw = rawValues[key] || vals;
+    HEATMAP_RANGES[key] = { min: Math.min(...raw), max: Math.max(...raw) };
   });
+
+  // CAF — Agricultura Familiar: usa os pontos de DB com escala familiar
+  const cafRows = DB.filter(d => d.escala && String(d.escala).toLowerCase().includes('familiar'));
+  if (cafRows.length) {
+    const fields = ['area_total','renda_total','sequestro_carbono','diversidade_especies','cobertura_solo','estoque_carbono'];
+    const values = fields.map(f => cafRows.map(d => Number(d[f] || 0)));
+    const normalized = values.map(arr => {
+      const mn = Math.min(...arr), mx = Math.max(...arr);
+      return arr.map(v => mx === mn ? 0.5 : (v - mn) / (mx - mn));
+    });
+    result.caf = cafRows.map((d, idx) => {
+      const score = normalized.reduce((sum, arr) => sum + arr[idx], 0) / normalized.length;
+      return [d.lat, d.lng, Math.max(0, Math.min(1, score))];
+    });
+    const cafScores = result.caf.map(r => r[2]);
+    HEATMAP_RANGES.caf = { min: Math.min(...cafScores), max: Math.max(...cafScores) };
+  } else {
+    result.caf = [];
+    HEATMAP_RANGES.caf = { min: 0, max: 1 };
+  }
   return result;
 }
 const HEATMAP_DATA = buildHeatmapData();
@@ -2313,7 +2562,7 @@ function renderProjCharts() {
     const isUp = delta > 0;
     return `<div class="stat-card" style="--accent-color:${p.cor}">
       <div class="stat-label" style="color:${p.cor}">${p.desc}</div>
-      <div class="stat-value" style="font-size:22px;color:var(--text)">${v2050.toFixed(1)}</div>
+      <div class="stat-value" style="font-size:22px;color:var(--text)">${varKey === 'seq' ? v2050.toFixed(3) : v2050.toFixed(1)}</div>
       <div class="stat-unit">${labels[varKey]} em 2050</div>
       ${cen!=='BAU'?`<div class="stat-delta ${isUp?'up':'down'}" style="color:${isUp?'var(--red)':'var(--green)'}">
         ${isUp?'▲':'▼'} ${Math.abs(delta)}% vs BAU</div>`:''}
@@ -3225,82 +3474,56 @@ function toggleSysLayer(s, btn) {
   showView('map');
   setTimeout(() => {
     if (s === 'all') {
-      // Toggle all off or turn all on
-      const isActive = activeSysLayers.has('all');
-      if (!isActive) {
-        activeSysLayers.clear();
-        activeSysLayers.add('all');
-        activeSystems = new Set(['all']);
+      if (activeSystems.has('all')) {
+        activeSystems.clear();
+        // Visual: all buttons off
+        document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('[id^="techbtn-"]').forEach(b => b.classList.remove('active'));
+        // Remove extra layers
+        Object.values(sysLayerMap).forEach(ln => {
+          if (extraLayers[ln] && map && map.hasLayer(extraLayers[ln])) map.removeLayer(extraLayers[ln]);
+        });
+      } else {
+        activeSystems.clear();
+        activeSystems.add('all');
+        // Visual: all system buttons OFF, "Todos" ON
+        document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => b.classList.remove('active'));
+        const allBtn = document.getElementById('techbtn-sys-all');
+        if (allBtn) allBtn.classList.add('active');
+        // Sync chips
+        document.querySelectorAll('.sys-filter-chip').forEach(c => {
+          c.classList.toggle('active', c.dataset.sys === 'all');
+        });
+        // Remove extra layers
+        Object.values(sysLayerMap).forEach(ln => {
+          if (extraLayers[ln] && map && map.hasLayer(extraLayers[ln])) map.removeLayer(extraLayers[ln]);
+        });
       }
-      // Reset - show all
-      activeSystems = new Set(['all']);
-      activeSysLayers.clear();
-      activeSysLayers.add('all');
-      // Visual: all system buttons OFF, "Todos" ON
-      document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => b.classList.remove('active'));
-      const allBtn = document.getElementById('techbtn-sys-all');
-      if (allBtn) allBtn.classList.add('active');
-      // Sync chips
-      document.querySelectorAll('.sys-filter-chip').forEach(c => {
-        c.classList.toggle('active', c.dataset.sys === 'all');
-      });
-      // Remove extra layers
-      Object.values(sysLayerMap).forEach(ln => {
-        if (extraLayers[ln] && map && map.hasLayer(extraLayers[ln])) map.removeLayer(extraLayers[ln]);
-      });
       renderMapMarkers();
       return;
     }
-    // Toggle specific system
+    // Specific system
     const layerName = sysLayerMap[s];
     const sideBtn = document.getElementById('techbtn-sys-' + s);
     const chip = document.querySelector(`.sys-filter-chip[data-sys="${s}"]`);
     const allSideBtn = document.getElementById('techbtn-sys-all');
 
-    if (activeSystems.has(s) || (activeSystems.has('all') && activeSysLayers.size === 0)) {
-      // If was "all", treat as: deactivate only this one - actually toggle this off
-      if (activeSystems.has('all')) {
-        // Switch from "all" mode to individual mode
-        activeSystems = new Set(Object.keys(sysLayerMap).filter(k => k !== s));
-        activeSysLayers.clear();
-        // show all except s
-        Object.keys(sysLayerMap).forEach(k => {
-          const ln = sysLayerMap[k];
-          if (k !== s && extraLayers[ln]) map.addLayer(extraLayers[ln]);
-          else if (k === s && extraLayers[ln]) map.removeLayer(extraLayers[ln]);
-        });
-        if (allSideBtn) allSideBtn.classList.remove('active');
-        document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => {
-          const bsys = b.id.replace('techbtn-sys-', '');
-          b.classList.toggle('active', bsys !== s && bsys !== 'all');
-        });
-        document.querySelectorAll('.sys-filter-chip').forEach(c => {
-          c.classList.toggle('active', c.dataset.sys !== s && c.dataset.sys !== 'all');
-        });
-      } else {
-        // Normal toggle off
-        activeSystems.delete(s);
-        activeSysLayers.delete(s);
-        if (sideBtn) sideBtn.classList.remove('active');
-        if (chip) chip.classList.remove('active');
-        if (layerName && extraLayers[layerName] && map) map.removeLayer(extraLayers[layerName]);
-        if (!activeSystems.size) {
-          activeSystems.add('all');
-          if (allSideBtn) allSideBtn.classList.add('active');
-          document.querySelectorAll('.sys-filter-chip[data-sys=all]').forEach(c => c.classList.add('active'));
-          renderMapMarkers();
-          return;
-        }
-      }
+    if (activeSystems.has(s)) {
+      // Turn off
+      activeSystems.delete(s);
+      activeSysLayers.delete(s);
+      if (sideBtn) sideBtn.classList.remove('active');
+      if (chip) chip.classList.remove('active');
+      if (layerName && extraLayers[layerName] && map) map.removeLayer(extraLayers[layerName]);
+      // If no systems active, do nothing, allow empty
     } else {
       // Turn on
       if (activeSystems.has('all')) {
-        activeSystems = new Set([s]);
-        activeSysLayers.clear();
+        activeSystems.clear();
+        // Turn off 'all' visual
         if (allSideBtn) allSideBtn.classList.remove('active');
-        document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.sys-filter-chip').forEach(c => c.classList.remove('active'));
-        document.querySelector('.sys-filter-chip[data-sys=all]')?.classList.remove('active');
+        // Remove extra layers
         Object.values(sysLayerMap).forEach(ln => {
           if (extraLayers[ln] && map) map.removeLayer(extraLayers[ln]);
         });
@@ -3310,6 +3533,19 @@ function toggleSysLayer(s, btn) {
       if (sideBtn) sideBtn.classList.add('active');
       if (chip) chip.classList.add('active');
       if (layerName && extraLayers[layerName] && map) map.addLayer(extraLayers[layerName]);
+    }
+    // Synchronize "Todos" button
+    const totalSys = Object.keys(sysLayerMap).length;
+    if (activeSystems.size === totalSys && !activeSystems.has('all')) {
+      activeSystems.clear();
+      activeSystems.add('all');
+      // Update visuals
+      document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => b.classList.remove('active'));
+      const allBtn = document.getElementById('techbtn-sys-all');
+      if (allBtn) allBtn.classList.add('active');
+      document.querySelectorAll('.sys-filter-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.sys === 'all');
+      });
     }
     renderMapMarkers();
     updateActiveSysDisplay();
@@ -3568,7 +3804,7 @@ function exportData(type) {
   if (type === 'db') {
     headers = Object.keys(DB[0] || {id:1});
     rows = [headers.join(','), ...DB.map(d=>headers.map(h=>JSON.stringify(d[h]??'')).join(','))];
-    filename = 'agroeco_ma_registros.csv';
+    filename = 'ds_embrapa_ma_registros.csv';
   } else if (type === 'munic') {
     headers = ['municipio','lat','lng','populacao','pib_percapita','pobreza_pct','desmat_km2','fome_pct','gee_kt','queimadas_ha','precip_mm','temp_c','lavoura_ha','bovinos','idh','cos_pct','assentamentos','pesca_t','bioma','regiao','solo','bacia'];
     rows = [headers.join(','), ...MUNIC_DATA.map(r=>r.map(v=>JSON.stringify(v??'')).join(','))];
@@ -3614,73 +3850,3 @@ setTimeout(() => { if (typeof populateMunicSelect === 'function') populateMunicS
 </script>
 </body>
 </html>
-<!--
-  // Adicionais — completando cobertura estadual (IBGE 2024)
-  ['Humberto de Campos',-2.607,-43.459,28500,11200,0.72,15,0.68,1.5,1850,1400,28.2,8500,22000,0.538,22,8,1250,'Transição','Lençóis MA','Neossolo Quartzarênico','Rio Munim'],
-  ['Primeira Cruz',-2.521,-43.432,15000,10800,0.70,12,0.64,1.2,2400,1400,28.2,5200,14000,0.527,20,5,980,'Transição','Lençóis MA','Neossolo Quartzarênico','Rio Munim'],
-  ['Morros',-2.858,-44.040,18500,11500,0.68,14,0.62,1.4,1200,1950,27.6,8000,18000,0.530,20,4,820,'Transição','Grande São Luís','Argissolo Amarelo','Rio Itapecuru'],
-  ['Santa Helena',-2.221,-45.303,40000,14800,0.65,45,0.58,4.5,9800,1800,27.4,22000,48000,0.532,35,18,1050,'Amazônia','Noroeste MA','Argissolo Amarelo','Rio Pindaré'],
-  ['Bequimão',-2.429,-44.776,25000,11800,0.68,22,0.64,2.2,2800,1950,27.4,12000,28000,0.530,32,12,780,'Transição','Grande São Luís','Gleissolo Háplico','Golfão Maranhense'],
-  ['São Bento',-2.691,-44.818,32000,13200,0.66,25,0.60,2.5,3200,1800,27.6,15000,35000,0.533,28,10,620,'Transição','Itapecuru-Munim','Argissolo Amarelo','Rio Itapecuru'],
-  ['Pinheiro',-2.523,-45.083,88000,16800,0.68,55,0.60,5.5,12000,1800,27.2,28000,62000,0.548,35,25,1850,'Amazônia','Baixada Reentrâncias','Gleissolo Háplico','Rio Periçum'],
-  ['Mirinzal',-2.064,-44.780,22000,11500,0.67,28,0.62,2.8,3500,1950,27.4,10000,24000,0.528,35,15,1200,'Amazônia','Baixada Reentrâncias','Gleissolo Sálico','Reentrâncias MA'],
-  ['Porto Rico do Maranhão',-2.521,-44.365,8000,10800,0.65,10,0.60,1.0,850,1950,27.4,4000,10000,0.520,22,3,550,'Transição','Grande São Luís','Argissolo Amarelo','Rio Itapecuru'],
-  ['Presidente Médici',-2.697,-45.877,30000,13500,0.62,85,0.55,8.5,18500,1950,27.2,14000,45000,0.528,38,20,380,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
-  ['Alto Alegre do Maranhão',-3.847,-44.630,25000,12200,0.65,28,0.60,2.8,5200,1600,27.8,12000,30000,0.530,25,12,420,'Transição','Itapecuru-Munim','Plintossolo Háplico','Rio Itapecuru'],
-  ['Cajari',-3.456,-45.350,18000,11800,0.67,35,0.62,3.5,7200,1800,27.2,8000,20000,0.525,38,18,680,'Amazônia','Baixada Reentrâncias','Gleissolo Melânico','Rio Pindaré'],
-  ['Palmeirândia',-2.575,-44.867,20000,11200,0.66,18,0.60,1.8,2200,1950,27.4,9000,22000,0.525,32,10,580,'Transição','Grande São Luís','Gleissolo Háplico','Golfão Maranhense'],
-  ['Apicum-Açu',-2.085,-45.076,18000,10800,0.65,22,0.62,2.2,2800,1800,27.4,8000,18000,0.522,38,12,1100,'Amazônia','Baixada Reentrâncias','Gleissolo Sálico','Reentrâncias MA'],
-  ['Amapá do Maranhão',-2.088,-45.434,18000,11200,0.63,45,0.58,4.5,9500,1800,27.2,8000,22000,0.520,40,15,420,'Amazônia','Noroeste MA','Argissolo Amarelo','Rio Pindaré'],
-  ['Governador Nunes Freire',-1.920,-45.832,55000,13500,0.60,95,0.54,9.5,22000,1950,27.2,22000,62000,0.528,42,22,320,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
-  ['Centro Novo do Maranhão',-2.109,-45.969,28000,12200,0.60,75,0.55,7.5,18000,1950,27.0,12000,35000,0.521,42,18,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
-  ['Godofredo Viana',-1.820,-45.727,20000,11800,0.61,65,0.56,6.5,15000,1950,27.2,9000,28000,0.518,42,15,320,'Amazônia','Noroeste MA','Argissolo V-A','Rio Pindaré'],
-  ['Cândido Mendes',-1.446,-45.722,38000,13200,0.60,125,0.54,12.5,28000,1950,27.2,15000,48000,0.522,45,22,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Turiaçu'],
-  ['Carutapera',-1.196,-46.019,45000,12800,0.59,155,0.54,15.5,38000,1950,27.2,18000,55000,0.519,48,28,320,'Amazônia','Noroeste MA','Argissolo Amarelo','Rio Turiaçu'],
-  ['Luís Domingues',-1.239,-45.885,10000,11200,0.58,85,0.54,8.5,22000,1950,27.0,4000,12000,0.510,45,12,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Turiaçu'],
-  ['Junco do Maranhão',-1.430,-45.970,8000,10800,0.57,75,0.54,7.5,18000,1950,27.0,3000,10000,0.508,45,10,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Turiaçu'],
-  ['Maracaçumé',-2.046,-45.954,32000,12500,0.59,95,0.54,9.5,22000,1950,27.0,13000,40000,0.520,45,18,320,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Maracaçumé'],
-  ['Centro do Guilherme',-2.342,-46.028,18000,11800,0.60,85,0.55,8.5,20000,1950,27.0,7000,22000,0.518,43,15,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
-  ['Paragominas-Maranhão',-2.892,-46.188,8000,11200,0.59,65,0.55,6.5,16000,1950,27.0,3000,10000,0.515,42,10,320,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
-  ['São João do Paraíso',-6.052,-47.280,18000,20200,0.50,95,0.46,9.5,15000,1200,26.8,52000,125000,0.548,30,3,65,'Cerrado','Sudoeste MA','Latossolo Amarelo','Rio Tocantins'],
-  ['Estreito',-6.549,-47.449,28000,28500,0.46,85,0.38,8.5,12000,1400,26.6,42000,125000,0.612,25,4,185,'Cerrado/Amazônia','Sudoeste MA','Argissolo V-A','Rio Tocantins'],
-  ['Davinópolis',-5.729,-47.361,12000,22000,0.52,45,0.44,4.5,8500,1400,26.8,25000,65000,0.580,28,3,95,'Cerrado','Sudoeste MA','Latossolo Amarelo','Rio Tocantins'],
-  ['Lajeado Novo',-6.130,-47.120,6000,18500,0.50,38,0.45,3.8,7000,1200,27.0,18000,45000,0.542,25,2,55,'Cerrado','Sudoeste MA','Latossolo Amarelo','Rio Tocantins'],
-  ['Campestre do Maranhão',-5.990,-46.560,14000,19200,0.50,55,0.46,5.5,10000,1300,27.0,32000,78000,0.548,26,2,68,'Cerrado','Sudoeste MA','Latossolo Amarelo','Rio Tocantins'],
-  ['Amarante do Maranhão',-5.570,-46.765,35000,18500,0.56,95,0.52,9.5,22000,1400,27.0,42000,95000,0.558,28,8,120,'Cerrado','Centro MA','Latossolo Amarelo','Rio Mearim'],
-  ['Buritis',-4.280,-46.245,25000,14500,0.60,65,0.55,6.5,14000,1600,27.0,18000,45000,0.532,35,12,180,'Transição','Centro MA','Latossolo Amarelo','Rio Pindaré'],
-  ['Bom Lugar',-4.360,-45.590,12000,13800,0.62,42,0.56,4.2,8500,1600,27.0,8000,22000,0.530,32,10,220,'Transição','Centro MA','Plintossolo Háplico','Rio Mearim'],
-  ['São Luís Gonzaga do Maranhão',-3.620,-44.680,35000,13200,0.64,22,0.60,2.2,4200,1600,27.8,18000,42000,0.533,28,15,380,'Transição','Itapecuru-Munim','Argissolo Amarelo','Rio Itapecuru'],
-  ['Nina Rodrigues',-3.466,-43.918,14000,11500,0.65,18,0.60,1.8,2800,1400,28.2,7000,18000,0.528,22,8,420,'Transição','Itapecuru-Munim','Argissolo Amarelo','Rio Itapecuru'],
-  ['Afonso Cunha',-4.032,-43.698,10000,11200,0.63,15,0.60,1.5,2200,1400,28.2,6000,16000,0.525,22,5,380,'Transição','Itapecuru-Munim','Argissolo Amarelo','Rio Itapecuru'],
-  ['Cantanhede',-3.957,-44.372,18000,12500,0.64,20,0.58,2.0,3800,1500,28.0,9000,24000,0.527,24,8,420,'Transição','Itapecuru-Munim','Plintossolo Háplico','Rio Itapecuru'],
-  ['Lago dos Rodrigues',-4.730,-44.895,12000,12200,0.65,22,0.60,2.2,4500,1600,27.2,7000,18000,0.525,30,12,380,'Transição','Centro MA','Plintossolo Argilúvico','Rio Mearim'],
-  ['São Roberto',-4.427,-45.285,8000,11800,0.63,25,0.58,2.5,4800,1600,27.4,4000,12000,0.522,30,8,280,'Transição','Centro MA','Plintossolo Háplico','Rio Mearim'],
-  ['São Raimundo do Doca Bezerra',-5.423,-45.618,14000,13200,0.60,45,0.55,4.5,9000,1500,27.2,8000,20000,0.525,28,8,180,'Transição','Centro MA','Argissolo Amarelo','Rio Mearim'],
-  ['Formosa da Serra Negra',-5.720,-45.925,18000,14800,0.58,65,0.52,6.5,14000,1400,27.2,12000,32000,0.530,28,5,120,'Transição','Centro MA','Latossolo Amarelo','Rio Mearim'],
-  ['Sítio Novo',-5.855,-46.330,12000,15200,0.57,55,0.52,5.5,12000,1400,27.0,8000,22000,0.526,28,4,95,'Cerrado','Centro MA','Latossolo Amarelo','Rio Mearim'],
-  ['São Pedro dos Crentes',-7.590,-46.840,8000,17800,0.52,125,0.46,12.5,25000,1100,27.0,45000,95000,0.545,26,2,42,'Cerrado','Meridional MA','Latossolo V-A','Rio Parnaíba'],
-  ['Novo Jardim',-7.480,-46.420,8000,18200,0.52,115,0.46,11.5,22000,1100,27.0,42000,88000,0.542,25,2,42,'Cerrado','Meridional MA','Latossolo V-A','Rio Parnaíba'],
-  ['Mirador',-6.368,-44.368,28000,18500,0.55,88,0.50,8.8,18000,1300,27.5,58000,125000,0.548,24,4,65,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
-  ['Benedito Leite',-7.193,-44.545,12000,16800,0.53,95,0.47,9.5,18000,1100,27.5,38000,85000,0.540,25,2,48,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
-  ['São Domingos do Azeitão',-6.822,-44.646,8000,16200,0.52,88,0.47,8.8,16000,1200,27.5,32000,72000,0.535,24,2,42,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
-  ['Sucupira do Norte',-6.470,-44.180,15000,16500,0.54,72,0.48,7.2,14000,1300,27.5,42000,95000,0.542,24,3,55,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
-  ['Nova Iorque',-6.795,-44.062,12000,17200,0.54,78,0.48,7.8,15000,1200,27.5,38000,88000,0.540,24,2,48,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
-  ['Fernando Falcão',-6.906,-45.258,12000,14500,0.52,115,0.48,11.5,22000,1200,27.2,35000,78000,0.530,24,3,52,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
-  ['Buriti Bravo',-5.836,-43.820,28000,14800,0.58,35,0.52,3.5,7200,1300,27.8,28000,65000,0.540,22,8,95,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
-  ['Pastos Bons',-6.601,-44.072,25000,16200,0.55,48,0.50,4.8,9500,1300,27.5,38000,88000,0.542,24,5,62,'Cerrado','Médio Parnaíba','Latossolo Amarelo','Rio Parnaíba'],
-  ['Colinas',-6.022,-44.248,35000,16500,0.56,42,0.50,4.2,8500,1400,27.8,52000,115000,0.548,24,5,75,'Cerrado','Médio Parnaíba','Argissolo Amarelo','Rio Parnaíba'],
-  ['Mata Roma',-3.608,-43.112,24000,12200,0.64,18,0.60,1.8,3200,1400,28.5,14000,32000,0.530,22,8,480,'Cerrado','Leste MA','Argissolo Amarelo','Rio Preto'],
-  ['São Bernardo',-3.383,-42.416,32000,12800,0.63,15,0.60,1.5,2800,1200,28.5,18000,38000,0.535,20,6,580,'Cerrado','Leste MA','Argissolo Amarelo','Delta Parnaíba'],
-  ['Brejo de Areia',-3.866,-45.668,12000,12500,0.62,45,0.56,4.5,9500,1600,27.5,6000,16000,0.525,35,10,280,'Amazônia','Noroeste MA','Latossolo Amarelo','Rio Pindaré'],
-  ['Satubinha',-4.048,-45.462,10000,12200,0.62,35,0.57,3.5,7200,1600,27.5,5000,14000,0.522,32,8,250,'Transição','Centro MA','Plintossolo Háplico','Rio Mearim'],
-  ['Poção de Pedras',-4.747,-44.943,18000,13500,0.63,28,0.58,2.8,5800,1600,27.2,10000,26000,0.528,30,10,350,'Transição','Centro MA','Plintossolo Argilúvico','Rio Mearim'],
-  ['São Mateus do Maranhão',-4.027,-44.519,42000,16500,0.65,30,0.60,3.0,5200,1400,28.0,28000,65000,0.545,28,12,420,'Transição','Itapecuru-Munim','Plintossolo Háplico','Rio Mearim'],
-  ['Olinda Nova do Maranhão',-2.982,-45.203,10000,11200,0.65,22,0.60,2.2,3200,1800,27.4,5000,13000,0.520,32,8,680,'Amazônia','Baixada Reentrâncias','Gleissolo Háplico','Rio Periçum'],
-  ['São Vicente Ferrer',-2.886,-44.875,32000,12500,0.66,20,0.60,2.0,3500,1800,27.6,16000,38000,0.530,30,12,620,'Transição','Itapecuru-Munim','Gleissolo Melânico','Rio Mearim'],
-  ['Cajapió',-2.984,-44.740,14000,11800,0.65,18,0.62,1.8,2800,1800,27.6,7000,18000,0.525,30,8,580,'Transição','Itapecuru-Munim','Gleissolo Háplico','Rio Mearim'],
-  ['São João Batista',-2.950,-44.802,32000,12800,0.68,25,0.62,2.5,4200,1800,27.4,14000,32000,0.531,30,15,620,'Transição','Baixada Reentrâncias','Gleissolo Melânico','Rio Mearim'],
-  ['Altamira do Maranhão',-4.083,-45.455,12000,13200,0.61,38,0.57,3.8,8000,1600,27.4,6000,16000,0.520,32,8,250,'Transição','Centro MA','Plintossolo Háplico','Rio Mearim'],
-  ['Olho d Água das Cunhãs',-4.190,-45.121,22000,12800,0.62,32,0.58,3.2,6500,1600,27.4,11000,28000,0.524,30,10,320,'Transição','Centro MA','Plintossolo Argilúvico','Rio Mearim'],
-  ['Igarapé Grande',-4.686,-44.797,14000,13000,0.63,28,0.58,2.8,5800,1600,27.2,8000,20000,0.525,28,10,350,'Transição','Centro MA','Plintossolo Háplico','Rio Mearim'],
-  ['São Luís Gonzaga',-3.620,-44.680,35000,13200,0.64,22,0.60,2.2,4200,1600,27.8,18000,42000,0.533,28,15,380,'Transição','Itapecuru-Munim','Argissolo Amarelo','Rio Itapecuru'],
--->
