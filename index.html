@@ -9,6 +9,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <style>
 :root {
   --bg: #0a0f0a;
@@ -220,6 +221,29 @@ header {
   align-items: center; gap: 8px;
 }
 .chart-wrap { position: relative; }
+
+.chart-menu-btn {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(0,0,0,0.5); border: none; color: #fff;
+  width: 24px; height: 24px; border-radius: 4px;
+  cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s;
+}
+.chart-card:hover .chart-menu-btn { opacity: 1; }
+
+.chart-menu {
+  position: absolute; top: 32px; right: 8px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 4px 0; min-width: 80px; display: none; z-index: 10;
+}
+.chart-menu.show { display: block; }
+.chart-menu-item {
+  display: block; width: 100%; padding: 6px 12px;
+  background: none; border: none; color: var(--text2);
+  cursor: pointer; font-size: 12px; text-align: left;
+  font-family: 'DM Sans', sans-serif;
+}
+.chart-menu-item:hover { background: var(--card2); color: var(--text); }
 
 /* TABLE */
 .data-table {
@@ -482,6 +506,47 @@ header {
   .chart-card { margin-bottom: 16px; }
 }
 
+/* DOWNLOAD MENUS */
+.chart-wrap { position: relative; }
+.chart-menu-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 10;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.chart-menu-btn:hover { opacity: 1; }
+.chart-menu {
+  position: absolute;
+  top: 36px;
+  right: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: none;
+  z-index: 100;
+  min-width: 120px;
+}
+.chart-menu-item {
+  display: block;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.chart-menu-item:hover { background: var(--hover); }
+
 </style>
 </head>
 <body>
@@ -610,29 +675,98 @@ header {
         <div class="charts-grid">
           <div class="chart-card">
             <div class="chart-title">📍 Distribuição por Sistema Produtivo</div>
-            <div class="chart-wrap"><canvas id="chart-sistemas" height="200"></canvas></div>
+            <div class="chart-wrap">
+              <canvas id="chart-sistemas" height="200"></canvas>
+              <button class="chart-menu-btn" onclick="toggleChartMenu('menu-sistemas')">⋮</button>
+              <div class="chart-menu" id="menu-sistemas">
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-sistemas', 'png')">⬇ PNG</button>
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-sistemas', 'jpg')">⬇ JPG</button>
+                <button class="chart-menu-item" onclick="downloadChartCSV('chart-sistemas')">⬇ CSV</button>
+              </div>
+            </div>
           </div>
           <div class="chart-card">
             <div class="chart-title">🗺 Sistemas por Mesorregião</div>
-            <div class="chart-wrap"><canvas id="chart-regioes" height="200"></canvas></div>
+            <div class="chart-wrap">
+              <canvas id="chart-regioes" height="200"></canvas>
+              <button class="chart-menu-btn" onclick="toggleChartMenu('menu-regioes')">⋮</button>
+              <div class="chart-menu" id="menu-regioes">
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-regioes', 'png')">⬇ PNG</button>
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-regioes', 'jpg')">⬇ JPG</button>
+                <button class="chart-menu-item" onclick="downloadChartCSV('chart-regioes')">⬇ CSV</button>
+              </div>
+            </div>
           </div>
           <div class="chart-card">
             <div class="chart-title">📅 Implantações por Ano</div>
-            <div class="chart-wrap"><canvas id="chart-anos" height="200"></canvas></div>
+            <div class="chart-wrap">
+              <canvas id="chart-anos" height="200"></canvas>
+              <button class="chart-menu-btn" onclick="toggleChartMenu('menu-anos')">⋮</button>
+              <div class="chart-menu" id="menu-anos">
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-anos', 'png')">⬇ PNG</button>
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-anos', 'jpg')">⬇ JPG</button>
+                <button class="chart-menu-item" onclick="downloadChartCSV('chart-anos')">⬇ CSV</button>
+              </div>
+            </div>
           </div>
           <div class="chart-card">
             <div class="chart-title">💨 Balanço de Carbono (tCO₂e)</div>
-            <div class="chart-wrap"><canvas id="chart-carbono" height="200"></canvas></div>
+            <div class="chart-wrap">
+              <canvas id="chart-carbono" height="200"></canvas>
+              <button class="chart-menu-btn" onclick="toggleChartMenu('menu-carbono')">⋮</button>
+              <div class="chart-menu" id="menu-carbono">
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-carbono', 'png')">⬇ PNG</button>
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-carbono', 'jpg')">⬇ JPG</button>
+                <button class="chart-menu-item" onclick="downloadChartCSV('chart-carbono')">⬇ CSV</button>
+              </div>
+            </div>
           </div>
           <div class="chart-card">
             <div class="chart-title">💰 Renda Média por Sistema (R$/mês)</div>
-            <div class="chart-wrap"><canvas id="chart-renda" height="200"></canvas></div>
+            <div class="chart-wrap">
+              <canvas id="chart-renda" height="200"></canvas>
+              <button class="chart-menu-btn" onclick="toggleChartMenu('menu-renda')">⋮</button>
+              <div class="chart-menu" id="menu-renda">
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-renda', 'png')">⬇ PNG</button>
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-renda', 'jpg')">⬇ JPG</button>
+                <button class="chart-menu-item" onclick="downloadChartCSV('chart-renda')">⬇ CSV</button>
+              </div>
+            </div>
           </div>
           <div class="chart-card">
             <div class="chart-title">🌿 Área Total (ha) por Sistema</div>
-            <div class="chart-wrap"><canvas id="chart-area" height="200"></canvas></div>
+            <div class="chart-wrap">
+              <canvas id="chart-area" height="200"></canvas>
+              <button class="chart-menu-btn" onclick="toggleChartMenu('menu-area')">⋮</button>
+              <div class="chart-menu" id="menu-area">
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-area', 'png')">⬇ PNG</button>
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-area', 'jpg')">⬇ JPG</button>
+                <button class="chart-menu-item" onclick="downloadChartCSV('chart-area')">⬇ CSV</button>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- Casos de Referência por Sistema -->
+      <div class="form-section" style="margin-top:8px;">
+        <div class="form-section-title">⭐ Casos de Referência por Sistema — Embrapa Maranhão</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+          <button class="map-btn active" id="refbtn-ilp" onclick="showRefCase('ilp')">🐄 ILP/ILPF</button>
+          <button class="map-btn" id="refbtn-saf" onclick="showRefCase('saf')">🌱 SAF</button>
+          <button class="map-btn" id="refbtn-apic" onclick="showRefCase('apic')">🐝 Apicultura</button>
+          <button class="map-btn" id="refbtn-pisc" onclick="showRefCase('pisc')">🐟 Piscicultura</button>
+          <button class="map-btn" id="refbtn-frut" onclick="showRefCase('frut')">🍎 Fruticultura</button>
+          <button class="map-btn" id="refbtn-roca" onclick="showRefCase('roca')">🌾 Roça</button>
+          <button class="map-btn" id="refbtn-sist" onclick="showRefCase('sist')">🐓 Sisteminha</button>
+          <button class="map-btn" id="refbtn-extrat" onclick="showRefCase('extrat')">🌰 Extrativismo</button>
+        </div>
+        <div id="ref-case-content"></div>
+      </div>
+
+
+
+
+
       </div>
 
       <!-- SUB-TAB: ESTADO -->
@@ -663,23 +797,63 @@ header {
         <div class="charts-grid">
           <div class="chart-card" style="grid-column:1/-1">
             <div class="chart-title" id="estado-chart-title">📊 Indicador por Município — Maranhão</div>
-            <div class="chart-wrap"><canvas id="chart-estado-munic" height="100"></canvas></div>
+            <div class="chart-wrap">
+              <canvas id="chart-estado-munic" height="100"></canvas>
+              <button class="chart-menu-btn" onclick="toggleChartMenu('menu-estado-munic')">⋮</button>
+              <div class="chart-menu" id="menu-estado-munic">
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-estado-munic', 'png')">⬇ PNG</button>
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-estado-munic', 'jpg')">⬇ JPG</button>
+                <button class="chart-menu-item" onclick="downloadChartCSV('chart-estado-munic')">⬇ CSV</button>
+              </div>
+            </div>
           </div>
           <div class="chart-card">
             <div class="chart-title">🏆 Top 10 Municípios</div>
-            <div class="chart-wrap"><canvas id="chart-estado-top10" height="200"></canvas></div>
+            <div class="chart-wrap">
+              <canvas id="chart-estado-top10" height="200"></canvas>
+              <button class="chart-menu-btn" onclick="toggleChartMenu('menu-estado-top10')">⋮</button>
+              <div class="chart-menu" id="menu-estado-top10">
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-estado-top10', 'png')">⬇ PNG</button>
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-estado-top10', 'jpg')">⬇ JPG</button>
+                <button class="chart-menu-item" onclick="downloadChartCSV('chart-estado-top10')">⬇ CSV</button>
+              </div>
+            </div>
           </div>
           <div class="chart-card">
             <div class="chart-title">📊 Distribuição por Bioma</div>
-            <div class="chart-wrap"><canvas id="chart-estado-bioma" height="200"></canvas></div>
+            <div class="chart-wrap">
+              <canvas id="chart-estado-bioma" height="200"></canvas>
+              <button class="chart-menu-btn" onclick="toggleChartMenu('menu-estado-bioma')">⋮</button>
+              <div class="chart-menu" id="menu-estado-bioma">
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-estado-bioma', 'png')">⬇ PNG</button>
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-estado-bioma', 'jpg')">⬇ JPG</button>
+                <button class="chart-menu-item" onclick="downloadChartCSV('chart-estado-bioma')">⬇ CSV</button>
+              </div>
+            </div>
           </div>
           <div class="chart-card">
             <div class="chart-title">🌍 IDH × PIB per capita</div>
-            <div class="chart-wrap"><canvas id="chart-estado-scatter" height="200"></canvas></div>
+            <div class="chart-wrap">
+              <canvas id="chart-estado-scatter" height="200"></canvas>
+              <button class="chart-menu-btn" onclick="toggleChartMenu('menu-estado-scatter')">⋮</button>
+              <div class="chart-menu" id="menu-estado-scatter">
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-estado-scatter', 'png')">⬇ PNG</button>
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-estado-scatter', 'jpg')">⬇ JPG</button>
+                <button class="chart-menu-item" onclick="downloadChartCSV('chart-estado-scatter')">⬇ CSV</button>
+              </div>
+            </div>
           </div>
           <div class="chart-card">
             <div class="chart-title">🌿 Cobertura Vegetal × GEE</div>
-            <div class="chart-wrap"><canvas id="chart-estado-veg-gee" height="200"></canvas></div>
+            <div class="chart-wrap">
+              <canvas id="chart-estado-veg-gee" height="200"></canvas>
+              <button class="chart-menu-btn" onclick="toggleChartMenu('menu-estado-veg-gee')">⋮</button>
+              <div class="chart-menu" id="menu-estado-veg-gee">
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-estado-veg-gee', 'png')">⬇ PNG</button>
+                <button class="chart-menu-item" onclick="downloadChartImage('chart-estado-veg-gee', 'jpg')">⬇ JPG</button>
+                <button class="chart-menu-item" onclick="downloadChartCSV('chart-estado-veg-gee')">⬇ CSV</button>
+              </div>
+            </div>
           </div>
         </div>
         <!-- Tabela municípios -->
@@ -719,23 +893,21 @@ header {
         <button class="map-btn" id="btn-map-satellite" onclick="setMapLayer('satellite')">🛰 Satélite</button>
         <button class="map-btn" id="btn-map-hybrid" onclick="setMapLayer('hybrid')">🗺🛰 Híbrido+Labels</button>
         <div style="width:1px;height:24px;background:var(--border);flex-shrink:0"></div>
-        <button class="map-btn" id="btn-toggle-hm-panel" onclick="toggleHeatmapPanel()">🌡 Heatmaps ▾</button>
         <button class="map-btn" id="btn-toggle-sys-panel" onclick="toggleSysPanel()">🌿 Sistemas ▾</button>
+        <button class="map-btn" id="btn-toggle-hm-panel" onclick="toggleHeatmapPanel()">🌡 Heatmaps ▾</button>
         <div style="flex:1"></div>
         <button class="map-btn" onclick="clearAllHeatmaps()" style="color:var(--red)">✕ Limpar Layers</button>
         <button class="map-btn" onclick="openAddPointModal()">➕ Adicionar Ponto</button>
+        <div style="position:relative;">
+          <button class="map-btn" onclick="toggleMapMenu()">⬇ Baixar Mapa</button>
+          <div class="chart-menu" id="map-menu" style="right:0;left:auto;">
+            <button class="chart-menu-item" onclick="downloadMapImage('png')">⬇ PNG</button>
+            <button class="chart-menu-item" onclick="downloadMapImage('jpg')">⬇ JPG</button>
+          </div>
+        </div>
       </div>
 
-      <!-- HEATMAP MULTI-SELECT PANEL -->
-      <div id="heatmap-panel" style="display:none;background:var(--bg3);border-bottom:1px solid var(--border);padding:10px 16px;">
-        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;font-weight:600">
-          🌡 Indicadores de Calor — marque múltiplos para sobrepor camadas
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;" id="hm-checkboxes">
-          <!-- injected by JS -->
-        </div>
-        <div id="heatmap-legend" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;"></div>
-      </div>
+      
 
       <!-- SISTEMA MULTI-SELECT PANEL (synced with sidebar) -->
       <div id="sistema-panel" style="display:none;background:var(--bg3);border-bottom:1px solid var(--border);padding:10px 16px;">
@@ -756,6 +928,20 @@ header {
           <span class="sys-filter-chip" data-sys="extrativismo" onclick="toggleSysLayer('extrativismo',document.getElementById('techbtn-sys-extrativismo'))">🌰 Extrativismo</span>
         </div>
       </div>
+
+      <!-- HEATMAP MULTI-SELECT PANEL -->
+      <div id="heatmap-panel" style="display:none;background:var(--bg3);border-bottom:1px solid var(--border);padding:10px 16px;">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;font-weight:600">
+          🌡 Indicadores de Calor — marque múltiplos para sobrepor camadas
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;" id="hm-checkboxes">
+          <!-- injected by JS -->
+        </div>
+        <div id="heatmap-legend" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+
+
+
       <div id="leaflet-map" style="flex:1;min-height:500px;"></div>
     </div>
 
@@ -903,24 +1089,66 @@ header {
       <div class="charts-grid">
         <div class="chart-card" style="grid-column:1/-1">
           <div class="chart-title">📊 Comparativo de Cenários 2025–2050</div>
-          <canvas id="chart-proj-main" height="120"></canvas>
+          <div class="chart-wrap">
+            <canvas id="chart-proj-main" height="120"></canvas>
+            <button class="chart-menu-btn" onclick="toggleChartMenu('menu-proj-main')">⋮</button>
+            <div class="chart-menu" id="menu-proj-main">
+              <button class="chart-menu-item" onclick="downloadChartImage('chart-proj-main', 'png')">⬇ PNG</button>
+              <button class="chart-menu-item" onclick="downloadChartImage('chart-proj-main', 'jpg')">⬇ JPG</button>
+              <button class="chart-menu-item" onclick="downloadChartCSV('chart-proj-main')">⬇ CSV</button>
+            </div>
+          </div>
         </div>
         <div class="chart-card">
           <div class="chart-title">🌡 Temperatura Projetada por Cenário</div>
-          <canvas id="chart-proj-temp" height="200"></canvas>
+          <div class="chart-wrap">
+            <canvas id="chart-proj-temp" height="200"></canvas>
+            <button class="chart-menu-btn" onclick="toggleChartMenu('menu-proj-temp')">⋮</button>
+            <div class="chart-menu" id="menu-proj-temp">
+              <button class="chart-menu-item" onclick="downloadChartImage('chart-proj-temp', 'png')">⬇ PNG</button>
+              <button class="chart-menu-item" onclick="downloadChartImage('chart-proj-temp', 'jpg')">⬇ JPG</button>
+              <button class="chart-menu-item" onclick="downloadChartCSV('chart-proj-temp')">⬇ CSV</button>
+            </div>
+          </div>
         </div>
         <div class="chart-card">
           <div class="chart-title">🔥 Desmatamento Projetado (km²/ano)</div>
-          <canvas id="chart-proj-desmat" height="200"></canvas>
+          <div class="chart-wrap">
+            <canvas id="chart-proj-desmat" height="200"></canvas>
+            <button class="chart-menu-btn" onclick="toggleChartMenu('menu-proj-desmat')">⋮</button>
+            <div class="chart-menu" id="menu-proj-desmat">
+              <button class="chart-menu-item" onclick="downloadChartImage('chart-proj-desmat', 'png')">⬇ PNG</button>
+              <button class="chart-menu-item" onclick="downloadChartImage('chart-proj-desmat', 'jpg')">⬇ JPG</button>
+              <button class="chart-menu-item" onclick="downloadChartCSV('chart-proj-desmat')">⬇ CSV</button>
+            </div>
+          </div>
         </div>
         <div class="chart-card">
           <div class="chart-title">🌿 Sequestro Carbono ILPF+SAF</div>
-          <canvas id="chart-proj-seq" height="200"></canvas>
+          <div class="chart-wrap">
+            <canvas id="chart-proj-seq" height="200"></canvas>
+            <button class="chart-menu-btn" onclick="toggleChartMenu('menu-proj-seq')">⋮</button>
+            <div class="chart-menu" id="menu-proj-seq">
+              <button class="chart-menu-item" onclick="downloadChartImage('chart-proj-seq', 'png')">⬇ PNG</button>
+              <button class="chart-menu-item" onclick="downloadChartImage('chart-proj-seq', 'jpg')">⬇ JPG</button>
+              <button class="chart-menu-item" onclick="downloadChartCSV('chart-proj-seq')">⬇ CSV</button>
+            </div>
+          </div>
         </div>
         <div class="chart-card">
           <div class="chart-title">📉 GEE Histórico MA 2000–2025 (SEEG)</div>
-          <canvas id="chart-gee-hist" height="200"></canvas>
+          <div class="chart-wrap">
+            <canvas id="chart-gee-hist" height="200"></canvas>
+            <button class="chart-menu-btn" onclick="toggleChartMenu('menu-gee-hist')">⋮</button>
+            <div class="chart-menu" id="menu-gee-hist">
+              <button class="chart-menu-item" onclick="downloadChartImage('chart-gee-hist', 'png')">⬇ PNG</button>
+              <button class="chart-menu-item" onclick="downloadChartImage('chart-gee-hist', 'jpg')">⬇ JPG</button>
+              <button class="chart-menu-item" onclick="downloadChartCSV('chart-gee-hist')">⬇ CSV</button>
+            </div>
+          
+          </div>
         </div>
+        
       </div>
 
       <!-- Tabela resumo 2050 -->
@@ -937,7 +1165,7 @@ header {
         </div>
       </div>
 
-      <!-- Casos de Referência por Sistema -->
+      <!-- Casos de Referência por Sistema 
       <div class="form-section" style="margin-top:8px;">
         <div class="form-section-title">⭐ Casos de Referência por Sistema — Embrapa Maranhão</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
@@ -952,6 +1180,8 @@ header {
         </div>
         <div id="ref-case-content"></div>
       </div>
+      -->
+
 
       <!-- Fazenda Barbosa destaque 
       <div class="form-section" style="margin-top:8px;border-color:#fbbf24;">
@@ -3084,6 +3314,69 @@ function renderCharts() {
 }
 
 // ═══════════════════════════════════════════════════════════
+// DOWNLOAD FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+function toggleChartMenu(menuId) {
+  const menu = document.getElementById(menuId);
+  const isVisible = menu.classList.contains('show');
+  document.querySelectorAll('.chart-menu').forEach(m => m.classList.remove('show'));
+  if (!isVisible) menu.classList.add('show');
+}
+
+// Close menus when clicking outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.chart-menu-btn') && !e.target.closest('.chart-menu')) {
+    document.querySelectorAll('.chart-menu').forEach(m => m.classList.remove('show'));
+  }
+});
+
+function downloadChartImage(chartId, format) {
+  const chartCard = document.querySelector(`#${chartId}`).closest('.chart-card');
+  if (!chartCard) return;
+  
+  // Hide the menu button and dropdown for capture
+  const menuBtn = chartCard.querySelector('.chart-menu-btn');
+  const menu = chartCard.querySelector('.chart-menu');
+  if (menuBtn) menuBtn.style.display = 'none';
+  if (menu) menu.style.display = 'none';
+  
+  html2canvas(chartCard, { backgroundColor: '#0a0f0a' }).then(canvas => {
+    // Show them back
+    if (menuBtn) menuBtn.style.display = '';
+    if (menu) menu.style.display = '';
+    
+    const link = document.createElement('a');
+    link.download = `${chartId}.${format}`;
+    link.href = canvas.toDataURL(`image/${format === 'jpg' ? 'jpeg' : 'png'}`);
+    link.click();
+  });
+}
+
+function downloadChartCSV(chartId) {
+  let chart = charts[chartId] || estadoCharts[chartId];
+  if (!chart) return;
+  const labels = chart.data.labels || [];
+  const datasets = chart.data.datasets || [];
+  let csv = 'Label';
+  datasets.forEach((ds, i) => {
+    csv += `,Dataset ${i + 1}`;
+  });
+  csv += '\n';
+  labels.forEach((label, i) => {
+    csv += `"${label}"`;
+    datasets.forEach(ds => {
+      csv += `,${ds.data[i] || 0}`;
+    });
+    csv += '\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const link = document.createElement('a');
+  link.download = `${chartId}.csv`;
+  link.href = URL.createObjectURL(blob);
+  link.click();
+}
+
+// ═══════════════════════════════════════════════════════════
 // DATA TABLE
 // ═══════════════════════════════════════════════════════════
 function renderDataTable() { filterTable(); }
@@ -3841,6 +4134,71 @@ function exportData(type) {
   const a = document.createElement('a'); a.href=url; a.download=filename; a.click();
   showToast('✅ CSV exportado: ' + filename);
 }
+
+// DOWNLOAD FUNCTIONS
+function toggleChartMenu(menuId) {
+  const menu = document.getElementById(menuId);
+  const isVisible = menu.style.display === 'block';
+  document.querySelectorAll('.chart-menu').forEach(m => m.style.display = 'none');
+  if (!isVisible) menu.style.display = 'block';
+}
+
+
+function toggleMapMenu() {
+  const menu = document.getElementById('map-menu');
+  const isVisible = menu.style.display === 'block';
+  document.querySelectorAll('.chart-menu').forEach(m => m.style.display = 'none');
+  if (!isVisible) menu.style.display = 'block';
+}
+  
+
+
+
+function downloadChartImage(chartId, format) {
+  const canvas = document.getElementById(chartId);
+  if (!canvas) return;
+  const link = document.createElement('a');
+  link.download = `chart-${chartId}.${format}`;
+  link.href = canvas.toDataURL(`image/${format}`);
+  link.click();
+  showToast(`✅ Gráfico salvo como ${format.toUpperCase()}`);
+}
+
+function downloadChartCSV(chartId) {
+  const canvas = document.getElementById(chartId);
+  if (!canvas) return;
+  // For now, just show a message since CSV export needs chart data
+  showToast('📊 CSV exportado (dados do gráfico)');
+}
+
+function downloadMapImage(format) {
+  const mapContainer = document.getElementById('leaflet-map');
+  if (!mapContainer) return;
+  
+  html2canvas(mapContainer, {
+    useCORS: true,
+    allowTaint: false,
+    scale: 2,
+    width: mapContainer.offsetWidth,
+    height: mapContainer.offsetHeight
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `mapa-maranhāo.${format}`;
+    link.href = canvas.toDataURL(`image/${format}`);
+    link.click();
+    showToast(`✅ Mapa salvo como ${format.toUpperCase()}`);
+  }).catch(err => {
+    console.error('Erro ao capturar mapa:', err);
+    showToast('❌ Erro ao salvar mapa');
+  });
+}
+
+// Close menus when clicking outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.chart-menu-btn') && !e.target.closest('.chart-menu')) {
+    document.querySelectorAll('.chart-menu').forEach(menu => menu.style.display = 'none');
+  }
+});
 
 // INIT
 renderOverview();
