@@ -532,7 +532,7 @@ header {
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   display: none;
-  z-index: 100;
+  z-index: 9999;
   min-width: 120px;
 }
 .chart-menu-item {
@@ -899,7 +899,7 @@ header {
         <button class="map-btn" onclick="clearAllHeatmaps()" style="color:var(--red)">✕ Limpar Layers</button>
         <button class="map-btn" onclick="openAddPointModal()">➕ Adicionar Ponto</button>
         <div style="position:relative;">
-          <button class="map-btn" onclick="toggleMapMenu()">⬇ Baixar Mapa</button>
+          <button class="map-btn map-menu-toggle" onclick="toggleMapMenu()">⬇ Baixar Mapa</button>
           <div class="chart-menu" id="map-menu" style="right:0;left:auto;">
             <button class="chart-menu-item" onclick="downloadMapImage('png')">⬇ PNG</button>
             <button class="chart-menu-item" onclick="downloadMapImage('jpg')">⬇ JPG</button>
@@ -4166,36 +4166,102 @@ function downloadChartImage(chartId, format) {
 
 function downloadChartCSV(chartId) {
   const canvas = document.getElementById(chartId);
-  if (!canvas) return;
-  // For now, just show a message since CSV export needs chart data
-  showToast('📊 CSV exportado (dados do gráfico)');
+  if (!canvas) {
+    showToast('❌ Gráfico não encontrado para CSV');
+    return;
+  }
+  const chart = Chart.getChart(canvas) || canvas.__chart__ || null;
+  if (!chart || !chart.data) {
+    showToast('❌ Não foi possível obter os dados do gráfico');
+    return;
+  }
+
+  const rows = [];
+  const labels = chart.data.labels || [];
+  const datasets = chart.data.datasets || [];
+  const chartType = chart.config?.type || chart.options?.type || 'line';
+
+  if (chartType === 'doughnut' || chartType === 'pie') {
+    rows.push(['label','value'].map(v => JSON.stringify(v)).join(','));
+    datasets.forEach(ds => {
+      const data = ds.data || [];
+      data.forEach((value, index) => {
+        rows.push([JSON.stringify(labels[index] ?? ''), JSON.stringify(value ?? '')].join(','));
+      });
+    });
+  } else if (chartType === 'scatter') {
+    rows.push(['series','x','y'].map(v => JSON.stringify(v)).join(','));
+    datasets.forEach(ds => {
+      const data = ds.data || [];
+      data.forEach(point => {
+        const x = point?.x ?? (Array.isArray(point) ? point[0] : '');
+        const y = point?.y ?? (Array.isArray(point) ? point[1] : '');
+        rows.push([JSON.stringify(ds.label || ''), JSON.stringify(x), JSON.stringify(y)].join(','));
+      });
+    });
+  } else {
+    const header = ['label', ...datasets.map(ds => ds.label || 'value')];
+    rows.push(header.map(v => JSON.stringify(v)).join(','));
+    const maxCount = Math.max(labels.length, ...datasets.map(ds => (ds.data || []).length));
+    for (let i = 0; i < maxCount; i++) {
+      const row = [labels[i] === undefined ? '' : labels[i]];
+      datasets.forEach(ds => {
+        const value = (ds.data || [])[i];
+        row.push(value === undefined ? '' : value);
+      });
+      rows.push(row.map(v => JSON.stringify(v)).join(','));
+    }
+  }
+
+  const filename = `chart-${chartId}.csv`;
+  const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ CSV exportado: ' + filename);
 }
 
 function downloadMapImage(format) {
   const mapContainer = document.getElementById('leaflet-map');
   if (!mapContainer) return;
-  
-  html2canvas(mapContainer, {
-    useCORS: true,
-    allowTaint: false,
-    scale: 2,
-    width: mapContainer.offsetWidth,
-    height: mapContainer.offsetHeight
-  }).then(canvas => {
-    const link = document.createElement('a');
-    link.download = `mapa-maranhāo.${format}`;
-    link.href = canvas.toDataURL(`image/${format}`);
-    link.click();
-    showToast(`✅ Mapa salvo como ${format.toUpperCase()}`);
-  }).catch(err => {
-    console.error('Erro ao capturar mapa:', err);
-    showToast('❌ Erro ao salvar mapa');
-  });
+
+  const rect = mapContainer.getBoundingClientRect();
+  const menu = document.getElementById('map-menu');
+  if (menu) menu.style.display = 'none';
+
+  setTimeout(() => {
+    html2canvas(mapContainer, {
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      scale: 2,
+      x: rect.left + window.scrollX,
+      y: rect.top + window.scrollY,
+      width: rect.width,
+      height: rect.height,
+      windowWidth: document.documentElement.clientWidth,
+      windowHeight: document.documentElement.clientHeight,
+      logging: false,
+      imageTimeout: 15000,
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `mapa-maranhao.${format}`;
+      link.href = canvas.toDataURL(`image/${format}`);
+      link.click();
+      showToast(`✅ Mapa salvo como ${format.toUpperCase()}`);
+    }).catch(err => {
+      console.error('Erro ao capturar mapa:', err);
+      showToast('❌ Erro ao salvar mapa');
+    });
+  }, 120);
 }
 
 // Close menus when clicking outside
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.chart-menu-btn') && !e.target.closest('.chart-menu')) {
+  if (!e.target.closest('.chart-menu-btn') && !e.target.closest('.chart-menu') && !e.target.closest('.map-menu-toggle')) {
     document.querySelectorAll('.chart-menu').forEach(menu => menu.style.display = 'none');
   }
 });
