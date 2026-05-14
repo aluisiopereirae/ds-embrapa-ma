@@ -564,9 +564,9 @@ header {
   <div class="header-nav">
     <button class="nav-btn active" onclick="showView('overview')">📊 Visão Geral</button>
     <button class="nav-btn" onclick="showView('map')">🗺 Mapa</button>
+    <button class="nav-btn" onclick="showView('proj')">📈 Projeções</button>
     <button class="nav-btn" onclick="showView('register')">➕ Registrar</button>
     <button class="nav-btn" onclick="showView('data')">📋 Dados</button>
-    <button class="nav-btn" onclick="showView('proj')">📈 Projeções</button>
     <button class="nav-btn" onclick="showView('guide')">📖 Guias</button>
   </div>
 </header>
@@ -2554,7 +2554,7 @@ function showView(v) {
   }
   
   const btns = document.querySelectorAll('.nav-btn');
-  const vIdx = ['overview','map','register','data','proj','guide'].indexOf(v);
+  const vIdx = ['overview','map','proj','register','data','guide'].indexOf(v);
   if (btns[vIdx]) btns[vIdx].classList.add('active');
 
   if (v === 'map' && !mapInitialized) {
@@ -4228,18 +4228,21 @@ function downloadMapImage(format) {
   const mapContainer = document.getElementById('leaflet-map');
   if (!mapContainer) return;
 
-  const rect = mapContainer.getBoundingClientRect();
   const menu = document.getElementById('map-menu');
   if (menu) menu.style.display = 'none';
 
   setTimeout(() => {
+    const rect = mapContainer.getBoundingClientRect();
+
     html2canvas(mapContainer, {
       useCORS: true,
       allowTaint: true,
       backgroundColor: null,
-      scale: 2,
-      x: rect.left + window.scrollX,
-      y: rect.top + window.scrollY,
+      scale: window.devicePixelRatio || 2,
+      // Compensação do scroll da página — evita deslocamento dos marcadores
+      scrollX: -window.scrollX,
+      scrollY: -window.scrollY,
+      // Dimensões exatas do contêiner leaflet
       width: rect.width,
       height: rect.height,
       windowWidth: document.documentElement.clientWidth,
@@ -4255,8 +4258,10 @@ function downloadMapImage(format) {
     }).catch(err => {
       console.error('Erro ao capturar mapa:', err);
       showToast('❌ Erro ao salvar mapa');
+    }).finally(() => {
+      if (menu) menu.style.display = '';
     });
-  }, 120);
+  }, 300);
 }
 
 // Close menus when clicking outside
