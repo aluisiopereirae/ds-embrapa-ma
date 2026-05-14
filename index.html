@@ -2039,20 +2039,20 @@ function clearAllHeatmaps() {
     if (cfg) c.style.borderColor = cfg.color+'55';
   });
   document.querySelectorAll('[id^="hmbtn-"]').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('[id^="techbtn-"]').forEach(b => b.classList.remove('active'));
-  const allBtn = document.getElementById('techbtn-sys-all');
-  if (allBtn) allBtn.classList.add('active');
+  // Remove all extra layers
   Object.keys(extraLayers).forEach(n => {
     if (map && map.hasLayer(extraLayers[n])) map.removeLayer(extraLayers[n]);
   });
-  activeSystems = new Set(['all']);
-  if (typeof activeSysLayers !== 'undefined') { activeSysLayers.clear(); activeSysLayers.add('all'); }
-  document.querySelectorAll('.sys-filter-chip').forEach(c => {
-    c.classList.toggle('active', c.dataset.sys === 'all');
-  });
-  if (markersGroup) markersGroup.clearLayers();
-  const fl = document.getElementById('frut-legend-box');
-  if (fl) fl.style.display = 'none';
+  // Clear system state — map goes empty
+  activeSystems = new Set();
+  if (typeof activeSysLayers !== 'undefined') activeSysLayers.clear();
+  // Deactivate all buttons and chips
+  document.querySelectorAll('[id^="techbtn-"]').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.sys-filter-chip').forEach(c => c.classList.remove('active'));
+  // Hide legends
+  const fl = document.getElementById('frut-legend-box'); if (fl) fl.style.display = 'none';
+  const elb = document.getElementById('extrat-legend-box'); if (elb) elb.style.display = 'none';
+  renderMapMarkers();
   updateLegend();
   if (typeof updateActiveSysDisplay === 'function') updateActiveSysDisplay();
   if (typeof updateMapLegendOverlay === 'function') updateMapLegendOverlay();
@@ -2181,7 +2181,7 @@ function filterByYear() {
 function renderMapMarkers() {
   if (!markersGroup) return;
   markersGroup.clearLayers();
-  const showAll = activeSystems.has('all') || !activeSystems.size;
+  const showAll = activeSystems.has('all');
   let filtered = showAll ? DB : DB.filter(d => activeSystems.has(d.sistema));
   if (yearFilter) filtered = filtered.filter(d => String(d.ano_implantacao) === yearFilter);
   filtered.forEach(d => {
@@ -2579,21 +2579,21 @@ function initExtraLayers() {
   if (!map) return;
   if (Object.keys(extraLayers).length > 0) return; // prevent double init
 
-  extraLayers.ilpf_layer   = L.layerGroup().addTo(map);
-  extraLayers.ilp_layer    = L.layerGroup().addTo(map);
-  extraLayers.saf_layer    = L.layerGroup().addTo(map);
-  extraLayers.sist_layer   = L.layerGroup().addTo(map);
-  extraLayers.pisc_layer   = L.layerGroup().addTo(map);
-  extraLayers.apic_layer   = L.layerGroup().addTo(map);
-  extraLayers.melip_layer  = L.layerGroup().addTo(map);
-  extraLayers.roca_layer   = L.layerGroup().addTo(map);
-  extraLayers.bab_layer    = L.layerGroup().addTo(map);
-  extraLayers.reniva_layer = L.layerGroup().addTo(map);
-  extraLayers.afere_layer  = L.layerGroup().addTo(map);
-  extraLayers.veg_layer    = L.layerGroup().addTo(map);
-  extraLayers.frut_layer   = L.layerGroup().addTo(map);
-  extraLayers.extrat_layer = L.layerGroup().addTo(map);
-  extraLayers.fb_layer     = L.layerGroup().addTo(map);
+  extraLayers.ilpf_layer   = L.layerGroup();
+  extraLayers.ilp_layer    = L.layerGroup();
+  extraLayers.saf_layer    = L.layerGroup();
+  extraLayers.sist_layer   = L.layerGroup();
+  extraLayers.pisc_layer   = L.layerGroup();
+  extraLayers.apic_layer   = L.layerGroup();
+  extraLayers.melip_layer  = L.layerGroup();
+  extraLayers.roca_layer   = L.layerGroup();
+  extraLayers.bab_layer    = L.layerGroup();
+  extraLayers.reniva_layer = L.layerGroup();
+  extraLayers.afere_layer  = L.layerGroup();
+  extraLayers.veg_layer    = L.layerGroup();
+  extraLayers.frut_layer   = L.layerGroup();
+  extraLayers.extrat_layer = L.layerGroup();
+  extraLayers.fb_layer     = L.layerGroup();
 
   // ILPF — only show specialty markers for municipalities NOT already in DB
   const dbIlpfMunic = new Set(DB.filter(d=>d.sistema==='ilpf').map(d=>d.municipio.toLowerCase().split(' ')[0]));
@@ -2720,14 +2720,33 @@ function initExtraLayers() {
     `<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 6px;font-size:11px;color:#ddd">
       <span style="width:10px;height:10px;border-radius:50%;background:${v};display:inline-block;flex-shrink:0"></span>${k}</span>`
   ).join('');
+  // Container compartilhado no canto inferior direito para legendas de sistema
+  if (!document.getElementById('sys-legend-wrap')) {
+    const wrap = document.createElement('div');
+    wrap.id = 'sys-legend-wrap';
+    wrap.style.cssText = 'position:absolute;bottom:32px;right:8px;z-index:1000;display:flex;flex-direction:column;gap:6px;align-items:flex-end;pointer-events:none;';
+    (document.getElementById('leaflet-map') || document.body).appendChild(wrap);
+  }
+  const sysLegendWrap = document.getElementById('sys-legend-wrap');
   if (!document.getElementById('frut-legend-box')) {
     const lb = document.createElement('div');
     lb.id = 'frut-legend-box';
-    lb.style.cssText = 'position:absolute;bottom:32px;left:8px;z-index:1000;background:rgba(10,15,10,0.88);border:1px solid #2a4a2a;border-radius:8px;padding:8px 10px;max-width:320px;display:none;';
+    lb.style.cssText = 'background:rgba(10,15,10,0.88);border:1px solid #2a4a2a;border-radius:8px;padding:8px 10px;max-width:320px;display:none;pointer-events:auto;';
     lb.innerHTML = '<div style="font-size:11px;font-weight:600;color:#4ade80;margin-bottom:4px">🍎 Legenda Fruticultura</div>' + fruitLegendHtml;
-    (document.getElementById('leaflet-map') || document.body).appendChild(lb);
+    sysLegendWrap.appendChild(lb);
   }
-  document.getElementById('frut-legend-box').style.display = 'block';
+  const extratLegendEntries = {'Babaçu (amêndoa)':'#5D4037','Açaí extrativo':'#6A1B9A','Buriti':'#FFA000','Pequi + Buriti':'#F9A825'};
+  const extratLegendHtml = Object.entries(extratLegendEntries).map(([k,v]) =>
+    `<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 6px;font-size:11px;color:#ddd">
+      <span style="width:10px;height:10px;border-radius:50%;background:${v};display:inline-block;flex-shrink:0"></span>${k}</span>`
+  ).join('');
+  if (!document.getElementById('extrat-legend-box')) {
+    const lb = document.createElement('div');
+    lb.id = 'extrat-legend-box';
+    lb.style.cssText = 'background:rgba(10,15,10,0.88);border:1px solid #2a4a2a;border-radius:8px;padding:8px 10px;max-width:320px;display:none;pointer-events:auto;';
+    lb.innerHTML = '<div style="font-size:11px;font-weight:600;color:#86efac;margin-bottom:4px">🌰 Legenda Extrativismo</div>' + extratLegendHtml;
+    sysLegendWrap.appendChild(lb);
+  }
   FRUTICULTURA_DATA.forEach(d => {
     const cor = frutC[d.fruta] || '#f472b6';
     const rr = Math.max(7, Math.min(18, (d.valor_mil||1000)/2000+7));
@@ -2750,6 +2769,23 @@ function initExtraLayers() {
   L.circleMarker([FAZENDA_BARBOSA.lat, FAZENDA_BARBOSA.lng],{radius:16,fillColor:'#fbbf24',color:'#fff',weight:3,fillOpacity:1})
   .bindPopup('<div class="map-popup"><h3 style="color:#d97706">⭐ '+FAZENDA_BARBOSA.nome+'</h3><div style="font-size:11px;color:#666;margin-bottom:6px">'+FAZENDA_BARBOSA.municipio+' — MA | Alt. ~'+FAZENDA_BARBOSA.altitude+'m</div><div class="row"><span class="key">Sistema</span><span class="val" style="font-size:11px">'+FAZENDA_BARBOSA.sistema+'</span></div><div class="row"><span class="key">Área</span><span class="val">'+FAZENDA_BARBOSA.area_ha+' ha</span></div><div class="row"><span class="key">Início ILP</span><span class="val">'+FAZENDA_BARBOSA.implantacao+'</span></div><div class="row"><span class="key">Soja pós-ILP</span><span class="val">'+FAZENDA_BARBOSA.prod_soja_sacsha+' sc/ha (+37%)</span></div><div class="row"><span class="key">COS</span><span class="val">'+FAZENDA_BARBOSA.cos_mgha+' Mg/ha</span></div><div style="margin-top:6px;font-size:11px;color:#4a6a4a;font-style:italic">'+FAZENDA_BARBOSA.obs+'</div></div>', {maxWidth:300})
   .addTo(extraLayers.fb_layer);
+
+  // Sincronizar estado visual inicial: se 'all' estiver ativo, mostrar tudo
+  if (activeSystems.has('all')) {
+    Object.values(sysLayerMap).forEach(ln => {
+      if (extraLayers[ln] && !map.hasLayer(extraLayers[ln])) map.addLayer(extraLayers[ln]);
+    });
+    ['bab_layer','reniva_layer','afere_layer','veg_layer'].forEach(ln => {
+      if (extraLayers[ln] && !map.hasLayer(extraLayers[ln])) map.addLayer(extraLayers[ln]);
+    });
+    ['techbtn-bab','techbtn-reniva','techbtn-afere','techbtn-veg'].forEach(id => {
+      const b = document.getElementById(id); if (b) b.classList.add('active');
+    });
+    document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => b.classList.add('active'));
+    document.querySelectorAll('.sys-filter-chip').forEach(c => c.classList.add('active'));
+    const fl = document.getElementById('frut-legend-box'); if (fl) fl.style.display = 'block';
+    const el = document.getElementById('extrat-legend-box'); if (el) el.style.display = 'block';
+  }
 }
 
 function toggleLayerGroup(name, btn) {
@@ -2758,14 +2794,13 @@ function toggleLayerGroup(name, btn) {
   if (isVisible) {
     map.removeLayer(extraLayers[name]);
     if (btn) btn.classList.remove('active');
-    // hide fruit legend if frut layer turned off
-    if (name === 'frut_layer') {
-      const fl = document.getElementById('frut-legend-box');
-      if (fl) fl.style.display = 'none';
-    }
+    if (name === 'frut_layer') { const fl = document.getElementById('frut-legend-box'); if (fl) fl.style.display = 'none'; }
+    if (name === 'extrat_layer') { const el = document.getElementById('extrat-legend-box'); if (el) el.style.display = 'none'; }
   } else {
     map.addLayer(extraLayers[name]);
     if (btn) btn.classList.add('active');
+    if (name === 'frut_layer') { const fl = document.getElementById('frut-legend-box'); if (fl) fl.style.display = 'block'; }
+    if (name === 'extrat_layer') { const el = document.getElementById('extrat-legend-box'); if (el) el.style.display = 'block'; }
   }
 }
 
@@ -3767,30 +3802,36 @@ function toggleSysLayer(s, btn) {
   showView('map');
   setTimeout(() => {
     if (s === 'all') {
+      const compLayers = ['bab_layer','reniva_layer','afere_layer','veg_layer'];
+      const compBtns   = ['techbtn-bab','techbtn-reniva','techbtn-afere','techbtn-veg'];
       if (activeSystems.has('all')) {
+        // DESLIGAR TUDO — mapa vazio
         activeSystems.clear();
-        // Visual: all buttons off
-        document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('[id^="techbtn-"]').forEach(b => b.classList.remove('active'));
-        // Remove extra layers
+        document.querySelectorAll('.sys-filter-chip').forEach(c => c.classList.remove('active'));
         Object.values(sysLayerMap).forEach(ln => {
           if (extraLayers[ln] && map && map.hasLayer(extraLayers[ln])) map.removeLayer(extraLayers[ln]);
         });
+        compLayers.forEach(ln => {
+          if (extraLayers[ln] && map && map.hasLayer(extraLayers[ln])) map.removeLayer(extraLayers[ln]);
+        });
+        const _fl = document.getElementById('frut-legend-box'); if (_fl) _fl.style.display = 'none';
+        const _el = document.getElementById('extrat-legend-box'); if (_el) _el.style.display = 'none';
       } else {
+        // LIGAR TUDO — ativa todos os sistemas e tecnologias complementares
         activeSystems.clear();
         activeSystems.add('all');
-        // Visual: all system buttons OFF, "Todos" ON
-        document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => b.classList.remove('active'));
-        const allBtn = document.getElementById('techbtn-sys-all');
-        if (allBtn) allBtn.classList.add('active');
-        // Sync chips
-        document.querySelectorAll('.sys-filter-chip').forEach(c => {
-          c.classList.toggle('active', c.dataset.sys === 'all');
-        });
-        // Remove extra layers
+        document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => b.classList.add('active'));
+        document.querySelectorAll('.sys-filter-chip').forEach(c => c.classList.add('active'));
+        compBtns.forEach(id => { const b = document.getElementById(id); if (b) b.classList.add('active'); });
         Object.values(sysLayerMap).forEach(ln => {
-          if (extraLayers[ln] && map && map.hasLayer(extraLayers[ln])) map.removeLayer(extraLayers[ln]);
+          if (extraLayers[ln] && map && !map.hasLayer(extraLayers[ln])) map.addLayer(extraLayers[ln]);
         });
+        compLayers.forEach(ln => {
+          if (extraLayers[ln] && map && !map.hasLayer(extraLayers[ln])) map.addLayer(extraLayers[ln]);
+        });
+        const _fl = document.getElementById('frut-legend-box'); if (_fl) _fl.style.display = 'block';
+        const _el = document.getElementById('extrat-legend-box'); if (_el) _el.style.display = 'block';
       }
       renderMapMarkers();
       return;
@@ -3808,37 +3849,49 @@ function toggleSysLayer(s, btn) {
       if (sideBtn) sideBtn.classList.remove('active');
       if (chip) chip.classList.remove('active');
       if (layerName && extraLayers[layerName] && map) map.removeLayer(extraLayers[layerName]);
-      // If no systems active, do nothing, allow empty
+      if (s === 'fruticultura') { const fl = document.getElementById('frut-legend-box'); if (fl) fl.style.display = 'none'; }
+      if (s === 'extrativismo') { const el = document.getElementById('extrat-legend-box'); if (el) el.style.display = 'none'; }
     } else {
       // Turn on
       if (activeSystems.has('all')) {
         activeSystems.clear();
-        // Turn off 'all' visual
-        if (allSideBtn) allSideBtn.classList.remove('active');
+        // Desativar todos os botões e chips ao sair do modo 'all'
+        document.querySelectorAll('[id^="techbtn-"]').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.sys-filter-chip').forEach(c => c.classList.remove('active'));
-        // Remove extra layers
+        // Remover todas as camadas extras
         Object.values(sysLayerMap).forEach(ln => {
-          if (extraLayers[ln] && map) map.removeLayer(extraLayers[ln]);
+          if (extraLayers[ln] && map && map.hasLayer(extraLayers[ln])) map.removeLayer(extraLayers[ln]);
         });
+        ['bab_layer','reniva_layer','afere_layer','veg_layer'].forEach(ln => {
+          if (extraLayers[ln] && map && map.hasLayer(extraLayers[ln])) map.removeLayer(extraLayers[ln]);
+        });
+        const _fl = document.getElementById('frut-legend-box'); if (_fl) _fl.style.display = 'none';
+        const _el = document.getElementById('extrat-legend-box'); if (_el) _el.style.display = 'none';
       }
       activeSystems.add(s);
       activeSysLayers.add(s);
       if (sideBtn) sideBtn.classList.add('active');
       if (chip) chip.classList.add('active');
       if (layerName && extraLayers[layerName] && map) map.addLayer(extraLayers[layerName]);
+      if (s === 'fruticultura') { const fl = document.getElementById('frut-legend-box'); if (fl) fl.style.display = 'block'; }
+      if (s === 'extrativismo') { const el = document.getElementById('extrat-legend-box'); if (el) el.style.display = 'block'; }
     }
-    // Synchronize "Todos" button
+    // Auto-promover para 'all' quando todos os sistemas individuais estiverem ativos
     const totalSys = Object.keys(sysLayerMap).length;
     if (activeSystems.size === totalSys && !activeSystems.has('all')) {
       activeSystems.clear();
       activeSystems.add('all');
-      // Update visuals
-      document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => b.classList.remove('active'));
-      const allBtn = document.getElementById('techbtn-sys-all');
-      if (allBtn) allBtn.classList.add('active');
-      document.querySelectorAll('.sys-filter-chip').forEach(c => {
-        c.classList.toggle('active', c.dataset.sys === 'all');
+      document.querySelectorAll('[id^="techbtn-sys-"]').forEach(b => b.classList.add('active'));
+      document.querySelectorAll('.sys-filter-chip').forEach(c => c.classList.add('active'));
+      // Ativar também Tecnologias Complementares
+      ['techbtn-bab','techbtn-reniva','techbtn-afere','techbtn-veg'].forEach(id => {
+        const b = document.getElementById(id); if (b) b.classList.add('active');
       });
+      ['bab_layer','reniva_layer','afere_layer','veg_layer'].forEach(ln => {
+        if (extraLayers[ln] && map && !map.hasLayer(extraLayers[ln])) map.addLayer(extraLayers[ln]);
+      });
+      const _fl = document.getElementById('frut-legend-box'); if (_fl) _fl.style.display = 'block';
+      const _el = document.getElementById('extrat-legend-box'); if (_el) _el.style.display = 'block';
     }
     renderMapMarkers();
     updateActiveSysDisplay();
