@@ -1208,7 +1208,7 @@ header {
         </div>
         <p style="margin-top:10px;font-size:13px;color:var(--text2);line-height:1.6">
           <strong style="color:var(--amber)">Sistema:</strong> Soja + Braquiária brizanta + Bovinos + Eucalyptus urograndis<br>
-          <strong style="color:var(--amber)">Parceiros:</strong> Embrapa Meio-Norte | Embrapa Cocais | UFMA | Rede ILPF | GIZ/Alemanha<br>
+          <strong style="color:var(--amber)">Parceiros:</strong> Embrapa Meio-Norte | Embrapa Maranhão | UFMA | Rede ILPF | GIZ/Alemanha<br>
           <strong style="color:var(--amber)">Observação:</strong> URT referência para o Leste Maranhense. Sede de Dias de Campo Embrapa (2017 e 2022). Apresentada na Caravana ILPF 2023 como caso de sucesso nacional. Bem-estar animal documentado pela sombra florestal.
         </p>
       </div>
@@ -1247,11 +1247,11 @@ function saveData(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
 
 // DADOS REAIS ILPF MARANHÃO (baseados em dados EMBRAPA/MAPA 2018-2024)
 const INITIAL_DATA = [
-  // ILPF - Dados reais baseados em levantamentos EMBRAPA Cocais e ILAPF/MAPA
+  // ILPF - Dados reais baseados em levantamentos EMBRAPA Maranhão e ILAPF/MAPA
   { id:1, sistema:'ilpf', municipio:'Balsas', mesorregiao:'Sul Maranhense', lat:-7.5322, lng:-46.0356, area_total:320, ano_implantacao:2015, bioma:'Cerrado', altitude:420, temperatura_media:26.5, precipitacao:1200, renda_total:18500, balanco_carbono:-45.2, emissao_total_co2e:12000, sequestro_carbono:28.5, lotacao_animal:1.2, biomassa_total:85, diversidade_especies:12, cobertura_solo:78, estoque_carbono:145, eficiencia_uso_solo:2.1, escala:'Comercial', status:'Ativo', produtor:'Fazenda Cerrado Verde', obs:'Sistema Barreirão adaptado, integração lavoura-pecuária-floresta com eucalipto'},
   { id:2, sistema:'ilpf', municipio:'São Raimundo das Mangabeiras', mesorregiao:'Sul Maranhense', lat:-7.0186, lng:-45.4831, area_total:480, ano_implantacao:2016, bioma:'Cerrado', altitude:380, temperatura_media:27.0, precipitacao:1150, renda_total:24000, balanco_carbono:-62.8, emissao_total_co2e:18000, sequestro_carbono:38.2, lotacao_animal:1.4, biomassa_total:120, diversidade_especies:8, cobertura_solo:72, estoque_carbono:190, eficiencia_uso_solo:2.4, escala:'Comercial', status:'Ativo', produtor:'Agropecuária Mangabeira', obs:'ILPF com capim Piatã e eucalipto, integrado com soja no verão'},
-  { id:3, sistema:'ilpf', municipio:'Tasso Fragoso', mesorregiao:'Sul Maranhense', lat:-8.4694, lng:-45.7481, area_total:280, ano_implantacao:2017, bioma:'Cerrado', altitude:455, temperatura_media:26.8, precipitacao:1100, renda_total:16200, balanco_carbono:-38.5, emissao_total_co2e:10500, sequestro_carbono:22.4, lotacao_animal:1.1, biomassa_total:68, diversidade_especies:10, cobertura_solo:65, estoque_carbono:118, eficiencia_uso_solo:1.9, escala:'Piloto', status:'Ativo', produtor:'Fazenda Planalto', obs:'Projeto ILPF Rede - parceria EMBRAPA Cocais'},
-  { id:4, sistema:'ilpf', municipio:'Riachão', mesorregiao:'Sul Maranhense', lat:-7.3608, lng:-46.6200, area_total:210, ano_implantacao:2018, bioma:'Cerrado', altitude:360, temperatura_media:27.2, precipitacao:1080, renda_total:13800, balanco_carbono:-29.4, emissao_total_co2e:8200, sequestro_carbono:18.1, lotacao_animal:0.9, biomassa_total:52, diversidade_especies:9, cobertura_solo:60, estoque_carbono:95, eficiencia_uso_solo:1.7, escala:'Piloto', status:'Ativo', produtor:'Sítio Vale Verde', obs:'ILPF jovem, monitorado pela EMBRAPA Cocais'},
+  { id:3, sistema:'ilpf', municipio:'Tasso Fragoso', mesorregiao:'Sul Maranhense', lat:-8.4694, lng:-45.7481, area_total:280, ano_implantacao:2017, bioma:'Cerrado', altitude:455, temperatura_media:26.8, precipitacao:1100, renda_total:16200, balanco_carbono:-38.5, emissao_total_co2e:10500, sequestro_carbono:22.4, lotacao_animal:1.1, biomassa_total:68, diversidade_especies:10, cobertura_solo:65, estoque_carbono:118, eficiencia_uso_solo:1.9, escala:'Piloto', status:'Ativo', produtor:'Fazenda Planalto', obs:'Projeto ILPF Rede - parceria EMBRAPA Maranhão'},
+  { id:4, sistema:'ilpf', municipio:'Riachão', mesorregiao:'Sul Maranhense', lat:-7.3608, lng:-46.6200, area_total:210, ano_implantacao:2018, bioma:'Cerrado', altitude:360, temperatura_media:27.2, precipitacao:1080, renda_total:13800, balanco_carbono:-29.4, emissao_total_co2e:8200, sequestro_carbono:18.1, lotacao_animal:0.9, biomassa_total:52, diversidade_especies:9, cobertura_solo:60, estoque_carbono:95, eficiencia_uso_solo:1.7, escala:'Piloto', status:'Ativo', produtor:'Sítio Vale Verde', obs:'ILPF jovem, monitorado pela EMBRAPA Maranhão'},
   { id:5, sistema:'ilpf', municipio:'Loreto', mesorregiao:'Sul Maranhense', lat:-7.0772, lng:-45.1456, area_total:550, ano_implantacao:2014, bioma:'Cerrado', altitude:320, temperatura_media:27.5, precipitacao:1250, renda_total:31000, balanco_carbono:-85.0, emissao_total_co2e:22000, sequestro_carbono:52.0, lotacao_animal:1.6, biomassa_total:165, diversidade_especies:14, cobertura_solo:85, estoque_carbono:240, eficiencia_uso_solo:2.8, escala:'Comercial', status:'Ativo', produtor:'Agropecuária Loreto', obs:'Sistema pioneiro na região, referência estadual'},
   { id:6, sistema:'ilpf', municipio:'Alto Parnaíba', mesorregiao:'Sul Maranhense', lat:-9.1033, lng:-45.9292, area_total:390, ano_implantacao:2016, bioma:'Cerrado', altitude:500, temperatura_media:26.2, precipitacao:1050, renda_total:21500, balanco_carbono:-54.6, emissao_total_co2e:15000, sequestro_carbono:32.8, lotacao_animal:1.3, biomassa_total:98, diversidade_especies:11, cobertura_solo:70, estoque_carbono:168, eficiencia_uso_solo:2.2, escala:'Comercial', status:'Ativo', produtor:'Fazenda São Benedito', obs:'ILPF com teca, integração lavoura-pecuária'},
   { id:7, sistema:'ilpf', municipio:'Feira Nova do Maranhão', mesorregiao:'Sul Maranhense', lat:-7.6592, lng:-44.8819, area_total:175, ano_implantacao:2019, bioma:'Cerrado', altitude:340, temperatura_media:27.8, precipitacao:1000, renda_total:9800, balanco_carbono:-22.1, emissao_total_co2e:6800, sequestro_carbono:13.5, lotacao_animal:0.8, biomassa_total:42, diversidade_especies:7, cobertura_solo:55, estoque_carbono:78, eficiencia_uso_solo:1.5, escala:'Piloto', status:'Ativo', produtor:'Cooperativa ILPF Cerrado', obs:'Projeto ABC+ - finac. Banco do Brasil'},
@@ -1436,7 +1436,7 @@ const INITIAL_DATA = [
 
 
 
-  // BABAÇU — ASSEMA / Embrapa Cocais
+  // BABAÇU — ASSEMA / Embrapa Maranhão
   { id:147, sistema:'apicultura', municipio:'Lago da Pedra', mesorregiao:'Oeste Maranhense', lat:-4.55, lng:-45.12, area_total:85, ano_implantacao:2015, bioma:'Amazônia', altitude:38, temperatura_media:27.8, precipitacao:1850, renda_total:320, balanco_carbono:-8.6, emissao_total_co2e:240, sequestro_carbono:5.4, diversidade_especies:24, cobertura_solo:81, escala:'Comunitário', status:'Ativo', produtor:'Cooperativa Apícola de Lago da Pedra', colmeias:850, prod_kg:320, obs:'Produção de mel em áreas de floresta secundária e babaçuais'},
   { id:148, sistema:'apicultura', municipio:'Viana', mesorregiao:'Norte Maranhense', lat:-3.23, lng:-45.00, area_total:96, ano_implantacao:2014, bioma:'Amazônia', altitude:14, temperatura_media:28.2, precipitacao:2200, renda_total:410, balanco_carbono:-10.2, emissao_total_co2e:270, sequestro_carbono:6.1, diversidade_especies:29, cobertura_solo:87, escala:'Comunitário', status:'Ativo', produtor:'Associação de Apicultores da Baixada Maranhense', colmeias:980, prod_kg:410, obs:'Apicultura tradicional em áreas úmidas da Baixada Maranhense'},
   { id:149, sistema:'apicultura', municipio:'Pinheiro', mesorregiao:'Norte Maranhense', lat:-2.52, lng:-45.08, area_total:92, ano_implantacao:2016, bioma:'Amazônia', altitude:18, temperatura_media:28.0, precipitacao:2100, renda_total:380, balanco_carbono:-9.4, emissao_total_co2e:255, sequestro_carbono:5.9, diversidade_especies:27, cobertura_solo:84, escala:'Comunitário', status:'Ativo', produtor:'Rede Apícola de Pinheiro', colmeias:920, prod_kg:380, obs:'Produção de mel associada a áreas de vegetação nativa e juçarais'},
@@ -1488,7 +1488,7 @@ const INITIAL_DATA = [
 
 
 
-// BABAÇU — ASSEMA / Embrapa Cocais
+// BABAÇU — ASSEMA / Embrapa Maranhão
 const BABACAU_DATA = [
   {municipio:'Lago da Pedra',lat:-4.55,lng:-45.12,colmeias:850,prod_kg:320},
   {municipio:'Viana',lat:-3.23,lng:-45.00,colmeias:980,prod_kg:410},
@@ -1548,7 +1548,7 @@ const FAZENDA_BARBOSA = {
   area_ha:68, sistema:'ILP + ILPF (Soja / Braquiária brizanta / Bovinos / Eucalipto)',
   implantacao:2010, ilpf_ano:2018, cos_mgha:38.5, biomassa:52.0,
   especie_florestal:'Eucalyptus urograndis',
-  prod_soja_sacsha:52, parceiros:'Embrapa Meio-Norte | Embrapa Cocais | UFMA | Rede ILPF | GIZ',
+  prod_soja_sacsha:52, parceiros:'Embrapa Meio-Norte | Embrapa Maranhão | UFMA | Rede ILPF | GIZ',
   bioma:'Cerrado (Leste Maranhense — ecótono Cerrado/Caatinga)',
   obs:'URT referência para o Leste Maranhense. Parceria ativa desde 2010. Sede de Dias de Campo Embrapa (2017, 2022). Resultados: aumento MO solo, produtividade soja +37%, bem-estar animal (sombra florestal). Caravana ILPF 2023.'
 };
@@ -1562,7 +1562,7 @@ const FAZENDA_BARBOSA = {
 
 
 // ═══ DADOS COMPLEMENTARES DOS SCRIPTS EMBRAPA ═══
-// ILPF — Rede ILPF / Embrapa Cocais / MAPA
+// ILPF — Rede ILPF / Embrapa Maranhão / MAPA
 const ILPF_DATA = [
   {municipio:'Balsas',lat:-7.53,lng:-46.03,cos_mgha:51.2,biomassa:128.0,especie:'Eucalipto',ano:2023},
   {municipio:'São Luís',lat:-2.53,lng:-44.30,cos_mgha:40.5,biomassa:58.0,especie:'Teca',ano:2020},
@@ -1574,7 +1574,7 @@ const ILPF_DATA = [
   {municipio:'Fazenda Barbosa (Brejo)',lat:-3.7004,lng:-42.9404,cos_mgha:38.5,biomassa:52.0,especie:'Eucalyptus urograndis',ano:2018},
 ];
 
-// ILP — Rede ILPF / Embrapa Cocais
+// ILP — Rede ILPF / Embrapa Maranhão
 const ILP_DATA = [
   {municipio:'Balsas',lat:-7.53,lng:-46.03,area_ha:3950,ano:2022},
   {municipio:'São Raimundo das Mangabeiras',lat:-6.99,lng:-45.55,area_ha:3500,ano:2018},
@@ -1587,7 +1587,7 @@ const ILP_DATA = [
   {municipio:'Fazenda Barbosa (Brejo)',lat:-3.7004,lng:-42.9404,area_ha:3200,ano:2010},
 ];
 
-// SAF — Embrapa Cocais / ATER
+// SAF — Embrapa Maranhão / ATER
 const SAF_DATA = [
   {municipio:'Lago da Pedra',lat:-4.55,lng:-45.12,iaf:57.8,renda:5500,ano:2023},
   {municipio:'Monção',lat:-3.47,lng:-45.18,iaf:47.8,renda:3700,ano:2019},
@@ -3116,7 +3116,7 @@ const REF_CASES = {
   ilp: {
     nome: 'Fazenda Barbosa — URT ILP/ILPF', municipio: 'Brejo, MA',
     sistema: 'Soja + Braquiária brizanta + Bovinos + Eucalyptus urograndis',
-    area: 68, inicio: 2010, parceiro: 'Embrapa Meio-Norte / Cocais / UFMA',
+    area: 68, inicio: 2010, parceiro: 'Embrapa Meio-Norte / Maranhão / UFMA',
     destaque: 'Produtividade soja +37% (52 sc/ha pós-ILP); COS: 38,5 Mg/ha',
     cor: '#fbbf24', icon: '🐄',
     metricas: [['Área', '68 ha'], ['Soja pós-ILP', '52 sc/ha (+37%)'], ['COS', '38,5 Mg/ha'], ['Altitude', '1.125 m']]
@@ -3124,7 +3124,7 @@ const REF_CASES = {
   saf: {
     nome: 'Assentamento Primavera — SAF Multiestrato', municipio: 'Caxias, MA',
     sistema: 'Açaí + Cupuaçu + Mandioca + Castanha + Espécies Nativas',
-    area: 18, inicio: 2019, parceiro: 'EMBRAPA Cocais / UFMA / CPT',
+    area: 18, inicio: 2019, parceiro: 'EMBRAPA Maranhão / UFMA / CPT',
     destaque: 'Diversidade: 24 espécies; Renda: R$ 4.200/mês; Sequestro: 8,2 t C/ha/ano',
     cor: '#2dd4bf', icon: '🌱',
     metricas: [['Área', '18 ha'], ['Diversidade', '24 espécies'], ['Renda', 'R$ 4.200/mês'], ['COS', '88%']]
@@ -3172,7 +3172,7 @@ const REF_CASES = {
   extrat: {
     nome: 'Polo Babaçueiro — Lago do Junco', municipio: 'Lago do Junco, MA',
     sistema: 'Extração babaçu + Meliponicultura + SAF',
-    area: 280, inicio: 1985, parceiro: 'ASSEMA / EMBRAPA Cocais / MMA',
+    area: 280, inicio: 1985, parceiro: 'ASSEMA / EMBRAPA Maranhão / MMA',
     destaque: '2.100 t amêndoas/ano; 380 famílias quebradeiras; referência nacional em sociobiodiversidade',
     cor: '#86efac', icon: '🌰',
     metricas: [['Amêndoas', '2.100 t/ano'], ['Famílias', '380'], ['Área babaçual', '280 ha'], ['Desde', '1985']]
@@ -4031,7 +4031,7 @@ const GUIDES = {
     implantacao:['Mapeamento das áreas de ocorrência das espécies','Elaboração de Plano de Manejo Comunitário','Capacitação em técnicas de coleta sustentável','Organização coletiva (associação, cooperativa)','Registro no SIF e MAPA para processamento','Acesso a mercados institucionais (PAA, PNAE, PGPM-Bio)'],
     manejo:['Coleta respeitando período de maturação','Não desmatar áreas de ocorrência natural','Replantio de mudas em clareiras','Monitoramento dos estoques naturais','Beneficiamento mínimo in loco (aumenta renda)','Certificação de origem (selos orgânicos, sociobiodiversidade)'],
     indicadores:['Diversidade de espécies manejadas','Cobertura florestal (%)','Produção por espécie (t/ano)','Renda por família (R$/mês)','Área sob manejo (ha)'],
-    referencias:['EMBRAPA Cocais - Babaçu e biodiversidade MA','ASSEMA - Associação em Áreas de Assentamento','MMA - Plano Nacional de Sociobiodiversidade']
+    referencias:['EMBRAPA Maranhão - Babaçu e biodiversidade MA','ASSEMA - Associação em Áreas de Assentamento','MMA - Plano Nacional de Sociobiodiversidade']
   },
   fruticultura: {
     icon:'🍎', name:'Fruticultura — Banana, Abacaxi, Açaí, Caju',
@@ -4047,15 +4047,15 @@ const GUIDES = {
     implantacao:['Mapeamento das ocorrências naturais (não plantio — manejo natural)','Organização comunitária (associação ou cooperativa)','Capacitação em técnicas de coleta sustentável','Instalação de casas de farinha e processamento mínimo','Registro no SIF/MAPA para comercialização','Acesso ao PGPM-Bio (preço mínimo governo federal)'],
     manejo:['Coleta de frutos maduros caídos (não derrubar palmeiras)','Respeitar a cota de coleta por palmeira (máx. 60%)','Processar amêndoas localmente: farinha, óleo, carvão vegetal, mesocarpo','Manutenção da faixa de proteção ripária com babaçuais','Replantio em clareiras com mudas nativas','Certificação de origem: Sociobiodiversidade + Orgânico'],
     indicadores:['Produção de amêndoas (t/mês/família)','Preço médio amêndoa (R$/kg)','Cobertura babaçual (ha)','Renda familiar do extrativismo (R$/mês)','N° de quebradeiras organizadas'],
-    referencias:['ASSEMA — Associação em Áreas de Assentamento MA','EMBRAPA Cocais — Babaçu MA','Lei do Babaçu Livre — Municípios MA']
+    referencias:['ASSEMA — Associação em Áreas de Assentamento MA','EMBRAPA Maranhão — Babaçu MA','Lei do Babaçu Livre — Municípios MA']
   },
   reniva: {
     icon:'🥕', name:'RENIVA — Rede Nacional de Viveiros Agroecológicos',
     desc:'Programa Embrapa/MAPA de produção e distribuição de mudas florestais e frutíferas nativas para restauração agroecológica. No Maranhão foca em espécies do cerrado e amazônia: ipê, mogno, cedro, açaí, cupuaçu.',
-    implantacao:['Parceria com Embrapa Cocais ou UFMA para acesso ao programa','Construção do viveiro (sombrite 50%, bancadas, telado)','Capacitação em produção de substratos orgânicos','Coleta de sementes de matrizes identificadas e saudáveis','Germinação em recipientes adequados (tubetes, sacos plásticos)','Registro do viveiro no MAPA (cadastro nacional de sementes e mudas)'],
+    implantacao:['Parceria com Embrapa Maranhão ou UFMA para acesso ao programa','Construção do viveiro (sombrite 50%, bancadas, telado)','Capacitação em produção de substratos orgânicos','Coleta de sementes de matrizes identificadas e saudáveis','Germinação em recipientes adequados (tubetes, sacos plásticos)','Registro do viveiro no MAPA (cadastro nacional de sementes e mudas)'],
     manejo:['Irrigação 2x/dia (manhã e tarde)','Adubação orgânica: vermicomposto + farelo de arroz','Rustificação gradual das mudas antes da expedição','Controle fitossanitário preventivo (fungos, cochonilhas)','Rastreabilidade: ficha por espécie, lote e destino','Parceria com assentamentos e comunidades para distribuição'],
     indicadores:['N° de mudas produzidas/ano','Espécies disponíveis (diversidade)','Taxa de sobrevivência no campo (%)','Áreas restauradas com mudas RENIVA (ha)','Famílias atendidas'],
-    referencias:['Embrapa — Programa RENIVA','MAPA — Registro Nacional de Sementes e Mudas','Embrapa Cocais — Viveiros Comunitários MA']
+    referencias:['Embrapa — Programa RENIVA','MAPA — Registro Nacional de Sementes e Mudas','Embrapa Maranhão — Viveiros Comunitários MA']
   },
   afere: {
     icon:'🧪', name:'AFERE — Avaliação da Fertilidade e Recomendação de Adubação',
@@ -4063,7 +4063,7 @@ const GUIDES = {
     implantacao:['Coleta de amostras (0-20cm e 20-40cm) em ziguezague — 15-20 pontos/ha','Envio para laboratório credenciado (UFMA, EMBRAPA, privados)','Interpretação dos resultados via Sistema AFERE online','Elaboração do plano de calagem e adubação por talhão','Aplicação de calcário (PRNT>80%) 90 dias antes do plantio','Adubação de plantio e cobertura conforme recomendação'],
     manejo:['Análise de solo a cada 2 anos em áreas sob manejo','Monitoramento do pH (alvo: 5.5-6.2 para a maioria das culturas)','Adubação verde complementar (feijão de porco, braquiária)','Aplicação de gesso agrícola em solos com Al³⁺ acima de 0,5 cmolc/dm³','Compostagem e integração de matéria orgânica','Registro histórico de aplicações (caderno de campo)'],
     indicadores:['pH do solo','Saturação de bases (V%) — alvo > 50%','Matéria orgânica (g/dm³)','P disponível (mg/dm³)','K, Ca, Mg trocáveis (cmolc/dm³)','Alumínio (cmolc/dm³)'],
-    referencias:['EMBRAPA Cerrados — Sistema AFERE','EMBRAPA Cocais — Fertilidade de solos MA','UFV/UFMA — Manual de calagem e adubação']
+    referencias:['EMBRAPA Cerrados — Sistema AFERE','EMBRAPA Maranhão — Fertilidade de solos MA','UFV/UFMA — Manual de calagem e adubação']
   },
   vegetacao: {
     icon:'🌿', name:'Monitoramento e Restauração de Vegetação Nativa',
