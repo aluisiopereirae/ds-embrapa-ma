@@ -549,16 +549,16 @@ header {
 
 /* ═══ FLOATING CHAT RAG ═══ */
 #chat-fab {
-  position: fixed; bottom: 24px; right: 24px; z-index: 9998;
-  width: 56px; height: 56px; border-radius: 50%;
+  position: fixed; bottom: 10px; right: 10px; z-index: 9998;
+  width: 40px; height: 40px; border-radius: 50%;
   background: linear-gradient(135deg, #16a34a, #4ade80);
   border: none; cursor: pointer;
-  box-shadow: 0 4px 24px rgba(74,222,128,0.45);
+  box-shadow: 0 3px 14px rgba(74,222,128,0.45);
   display: flex; align-items: center; justify-content: center;
   transition: transform 0.25s, box-shadow 0.25s;
 }
-#chat-fab:hover { transform: scale(1.12); box-shadow: 0 8px 32px rgba(74,222,128,0.65); }
-#chat-fab svg { width: 26px; height: 26px; fill: #0a0f0a; }
+#chat-fab:hover { transform: scale(1.12); box-shadow: 0 6px 20px rgba(74,222,128,0.65); }
+#chat-fab svg { width: 18px; height: 18px; fill: #0a0f0a; }
 #chat-fab .chat-badge {
   position: absolute; top: -2px; right: -2px;
   width: 16px; height: 16px; border-radius: 50%;
@@ -567,7 +567,7 @@ header {
   font-size: 9px; font-weight: 700; color: #000;
 }
 #chat-panel {
-  position: fixed; bottom: 90px; right: 24px; z-index: 9999;
+  position: fixed; bottom: 58px; right: 10px; z-index: 9999;
   width: 390px; max-height: 580px;
   background: var(--bg2); border: 1px solid var(--border);
   border-radius: 18px; display: none; flex-direction: column;
@@ -2018,15 +2018,15 @@ function lerpColor(c1, c2, t) {
 
 // Per-indicator color gradients — vibrant, distinct with enhanced semantic colors
 const HM_CONFIG = {
-  idh:          { label:'IDH Municipal',       icon:'📈', color:'#38bdf8', bg:'#0c4a6e',
+  idh:          { label:'IDH Municipal',       icon:'📈', color:'#38bdf8', bg:'#0c4a6e', unit:'índice',
                   gradient:{0.0:'#000033',0.12:'#001a6b',0.25:'#0055aa',0.4:'#1a90d4',0.55:'#38bdf8',0.7:'#5dbaeb',0.85:'#7dd3fc',0.95:'#bae6fd',1.0:'#e0f7ff'} },
-  desmatamento: { label:'Desmatamento',         icon:'🪓', color:'#d4d4d4', bg:'#1f2937',
+  desmatamento: { label:'Desmatamento',         icon:'🪓', color:'#d4d4d4', bg:'#1f2937', unit:'km²',
                   gradient:{0.0:'#111111',0.15:'#1f2937',0.3:'#374151',0.45:'#6b7280',0.6:'#9ca3af',0.75:'#d1d5db',0.9:'#e5e7eb',1.0:'#f9fafb'} },
-  precipitacao: { label:'Precipitação',         icon:'🌧', color:'#60a5fa', bg:'#1e3a5f',
+  precipitacao: { label:'Precipitação',         icon:'🌧', color:'#60a5fa', bg:'#1e3a5f', unit:'mm',
                   gradient:{0.0:'#FFA500',0.1:'#FF8C00',0.25:'#4169E1',0.4:'#1E90FF',0.55:'#60a5fa',0.7:'#87CEEB',0.85:'#ADD8E6',1.0:'#001F5C'} },
-  temperatura:  { label:'Temperatura',          icon:'🌡', color:'#fbbf24', bg:'#78350f',
+  temperatura:  { label:'Temperatura',          icon:'🌡', color:'#fbbf24', bg:'#78350f', unit:'°C',
                   gradient:{0.0:'#1565C0',0.25:'#1E88E5',0.4:'#FFB300',0.55:'#FF6F00',0.7:'#E65100',0.85:'#FF6B6B',0.95:'#C62828',1.0:'#7F1D1D'} },
-  pobreza:      { label:'Pobreza',              icon:'💸', color:'#f472b6', bg:'#500724',
+  pobreza:      { label:'Pobreza',              icon:'💸', color:'#f472b6', bg:'#500724', unit:'%',
                   gradient:{0.0:'#1a001a',0.12:'#3d0040',0.25:'#86198f',0.4:'#a855f7',0.55:'#c026d3',0.7:'#e879f9',0.85:'#f0abfc',0.95:'#fae8ff',1.0:'#fdf2f8'} },
   vegetacao:    { label:'Vegetação',            icon:'🌳', color:'#4ade80', bg:'#052e16', unit:'%',
                   gradient:{0.0:'#f7fff7',0.15:'#d1fae5',0.3:'#a7f3d0',0.45:'#6ee7b7',0.6:'#4ade80',0.72:'#22c55e',0.82:'#16a34a',0.91:'#15803d',1.0:'#052e16'} },
@@ -2253,15 +2253,18 @@ function clearAllHeatmaps() {
 }
 
 function formatHeatmapLegendValue(value, unit) {
-  if (unit === '%') return `${value.toFixed(0)}%`;
+  if (unit === '%') return `${value.toFixed(1)}%`;
   if (unit === '°C') return `${value.toFixed(1)}°C`;
   if (unit === 'R$') return `R$ ${Math.round(value).toLocaleString('pt-BR')}`;
   if (unit === 'kt CO₂e') return `${Math.round(value).toLocaleString('pt-BR')} kt`;
   if (unit === 'ha') return `${Math.round(value).toLocaleString('pt-BR')} ha`;
+  if (unit === 'km²') return `${Math.round(value).toLocaleString('pt-BR')} km²`;
+  if (unit === 'mm') return `${Math.round(value).toLocaleString('pt-BR')} mm`;
   if (unit === 't') return `${Math.round(value).toLocaleString('pt-BR')} t`;
   if (unit === 'habitantes' || unit === 'unidades') return `${Math.round(value).toLocaleString('pt-BR')}`;
-  if (unit === 'score' || unit === 'índice') return value.toFixed(2);
-  return `${value.toFixed(2)} ${unit}`.trim();
+  if (unit === 'score') return value.toFixed(2);
+  if (unit === 'índice') return value.toFixed(3);
+  return `${value.toFixed(2)} ${unit == null || unit === 'undefined' ? 'unid.' : unit}`.trim();
 }
 
 function updateLegend() {
@@ -2282,7 +2285,7 @@ function updateLegend() {
         <div class="legend-scale">
           ${ticks.map(v => `<span>${v}</span>`).join('')}
         </div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.85);margin-top:4px;">${c.unit === 'score' ? 'Score' : c.unit}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.85);margin-top:4px;">${c.unit === 'score' ? 'Score' : (c.unit == null || c.unit === 'undefined' ? 'unid.' : c.unit)}</div>
       </div>
     </div>`;
   }).join('');
