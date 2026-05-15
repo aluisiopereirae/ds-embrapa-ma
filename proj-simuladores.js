@@ -1174,13 +1174,16 @@ function updateVulnChart() {
     _destroyChart('vuln-radar');
     const radarKeys = ['gee','desmat','pob','fome','idh','pib'];
     const radarLabels = ['GEE','Desmat.','Pobreza','Fome','IDH','PIB'];
+    // higher_better:false (GEE, desmat, pobreza, fome) → alto valor = mais vulnerável → n alto = grande no radar
+    // higher_better:true  (IDH, PIB)                  → alto valor = melhor = menos vulnerável → 1-n grande = pequeno no radar
     const radarVals = radarKeys.map(k => {
       const cfg = COMP_IND[k];
       const vals = _allVals(cfg.col);
       const mn = Math.min(...vals), mx = Math.max(...vals);
       const raw = _simVal(row, cfg.col);
       const n = (raw-mn)/(mx-mn||1);
-      return (cfg.higher_better ? n : 1-n) * 100; // vulnerability direction
+      //return (cfg.higher_better ? 1-n : n) * 100;
+      return (cfg.higher_better ? n : 1-n) * 100;
     });
     const avgVals = radarKeys.map(k => {
       const cfg = COMP_IND[k];
@@ -1188,6 +1191,7 @@ function updateVulnChart() {
       const mn = Math.min(...vals), mx = Math.max(...vals);
       const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
       const n = (avg-mn)/(mx-mn||1);
+      //return (cfg.higher_better ? 1-n : n) * 100;
       return (cfg.higher_better ? n : 1-n) * 100;
     });
     _simCharts['vuln-radar'] = new Chart(radarCtx, {
