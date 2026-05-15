@@ -742,6 +742,54 @@ header {
   #chat-panel { width: calc(100vw - 16px); right: 8px; bottom: 80px; }
 }
 
+/* ═══ PROJ SUB-TABS ═══ */
+#proj-subtab-bar {
+  display: flex; gap: 6px; padding: 0 0 16px 0; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border); margin-bottom: 16px;
+}
+.proj-stab {
+  background: none; border: 1px solid var(--border);
+  color: var(--text2); padding: 7px 16px; border-radius: 8px;
+  cursor: pointer; font-size: 13px; font-family: 'DM Sans',sans-serif;
+  transition: all 0.2s; white-space: nowrap;
+}
+.proj-stab:hover { background: var(--hover); border-color: var(--border2); color: var(--green); }
+.proj-stab.active { background: var(--card); border-color: var(--green3); color: var(--green); font-weight: 600; }
+
+/* Análise comparativa */
+#comp-layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; align-items: start; }
+@media(max-width:900px){ #comp-layout { grid-template-columns: 1fr; } }
+#comp-map-container { height: 420px; border-radius: 12px; border: 1px solid var(--border); background: #0d1a0d; }
+.comp-ind-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+.comp-ind-label { font-size: 11px; color: var(--text3); min-width: 80px; text-transform: uppercase; letter-spacing: 0.08em; }
+.comp-ind-select { background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 6px 10px; font-size: 12px; cursor: pointer; outline: none; flex: 1; }
+.comp-pair-btn { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: none; color: var(--text3); cursor: pointer; font-size: 11px; transition: all 0.15s; white-space: nowrap; }
+.comp-pair-btn:hover { background: var(--hover); color: var(--green); border-color: var(--green3); }
+.comp-pair-btn.active { background: var(--green3); color: #fff; border-color: var(--green3); font-weight: 600; }
+.comp-corr-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 12px; color: var(--text2); }
+.sim-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+.sim-card-title { font-family: 'Syne',sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.sim-param { margin-bottom: 14px; }
+.sim-param label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+.sim-slider { width: 100%; accent-color: var(--green2); cursor: pointer; }
+.sim-select { background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 6px 10px; font-size: 12px; width: 100%; cursor: pointer; outline: none; }
+.sim-result-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(140px,1fr)); gap: 10px; margin: 14px 0; }
+.sim-result-card { background: var(--card); border-radius: 10px; padding: 12px; text-align: center; border: 1px solid var(--border); }
+.sim-result-val { font-size: 20px; font-weight: 700; font-family: 'Syne',sans-serif; color: var(--green); }
+.sim-result-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+.sim-btn { padding: 9px 20px; border-radius: 9px; border: none; cursor: pointer; font-size: 13px; font-family: 'DM Sans',sans-serif; transition: all 0.2s; }
+.sim-btn-primary { background: var(--green3); color: #fff; }
+.sim-btn-primary:hover { background: var(--green2); }
+#plantio-canvas { border-radius: 10px; border: 1px solid var(--border); display: block; margin: 0 auto; max-width: 100%; }
+.sim-tabs-inner { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.sim-itab { padding: 5px 13px; border-radius: 7px; border: 1px solid var(--border); background: none; color: var(--text3); cursor: pointer; font-size: 12px; transition: all 0.15s; }
+.sim-itab.active { background: var(--card); border-color: var(--green3); color: var(--green); }
+.vuln-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+.vuln-bar-label { width: 120px; color: var(--text2); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vuln-bar-track { flex: 1; height: 10px; border-radius: 5px; background: var(--card); overflow: hidden; }
+.vuln-bar-fill { height: 100%; border-radius: 5px; transition: width 0.4s; }
+.vuln-bar-val { width: 50px; color: var(--text3); font-size: 11px; }
+
 /* ═══ SETTINGS ═══ */
 #settings-btn {
   background: none; border: 1px solid transparent;
@@ -1376,6 +1424,16 @@ header {
 
     <!-- PROJECTIONS PANEL -->
     <div id="view-proj" class="panel" style="display:none;">
+
+      <!-- ═══ SUB-TABS PROJEÇÕES ═══ -->
+      <div id="proj-subtab-bar">
+        <button class="proj-stab active" data-tab="cenarios" onclick="showProjSubTab('cenarios')">📈 Cenários 2025–2050</button>
+        <button class="proj-stab" data-tab="analise" onclick="showProjSubTab('analise')">🗺 Análise Comparativa Municipal</button>
+        <button class="proj-stab" data-tab="simuladores" onclick="showProjSubTab('simuladores')">🧪 Simuladores de Cenários</button>
+      </div>
+
+      <!-- ═══ Cenários ═══ -->
+      <div id="proj-cenarios">
       <div class="sec-header">
         <div class="sec-title">📈 Projeções GEE 2025–2050 — Cenários Embrapa × SEEG × IPCC AR6</div>
         <div style="display:flex;gap:8px;align-items:center;">
@@ -1520,8 +1578,15 @@ header {
       </div>
       -->
 
+      </div><!-- /proj-cenarios -->
 
-    </div>
+      <!-- ═══ Análise Comparativa Municipal ═══ -->
+      <div id="proj-analise" style="display:none;"></div>
+
+      <!-- ═══ Simuladores de Cenários ═══ -->
+      <div id="proj-simuladores" style="display:none;"></div>
+
+    </div><!-- /view-proj -->
   </main>
 </div>
 
@@ -2878,7 +2943,10 @@ function showView(v) {
   if (v === 'guide') { renderGuide(); }
   if (v === 'proj') {
     renderProjCharts();
-    setTimeout(() => { if (!document.getElementById('ref-case-content')?.innerHTML) showRefCase('ilp'); }, 200);
+    setTimeout(() => {
+      if (!document.getElementById('ref-case-content')?.innerHTML) showRefCase('ilp');
+      if (typeof initSimuladores === 'function') initSimuladores();
+    }, 200);
   }
   if (v === 'register') renderRegisterForm();
   if (v === 'proj') renderProjCharts();
@@ -4847,6 +4915,8 @@ function resetSettings() {
 // Apply on page load
 loadSettings();
 </script>
+
+<script src="proj-simuladores.js"></script>
 
 <!-- ═══ SETTINGS MODAL ═══ -->
 <div id="settings-overlay" onclick="if(event.target===this)closeSettings()">
