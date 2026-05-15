@@ -10,9 +10,9 @@
 
 Esta plataforma foi desenvolvida como parte de um trabalho de ciência de dados da **Embrapa Maranhão**, com o objetivo de centralizar, visualizar e analisar dados de unidades produtivas sustentáveis distribuídas pelo estado do Maranhão.
 
-A aplicação é inteiramente **client-side** — um único arquivo HTML com dados embutidos — acessível diretamente pelo navegador, sem necessidade de servidor ou instalação.
+A aplicação é projetada com dados de diferentes fontes — acessível diretamente pelo navegador, sem necessidade de servidor ou instalação.
 
-**Levantamento de dados:** Aluisio Pereira  
+**Levantamento de dados:** [Aluisio Pereira](https://www.embrapa.br/equipe/-/empregado/364662/aluisio-jose-pereira) (Pesquisador - Ciência de Dados)  
 **Fontes:** Embrapa · IBGE · SEEG · PRODES · IMESC · CAR · MapBiomas · BRLUC
 
 ---
@@ -50,7 +50,6 @@ A aplicação é inteiramente **client-side** — um único arquivo HTML com dad
 - Gráficos interativos (Chart.js): distribuição por sistema, por região, por ano de implantação, balanço de carbono e renda
 - Aba **Estado do Maranhão** com análise comparativa por município: scatter plots, ranking Top 10, distribuição por bioma e por indicador
 - Casos de Referência por sistema com fichas técnicas detalhadas (ILP/ILPF, SAF, Sisteminha, Extrativismo, Fruticultura, Roça)
-- Destaque especial para a **Fazenda Barbosa (URT ILP/ILPF — Brejo-MA)**
 
 ### 🗺 Mapa Interativo
 - Mapa Leaflet com camadas por sistema produtivo, filtráveis individualmente ou em conjunto
@@ -64,7 +63,7 @@ A aplicação é inteiramente **client-side** — um único arquivo HTML com dad
 - Filtro por ano de implantação
 - Popup detalhado por ponto: dados da unidade produtiva + indicadores municipais IBGE/IMESC 2024
 - Legenda dinâmica no canto inferior direito para Fruticultura e Extrativismo
-- Exportação do mapa em **PNG** e **JPG** com captura precisa da área visível
+- Exportação do mapa em PNG e JPG com captura da área visível
 - Cadastro e edição de novos pontos diretamente no mapa
 
 ### 📈 Projeções 2025–2050
@@ -106,13 +105,13 @@ A aplicação é inteiramente **client-side** — um único arquivo HTML com dad
 
 | Tecnologia | Uso |
 |---|---|
-| HTML5 / CSS3 / JavaScript | Aplicação client-side, sem framework |
+| Análise de dados em Python / HTML5 / CSS3 / JavaScript |
 | [Leaflet.js](https://leafletjs.com/) | Mapa interativo |
 | [Leaflet.heat](https://github.com/Leaflet/Leaflet.heat) | Camadas de heatmap |
 | [Chart.js](https://www.chartjs.org/) | Gráficos e visualizações |
 | [html2canvas](https://html2canvas.hertzen.com/) | Exportação do mapa como imagem |
 | [Claude API (Anthropic)](https://www.anthropic.com/) | Assistente de IA com RAG |
-| GitHub Pages | Hospedagem estática |
+| Hospedagem: GitHub Pages | Hospedagem estática |
 
 ---
 
@@ -128,10 +127,11 @@ A aplicação é inteiramente **client-side** — um único arquivo HTML com dad
 | **CAR** | Cadastro Ambiental Rural |
 | **MapBiomas** | Cobertura e uso do solo |
 | **BRLUC** | Uso da terra e carbono no Brasil |
+| **Outras** | Para combinações e comparações |
 
 ---
 
-## Estrutura do Projeto
+## Estrutura do repositório
 
 ```
 ds-embrapa-ma/
@@ -140,7 +140,7 @@ ds-embrapa-ma/
 └── README.md           # Este arquivo
 ```
 
-> Todos os dados, estilos e lógica estão contidos em `index.html`, tornando a plataforma portável e de fácil distribuição.
+> Os dados principais, estilos e lógica estão contidos em `index.html`, tornando a plataforma portável e de fácil distribuição.
 
 ---
 
@@ -155,5 +155,5 @@ ds-embrapa-ma/
 
 ## Autor
 
-**Aluisio Pereira**  
-Pesquisador / Analista — Embrapa Maranhão
+[**Aluisio Pereira**](https://www.embrapa.br/equipe/-/empregado/364662/aluisio-jose-pereira) 
+Pesquisador (Ciência de Dados) — Embrapa Maranhão
