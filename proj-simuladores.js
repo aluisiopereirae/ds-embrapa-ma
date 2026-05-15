@@ -574,46 +574,44 @@ function _buildSimHTML() {
 
 <!-- SIM 1: Conversão de Áreas Degradadas -->
 <div id="simtab-conversao">
-<div style="display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start">
-<div>
-  <div class="sim-card">
-    <div class="sim-card-title">🔄 Conversão de Áreas Degradadas no MA</div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:14px">
-      Responde:<br>
-      • <em>A conversão de X% do MA em sistemas integrados reduzirá quanto de GEE?</em><br>
-      • <em>Qual o impacto climático?</em><br>
-      • <em>Quanto de investimento é necessário?</em>
+  <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start">
+    <div class="sim-card" style="margin:0">
+      <div class="sim-card-title">🔄 Conversão de Áreas Degradadas no MA</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:14px">
+        Responde:<br>
+        • <em>A conversão de X% do MA em sistemas integrados reduzirá quanto de GEE?</em><br>
+        • <em>Qual o impacto climático?</em><br>
+        • <em>Quanto de investimento é necessário?</em>
+      </div>
+      <div class="sim-param">
+        <label>% de área degradada convertida: <strong id="conv-pct-val">${convState.pct}%</strong>
+          <br><small style="color:var(--text3)">Área degradada total estimada: 7,5 M ha</small>
+        </label>
+        <input type="range" class="sim-slider" id="conv-pct" min="1" max="100" value="${convState.pct}" oninput="updateConvSlider()">
+      </div>
+      <div class="sim-param">
+        <label>Sistema adotado:</label>
+        <select class="sim-select" id="conv-sys" onchange="runConversaoSim()">${sysOptions}</select>
+      </div>
+      <div class="sim-param">
+        <label>Horizonte de tempo: <strong id="conv-years-val">${convState.years} anos</strong></label>
+        <input type="range" class="sim-slider" id="conv-years" min="5" max="40" step="5" value="${convState.years}" oninput="updateConvSlider()">
+      </div>
     </div>
-    <div class="sim-param">
-      <label>% de área degradada convertida: <strong id="conv-pct-val">${convState.pct}%</strong>
-        <br><small style="color:var(--text3)">Área degradada total estimada: 7,5 M ha</small>
-      </label>
-      <input type="range" class="sim-slider" id="conv-pct" min="1" max="100" value="${convState.pct}" oninput="updateConvSlider()">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div id="conv-results"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="chart-card">
+          <div class="chart-title">📈 Trajetória de Impacto ao Longo do Tempo</div>
+          <div class="chart-wrap" style="height:220px"><canvas id="conv-chart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">⚖️ Comparativo de Sistemas — Redução de GEE por ha em ${convState.years} anos</div>
+          <div class="chart-wrap" style="height:220px"><canvas id="conv-cmp-chart"></canvas></div>
+        </div>
+      </div>
     </div>
-    <div class="sim-param">
-      <label>Sistema adotado:</label>
-      <select class="sim-select" id="conv-sys" onchange="runConversaoSim()">${sysOptions}</select>
-    </div>
-    <div class="sim-param">
-      <label>Horizonte de tempo: <strong id="conv-years-val">${convState.years} anos</strong></label>
-      <input type="range" class="sim-slider" id="conv-years" min="5" max="40" step="5" value="${convState.years}" oninput="updateConvSlider()">
-    </div>
-    <button class="sim-btn sim-btn-primary" style="width:100%" onclick="runConversaoSim()">▶ Calcular Impacto</button>
   </div>
-</div>
-
-<div>
-  <div id="conv-results" style="margin-bottom:14px"></div>
-  <div class="chart-card">
-    <div class="chart-title">📈 Trajetória de Impacto ao Longo do Tempo</div>
-    <div class="chart-wrap" style="height:240px"><canvas id="conv-chart"></canvas></div>
-  </div>
-  <div class="chart-card" style="margin-top:14px">
-    <div class="chart-title">⚖️ Comparativo de Sistemas — Redução de GEE por ha em ${convState.years} anos</div>
-    <div class="chart-wrap" style="height:200px"><canvas id="conv-cmp-chart"></canvas></div>
-  </div>
-</div>
-</div>
 </div>
 
 <!-- SIM 2: Plantio Interativo -->
