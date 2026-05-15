@@ -94,12 +94,52 @@ header {
   width: 240px; min-width: 240px;
   background: var(--bg2);
   border-right: 1px solid var(--border);
-  overflow-y: auto;
-  padding: 16px 0;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 0;
+  transition: width 0.22s ease, min-width 0.22s ease;
+  flex-shrink: 0;
 }
 .sidebar.collapsed {
-  width: 0; min-width: 0; overflow: hidden; padding: 0;
+  width: 48px; min-width: 48px;
 }
+
+/* Botão toggle no topo da sidebar */
+.sidebar-toggle-btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 11px 14px;
+  background: none; border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2); cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  text-align: left; transition: background 0.18s, color 0.18s;
+  white-space: nowrap; flex-shrink: 0;
+}
+.sidebar-toggle-btn:hover { background: var(--card); color: var(--green); }
+.sidebar-toggle-btn .sb-icon { font-size: 15px; flex-shrink: 0; }
+.sidebar-toggle-btn .sb-label { flex: 1; }
+.sidebar.collapsed .sidebar-toggle-btn { justify-content: center; padding: 11px 0; }
+.sidebar.collapsed .sidebar-toggle-btn .sb-label { display: none; }
+
+/* Icon rail — estado retraído */
+.sidebar.collapsed .sidebar-section { padding: 0; }
+.sidebar.collapsed .accordion-header { display: none; }
+.sidebar.collapsed .accordion-content,
+.sidebar.collapsed .accordion-content.collapsed { max-height: 9999px !important; }
+.sidebar.collapsed .sidebar-label,
+.sidebar.collapsed .sidebar-sublabel { display: none; }
+.sidebar.collapsed .accordion-content > div { padding: 0 !important; border: none !important; margin: 0 !important; }
+.sidebar.collapsed .sys-btn {
+  font-size: 0; justify-content: center;
+  padding: 7px 0; margin: 0;
+  border-radius: 0; border-color: transparent; gap: 0;
+}
+.sidebar.collapsed .sys-btn .icon { font-size: 16px; }
+.sidebar.collapsed .sys-btn .toggle-dot,
+.sidebar.collapsed .sys-btn .cnt { display: none; }
+.sidebar.collapsed .sidebar-section[style*="border-top"] { border-top: 1px solid var(--border) !important; }
+
+/* Sidebar interior expande com padding */
+.sidebar-inner { padding: 8px 0 16px; }
 
 .sidebar-section { padding: 0 12px 8px; }
 .sidebar-label {
@@ -499,7 +539,7 @@ header {
 @media (max-width: 768px) {
   .app { flex-direction: column; }
   .sidebar { width: 100%; min-width: 100%; order: -1; }
-  .sidebar.collapsed { width: 100%; min-width: 100%; }
+  .sidebar.collapsed { width: 48px; min-width: 48px; }
   .main { width: 100%; }
   .map-toolbar { flex-wrap: wrap; }
   .data-table { font-size: 12px; }
@@ -928,6 +968,12 @@ header {
 <div class="app">
   <!-- SIDEBAR -->
   <aside class="sidebar">
+    <!-- Botão toggle topo da sidebar -->
+    <button class="sidebar-toggle-btn" id="btn-toggle-sidebar" onclick="toggleSidebar()" title="Recolher menu lateral">
+      <span class="sb-icon">☰</span>
+      <span class="sb-label">Recolher menu</span>
+    </button>
+    <div class="sidebar-inner">
     <!-- SISTEMAS & TECNOLOGIAS EMBRAPA - ACCORDION -->
     <div class="sidebar-section">
       <button class="accordion-header" onclick="toggleAccordion('sistemas-tech')">
@@ -937,7 +983,7 @@ header {
       <div class="accordion-content" id="sistemas-tech">
         <!-- SISTEMAS PRINCIPAIS -->
         <div style="padding:0 12px 8px;">
-          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;padding:6px 4px 4px;margin-bottom:4px;border-bottom:1px solid var(--border)">Filtrar Sistemas</div>
+          <div class="sidebar-sublabel" style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;padding:6px 4px 4px;margin-bottom:4px;border-bottom:1px solid var(--border)">Filtrar Sistemas</div>
           
           <button class="sys-btn active" id="techbtn-sys-all" onclick="toggleSysLayer('all', this)">
             <span class="icon">🌍</span> Todos <span class="cnt" id="cnt-all">0</span><span class="toggle-dot"></span>
@@ -976,7 +1022,7 @@ header {
 
         <!-- TECNOLOGIAS COMPLEMENTARES EMBRAPA -->
         <div style="padding:0 12px 8px;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;">
-          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;padding:6px 4px 4px;margin-bottom:4px;border-bottom:1px solid var(--border)">Tecnologias Complementares</div>
+          <div class="sidebar-sublabel" style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;padding:6px 4px 4px;margin-bottom:4px;border-bottom:1px solid var(--border)">Tecnologias Complementares</div>
           <button class="sys-btn" id="techbtn-bab" onclick="toggleLayerGroup('bab_layer', this); showView('map');"><span class="icon">🌴</span> Babaçu<span class="toggle-dot"></span></button>
           <button class="sys-btn" id="techbtn-reniva" onclick="toggleLayerGroup('reniva_layer', this); showView('map');"><span class="icon">🥕</span> RENIVA<span class="toggle-dot"></span></button>
           <button class="sys-btn" id="techbtn-afere" onclick="toggleLayerGroup('afere_layer', this); showView('map');"><span class="icon">🧪</span> AFERE (Solo)<span class="toggle-dot"></span></button>
@@ -1007,7 +1053,9 @@ header {
       <button class="sys-btn" id="hmbtn-caf" onclick="toggleHeatmapSidebar('caf')"><span class="icon">👩‍🌾</span> CAF Agricultura Familiar<span class="toggle-dot"></span></button>
       <button class="sys-btn" id="hmbtn-pib" onclick="toggleHeatmapSidebar('pib')"><span class="icon">💰</span> PIB<span class="toggle-dot"></span></button>
       <button class="sys-btn" id="hmbtn-populacao" onclick="toggleHeatmapSidebar('populacao')"><span class="icon">👥</span> População<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-alfabetizacao" onclick="toggleHeatmapSidebar('alfabetizacao')"><span class="icon">📚</span> Alfabetização<span class="toggle-dot"></span></button></aside>
+      <button class="sys-btn" id="hmbtn-alfabetizacao" onclick="toggleHeatmapSidebar('alfabetizacao')"><span class="icon">📚</span> Alfabetização<span class="toggle-dot"></span></button>
+    </div><!-- /sidebar-inner -->
+  </aside>
 
   <!-- MAIN CONTENT -->
   <main class="main">
@@ -1242,7 +1290,6 @@ header {
     <div id="view-map" class="panel" style="padding:0; display:none; flex-direction:column;">
       <!-- ROW 1: Base layers + Add point -->
       <div class="map-toolbar" style="flex-wrap:wrap;gap:6px;">
-        <button class="map-btn" id="btn-toggle-sidebar" onclick="toggleSidebar()">☰ Menu</button>
         <button class="map-btn active" id="btn-map-normal" onclick="setMapLayer('normal')">🗺 Normal</button>
         <button class="map-btn" id="btn-map-satellite" onclick="setMapLayer('satellite')">🛰 Satélite</button>
         <button class="map-btn" id="btn-map-hybrid" onclick="setMapLayer('hybrid')">🗺🛰 Híbrido+Labels</button>
@@ -2348,10 +2395,18 @@ function toggleSidebar() {
   const isCollapsed = sidebar.classList.contains('collapsed');
   if (isCollapsed) {
     sidebar.classList.remove('collapsed');
-    btn.textContent = '◀ ☰ Menu';
+    if (btn) {
+      btn.title = 'Recolher menu lateral';
+      btn.querySelector('.sb-icon').textContent = '☰';
+      btn.querySelector('.sb-label').textContent = 'Recolher menu';
+    }
   } else {
     sidebar.classList.add('collapsed');
-    btn.textContent = '▶ ☰ Menu';
+    if (btn) {
+      btn.title = 'Expandir menu lateral';
+      btn.querySelector('.sb-icon').textContent = '☰';
+      btn.querySelector('.sb-label').textContent = 'Expandir';
+    }
   }
 }
 
@@ -4813,6 +4868,12 @@ function applySettings() {
   if (appSettings.sidebarCompact) {
     document.querySelector('.sidebar')?.classList.add('collapsed');
     document.querySelector('.main-content')?.classList.add('full');
+    const sbBtn = document.getElementById('btn-toggle-sidebar');
+    if (sbBtn) {
+      sbBtn.title = 'Expandir menu lateral';
+      const ico = sbBtn.querySelector('.sb-icon'); if (ico) ico.textContent = '☰';
+      const lbl = sbBtn.querySelector('.sb-label'); if (lbl) lbl.textContent = 'Expandir';
+    }
   }
 }
 
