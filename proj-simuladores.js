@@ -21,67 +21,67 @@ const MC = {
 /* ─────────── FATORES POR SISTEMA (literatura científica) ─────────── */
 // seq_co2: t CO₂eq/ha/ano sequestrado líquido vs. área degradada basal (2.5 t CO₂eq/ha/ano emitido)
 // invest_ha: R$/ha investimento inicial  |  renda_ha: R$/ha/ano renda bruta estimada
-// carbon_ha: t C/ha/ano estocado  |  temp_red: °C redução microclimática por ha implantado
+// carbon_ha: t C/ha/ano estocado  |  temp_red: °C de redução microclimática regional se 100% da área degradada for convertida (escala proporcional à fração implantada)
 // empregos: empregos/1000 ha  |  biodiv: índice relativo de biodiversidade 0-10
 const SIM_SYSTEMS = {
   ilp: {
     label:'ILP', icon:'🐄', color:'#60a5fa',
     seq_co2:2.1, invest_ha:2500, renda_ha:1800, empregos:8,
-    carbon_ha:1.2, temp_red:0.003, biodiv:5,
+    carbon_ha:1.2, temp_red:1.5, biodiv:5,
     desc:'Integração Lavoura-Pecuária: pastagem + lavoura em rotação'
   },
   ilpf: {
     label:'ILPF', icon:'🌳', color:'#4ade80',
     seq_co2:3.8, invest_ha:4500, renda_ha:2200, empregos:12,
-    carbon_ha:2.8, temp_red:0.006, biodiv:7,
+    carbon_ha:2.8, temp_red:2.2, biodiv:7,
     desc:'Integração Lavoura-Pecuária-Floresta: maior sequestro de carbono'
   },
   saf: {
     label:'SAF', icon:'🌱', color:'#86efac',
     seq_co2:5.2, invest_ha:6000, renda_ha:1600, empregos:18,
-    carbon_ha:4.1, temp_red:0.009, biodiv:9,
+    carbon_ha:4.1, temp_red:3.0, biodiv:9,
     desc:'Sistema Agroflorestal: máximo sequestro e biodiversidade'
   },
   sisteminha: {
     label:'Sisteminha Embrapa', icon:'🐓', color:'#fbbf24',
     seq_co2:0.8, invest_ha:800, renda_ha:3200, empregos:45,
-    carbon_ha:0.5, temp_red:0.001, biodiv:4,
+    carbon_ha:0.5, temp_red:0.8, biodiv:4,
     desc:'Produção integrada de subsistência — alta geração de emprego'
   },
   apicultura: {
     label:'Apicultura', icon:'🐝', color:'#f59e0b',
     seq_co2:0.3, invest_ha:1200, renda_ha:2800, empregos:25,
-    carbon_ha:0.2, temp_red:0.001, biodiv:6,
+    carbon_ha:0.2, temp_red:0.6, biodiv:6,
     desc:'Polinizadores + conservação da vegetação nativa'
   },
   meliponicultura: {
     label:'Meliponicultura', icon:'🍯', color:'#d97706',
     seq_co2:0.4, invest_ha:900, renda_ha:3500, empregos:28,
-    carbon_ha:0.25, temp_red:0.001, biodiv:7,
+    carbon_ha:0.25, temp_red:0.7, biodiv:7,
     desc:'Abelhas nativas — serviços ecossistêmicos e biodiversidade'
   },
   roca: {
     label:'Roça Sustentável', icon:'🌾', color:'#a3e635',
     seq_co2:1.2, invest_ha:600, renda_ha:900, empregos:30,
-    carbon_ha:0.8, temp_red:0.002, biodiv:5,
+    carbon_ha:0.8, temp_red:1.0, biodiv:5,
     desc:'Agricultura familiar sem queima — redução de GEE e fogo'
   },
   piscicultura: {
     label:'Piscicultura', icon:'🐟', color:'#22d3ee',
     seq_co2:0.5, invest_ha:8000, renda_ha:5500, empregos:15,
-    carbon_ha:0.3, temp_red:0.002, biodiv:5,
+    carbon_ha:0.3, temp_red:0.9, biodiv:5,
     desc:'Aquicultura continental — renda e segurança alimentar'
   },
   extrativismo: {
     label:'Extrativismo Sust.', icon:'🌰', color:'#a78bfa',
     seq_co2:1.5, invest_ha:300, renda_ha:800, empregos:20,
-    carbon_ha:1.0, temp_red:0.003, biodiv:8,
+    carbon_ha:1.0, temp_red:2.5, biodiv:8,
     desc:'Babaçu, açaí, buriti — conservação e renda florestal'
   },
   fruticultura: {
     label:'Fruticultura', icon:'🍎', color:'#fb923c',
     seq_co2:2.0, invest_ha:3500, renda_ha:3800, empregos:22,
-    carbon_ha:1.4, temp_red:0.004, biodiv:6,
+    carbon_ha:1.4, temp_red:1.8, biodiv:6,
     desc:'Pomares diversificados — renda e sombreamento'
   }
 };
@@ -769,7 +769,7 @@ function runConversaoSim() {
   const geeRedKtAnual = areaHa * (DEGRADED_EMISSION + sys.seq_co2) / 1000; // kt CO₂eq/ano
   const geeTotalKt    = geeRedKtAnual * years;
   const carbonoTotalMt = (areaHa * sys.carbon_ha * years) / 1e6;
-  const tempReducao   = areaHa * sys.temp_red;
+  const tempReducao   = sys.temp_red * (areaHa / MA_DEGRADED_HA);
   const investTotal   = areaHa * sys.invest_ha;
   const rendaAnual    = areaHa * sys.renda_ha;
   const empregos      = (areaHa / 1000) * sys.empregos;
