@@ -10,6 +10,7 @@ const SA_LAYOUTS = {
       const rows = Math.max(1, Math.floor(H / spacingRow));
       const cosA = Math.cos(angleRad), sinA = Math.sin(angleRad);
       const cx = W / 2, cy = H / 2;
+      const ns = Math.max(1, nSpecies);
       const pts = [];
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -18,7 +19,7 @@ const SA_LAYOUTS = {
           pts.push({
             x: cx + x0 * cosA - y0 * sinA,
             y: cy + x0 * sinA + y0 * cosA,
-            row: r, col: c, speciesIdx: 0
+            row: r, col: c, speciesIdx: r % ns  // alterna espécies por linha
           });
         }
       }
@@ -30,6 +31,7 @@ const SA_LAYOUTS = {
     label: 'Hexagonal', icon: '⬡', desc: 'Grade hexagonal — maior densidade por área',
     generate(areaM2, spacingRow, spacingPlant, angleRad = 0, nSpecies = 1) {
       const W = Math.sqrt(areaM2), H = areaM2 / W;
+      const ns = Math.max(1, nSpecies);
       const pts = [];
       const rows = Math.max(1, Math.floor(H / spacingRow));
       for (let r = 0; r < rows; r++) {
@@ -39,7 +41,7 @@ const SA_LAYOUTS = {
           pts.push({
             x: offset + (c + 0.5) * spacingPlant,
             y: (r + 0.5) * spacingRow,
-            row: r, col: c, speciesIdx: 0
+            row: r, col: c, speciesIdx: r % ns  // alterna espécies por linha
           });
         }
       }

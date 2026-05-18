@@ -171,12 +171,14 @@ function _buildSaHTML() {
           </div>
 
           <!-- Seletor de localização -->
-          <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap">
-            <div style="flex:1;min-width:180px">
+          <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:10px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
               <div style="font-size:10px;color:var(--text3);margin-bottom:3px">Município (centro da propriedade):</div>
-              <select id="sa-sat-munic" class="sim-select" onchange="sa_satSetMunic()" style="width:100%">
-                <option value="">— Selecionar município —</option>
-              </select>
+              <input type="text" id="sa-sat-munic-input" list="sa-sat-munic-list"
+                placeholder="🔍 Pesquisar município..."
+                onchange="sa_satSelectByName(this.value)" oninput="sa_satSelectByName(this.value)"
+                style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text1);font-size:12px;font-family:inherit;box-sizing:border-box">
+              <datalist id="sa-sat-munic-list"></datalist>
             </div>
             <div>
               <div style="font-size:10px;color:var(--text3);margin-bottom:3px">Latitude</div>
@@ -194,20 +196,18 @@ function _buildSaHTML() {
             </button>
           </div>
 
-          <!-- Dica de dados IBGE -->
-          <div style="background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.18);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--text3)">
-            💡 <strong style="color:var(--green)">Dica:</strong> Selecione o município para usar dados do IBGE/MUNIC_DATA como ponto de partida.
-            Em seguida clique no mapa para posicionar o centro exato da propriedade.
-            Os parâmetros de plantio do painel esquerdo são aplicados automaticamente.
+          <!-- Dica -->
+          <div style="background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.15);border-radius:7px;padding:7px 11px;margin-bottom:10px;font-size:11px;color:var(--text3)">
+            💡 Pesquise o município para centralizar no terreno. Clique no mapa para posicionar o centro exato da propriedade. Os parâmetros do painel esquerdo são aplicados automaticamente.
           </div>
 
           <!-- Mapa Leaflet -->
           <div id="sa-sat-map" style="height:520px;border-radius:8px;background:#111;overflow:hidden;border:1px solid var(--border)"></div>
 
           <div style="font-size:10px;color:var(--text3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap">
-            <span>🛰️ Imagens © Esri World Imagery</span>
-            <span>📍 Clique no mapa para reposicionar o centro do plantio</span>
-            <span>🔍 Scroll / pinça para zoom dinâmico</span>
+            <span>🛰️ Esri World Imagery</span>
+            <span>📍 Clique no mapa → reposiciona o plantio</span>
+            <span>🔍 Scroll / pinça para zoom</span>
             <span id="sa-sat-count"></span>
           </div>
         </div>
@@ -421,9 +421,20 @@ function sa_selectVariant(id) {
 
 // ─── Sliders (dinâmico com debounce) ─────────────────────────────────────────
 function sa_onSlider() {
+  const g = id => document.getElementById(id);
+  // Atualiza estado imediatamente para métricas econômicas (área, etc.)
+  if (_saState) {
+    _saState.area         = +(g('sa-area')?.value  || _saState.area);
+    _saState.spacingRow   = +(g('sa-srow')?.value  || _saState.spacingRow);
+    _saState.spacingPlant = +(g('sa-spl')?.value   || _saState.spacingPlant);
+    _saState.angle        = +(g('sa-ang')?.value   || 0);
+    // Recalcula métricas com posições atuais (resposta imediata para empregos, renda, etc.)
+    _saMetrics = sa_calcMetricas(_saState, _saPositions);
+    sa_renderMetrics();
+  }
   sa_updateLabels();
   clearTimeout(_saDebounce);
-  _saDebounce = setTimeout(sa_runSimulation, 180);
+  _saDebounce = setTimeout(sa_runSimulation, 280);
 }
 
 function sa_syncSliders() {
@@ -489,6 +500,10 @@ function sa_runSimulation() {
   _saPositions = genFn
     ? genFn.generate(areaM2, _saState.spacingRow, _saState.spacingPlant, angRad, nSp)
     : [];
+  // Layouts que não aplicam ângulo internamente: aplica rotação post-geração
+  if (angRad && (_saState.layout || 'linear') !== 'linear') {
+    _saPositions = _saRotatePositions(_saPositions, angRad);
+  }
   if (_saPositions.length > 2500) _saPositions = _saPositions.slice(0, 2500);
 
   // Canvas
@@ -517,27 +532,73 @@ function sa_runSimulation() {
   }
 }
 
+// ─── Rotação de posições (para layouts sem angleRad interno) ──────────────────
+function _saRotatePositions(pts, angleRad) {
+  if (!pts.length || !angleRad) return pts;
+  let sumX = 0, sumY = 0;
+  pts.forEach(p => { sumX += p.x; sumY += p.y; });
+  const cx = sumX / pts.length, cy = sumY / pts.length;
+  const cosA = Math.cos(angleRad), sinA = Math.sin(angleRad);
+  return pts.map(p => {
+    const dx = p.x - cx, dy = p.y - cy;
+    return { ...p, x: cx + dx * cosA - dy * sinA, y: cy + dx * sinA + dy * cosA };
+  });
+}
+
 // ─── Painéis de resultado ─────────────────────────────────────────────────────
 function sa_renderMetrics() {
   const el = document.getElementById('sa-metrics-panel');
   if (!el || !_saMetrics) return;
   const m = _saMetrics;
-  const cell = (icon, label, val, unit) =>
+  const sysKey = _saState?.system || '';
+  const area   = _saState?.area   || 0;
+
+  const cell = (icon, label, val, unit, color) =>
     `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 8px">
        <div style="font-size:10px;color:var(--text3)">${icon} ${label}</div>
-       <div style="font-size:14px;font-weight:700;color:var(--green)">${val}<span style="font-size:9px;color:var(--text3);margin-left:2px">${unit}</span></div>
+       <div style="font-size:14px;font-weight:700;color:${color||'var(--green)'}">
+         ${val}<span style="font-size:9px;color:var(--text3);margin-left:2px">${unit}</span>
+       </div>
      </div>`;
+
+  // Totais por sistema (colmeias, tanques, viveiros, UA, etc.)
+  let sysCells = '';
+  if (['apicultura','meliponicultura'].includes(sysKey)) {
+    const dens  = sysKey === 'meliponicultura' ? 8 : 2;
+    const total = Math.round(area * dens);
+    sysCells += cell(sysKey === 'meliponicultura' ? '🍯' : '🐝',
+      sysKey === 'meliponicultura' ? 'Colmeias nativas' : 'Colmeias Apis',
+      total.toLocaleString('pt-BR'), '', '#f59e0b');
+  }
+  if (sysKey === 'piscicultura') {
+    const tanks = Math.max(1, Math.round(area / 0.2));
+    const volM3 = Math.round(area * 10000 * 1.2);
+    sysCells += cell('🐟','Tanques/Viveiros', tanks.toLocaleString('pt-BR'), '', '#22d3ee');
+    sysCells += cell('💧','Volume total', (volM3/1000).toFixed(0)+'k', 'm³', '#60a5fa');
+  }
+  if (sysKey === 'sisteminha') {
+    const tanques  = Math.max(1, Math.round(area * 4));
+    const galinhas = Math.round(area * 150);
+    sysCells += cell('🐓','Galinhas/Aves', galinhas.toLocaleString('pt-BR'), '', '#fbbf24');
+    sysCells += cell('🪣','Tanques Sist.', tanques.toLocaleString('pt-BR'), '', '#22d3ee');
+  }
+  if (['ilp','ilpf'].includes(sysKey)) {
+    const ua = Math.round(area * (sysKey === 'ilpf' ? 1.2 : 2.0));
+    sysCells += cell('🐄','Cap. suporte', ua.toLocaleString('pt-BR'), 'UA', '#60a5fa');
+  }
+
   el.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
-    ${cell('🌱','Plantas',      (m.nPlantas||0).toLocaleString('pt-BR'), '')}
-    ${cell('📏','Densidade',    (m.density||0).toFixed(0), 'pl/ha')}
-    ${cell('🌿','Espécies',     m.richness||0, '')}
-    ${cell('🧬','Shannon-H',    (m.shannonH||0).toFixed(2), '')}
-    ${cell('💰','Renda/ano',    'R$ '+((m.rendaAnual||0)/1000).toFixed(0)+'k', '')}
-    ${cell('📅','Payback',      (m.paybackAnos||0).toFixed(1), 'anos')}
-    ${cell('🌳','Carbono/ano',  (m.carbonAnual||0).toFixed(1), 't C')}
-    ${cell('☁️','GEE evitado',  (m.geeAnual||0).toFixed(1), 't CO₂eq')}
-    ${cell('🌿','Cobertura',    (m.coberturaPercent||0).toFixed(0), '%')}
-    ${cell('👷','Empregos',     m.empregosGerados||0, '')}
+    ${cell('🌱','Plantas/Colônias', (m.nPlantas||0).toLocaleString('pt-BR'), '')}
+    ${cell('📏','Densidade',        (m.density||0).toFixed(0), 'pl/ha')}
+    ${cell('🌿','Espécies',         m.richness||0, '')}
+    ${cell('🧬','Shannon-H',        (m.shannonH||0).toFixed(3), '')}
+    ${cell('💰','Renda/ano',        'R$ '+((m.rendaAnual||0)/1000).toFixed(0)+'k', '')}
+    ${cell('📅','Payback',          (m.paybackAnos||0).toFixed(1), 'anos')}
+    ${cell('🌳','Carbono/ano',      (m.carbonAnual||0).toFixed(1), 't C')}
+    ${cell('☁️','GEE evitado',      (m.geeAnual||0).toFixed(1), 't CO₂eq')}
+    ${cell('🌿','Cobertura',        (m.coberturaPercent||0).toFixed(0), '%')}
+    ${cell('👷','Empregos',         m.empregosGerados||0, '')}
+    ${sysCells}
   </div>`;
 }
 
@@ -679,13 +740,15 @@ function sa_satInit() {
     center: [_saSatCenter.lat, _saSatCenter.lng],
     zoom: 15,
     zoomControl: true,
-    attributionControl: true
+    attributionControl: true,
+    scrollWheelZoom: true    // scroll do mouse sempre ativo
   });
+  _saSatMap.scrollWheelZoom.enable();
 
   // Satélite Esri World Imagery (livre, sem chave de API)
   L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    { attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community', maxZoom: 22 }
+    { attribution: 'Tiles &copy; Esri', maxZoom: 22 }
   ).addTo(_saSatMap);
 
   // Rótulos de estradas/lugares sobre o satélite
@@ -695,6 +758,33 @@ function sa_satInit() {
   ).addTo(_saSatMap);
 
   _saSatLayer = L.layerGroup().addTo(_saSatMap);
+
+  // Legenda de espécies — controle Leaflet no canto inferior direito
+  const LegendCtrl = L.Control.extend({
+    options: { position: 'bottomright' },
+    onAdd() {
+      const d = L.DomUtil.create('div');
+      d.id = 'sa-sat-legend';
+      d.style.cssText = [
+        'background:rgba(6,18,6,0.88)',
+        'border:1px solid rgba(74,222,128,0.3)',
+        'border-radius:8px',
+        'padding:8px 12px',
+        'font-size:11px',
+        'color:#d4f0d4',
+        'min-width:100px',
+        'max-width:240px',
+        'backdrop-filter:blur(3px)',
+        'user-select:none',
+        'pointer-events:none'
+      ].join(';');
+      d.innerHTML = '<span style="color:rgba(74,222,128,0.5);font-size:10px">Espécies</span>';
+      L.DomEvent.disableClickPropagation(d);
+      L.DomEvent.disableScrollPropagation(d);
+      return d;
+    }
+  });
+  new LegendCtrl().addTo(_saSatMap);
 
   // Clique no mapa reposiciona o centro do plantio
   _saSatMap.on('click', e => {
@@ -709,37 +799,32 @@ function sa_satInit() {
   sa_satDrawPlants();
 }
 
-// ─── Popula select de municípios (lazy, usa MUNIC_DATA global) ───────────────
+// ─── Popula datalist de municípios (lazy, usa MUNIC_DATA global) ─────────────
 function _sa_satPopulateMunic() {
-  const sel = document.getElementById('sa-sat-munic');
-  if (!sel || sel.dataset.populated) return;
+  const dl = document.getElementById('sa-sat-munic-list');
+  if (!dl || dl.dataset.populated) return;
   const md = (typeof _getMD === 'function') ? _getMD() : (typeof MUNIC_DATA !== 'undefined' ? MUNIC_DATA : []);
   if (!md.length) return;
-  const sorted = [...md].sort((a, b) => String(a[0]).localeCompare(String(b[0]), 'pt-BR'));
-  sel.innerHTML = '<option value="">— Selecionar município —</option>' +
-    sorted.map((r, i) => {
-      const origIdx = md.indexOf(r);
-      return `<option value="${origIdx}">${r[0]}</option>`;
-    }).join('');
-  sel.dataset.populated = '1';
+  dl.innerHTML = [...md]
+    .sort((a, b) => String(a[0]).localeCompare(String(b[0]), 'pt-BR'))
+    .map(r => `<option value="${r[0]}"></option>`)
+    .join('');
+  dl.dataset.populated = '1';
 }
 
-// ─── Preenche lat/lng ao escolher município ──────────────────────────────────
-function sa_satSetMunic() {
-  const sel = document.getElementById('sa-sat-munic');
-  if (!sel || sel.value === '') return;
+// ─── Seleciona município pelo nome digitado ───────────────────────────────────
+function sa_satSelectByName(name) {
+  if (!name || name.length < 3) return;
   const md = (typeof _getMD === 'function') ? _getMD() : (typeof MUNIC_DATA !== 'undefined' ? MUNIC_DATA : []);
-  const row = md[+sel.value];
-  if (!row) return;
-  const lat = row[1], lng = row[2];
-  if (!lat || !lng) return;
-  _saSatCenter = { lat, lng };
+  const row = md.find(r => String(r[0]).toLowerCase() === String(name).toLowerCase());
+  if (!row || !row[1] || !row[2]) return;
+  _saSatCenter = { lat: row[1], lng: row[2] };
   const latEl = document.getElementById('sa-sat-lat');
   const lngEl = document.getElementById('sa-sat-lng');
-  if (latEl) latEl.value = lat;
-  if (lngEl) lngEl.value = lng;
+  if (latEl) latEl.value = row[1];
+  if (lngEl) lngEl.value = row[2];
   if (_saSatMap) {
-    _saSatMap.setView([lat, lng], 14);
+    _saSatMap.setView([row[1], row[2]], 14);
     sa_satDrawPlants();
   }
 }
@@ -764,70 +849,102 @@ function sa_satDrawPlants() {
   const positions = _saPositions;
   if (!positions || !positions.length) return;
 
-  const variant = SA_SYSTEMS[_saState?.system]?.variants.find(v => v.id === _saState?.variant)
-               || SA_SYSTEMS[_saState?.system]?.variants[0];
-  const nSp = variant?.species?.length || 1;
+  const sys     = SA_SYSTEMS[_saState?.system];
+  const variant = sys?.variants.find(v => v.id === _saState?.variant) || sys?.variants[0];
+  const nSp     = variant?.species?.length || 1;
+  const sysKey  = _saState?.system || '';
 
-  // Bounding box das posições (metros) para calcular centro do plantio
+  // Bounding box das posições (metros)
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   for (const p of positions) {
-    if (p.x < minX) minX = p.x;
-    if (p.x > maxX) maxX = p.x;
-    if (p.y < minY) minY = p.y;
-    if (p.y > maxY) maxY = p.y;
+    if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
   }
-  const worldCX = (minX + maxX) / 2;
-  const worldCY = (minY + maxY) / 2;
+  const worldCX = (minX + maxX) / 2, worldCY = (minY + maxY) / 2;
 
   const lat0    = _saSatCenter.lat;
   const lng0    = _saSatCenter.lng;
   const cosLat  = Math.cos(lat0 * Math.PI / 180);
   const mPerLat = 111319;
   const mPerLng = 111319 * cosLat;
+  const toLL = (x, y) => [lat0 + (y - worldCY) / mPerLat, lng0 + (x - worldCX) / mPerLng];
 
-  // Função conversão metros → LatLng (relativo ao centro do plantio)
-  const toLL = (dx, dy) => [lat0 + (dy - worldCY) / mPerLat, lng0 + (dx - worldCX) / mPerLng];
+  // Perímetro tracejado
+  const perim = [[minX,minY],[maxX,minY],[maxX,maxY],[minX,maxY]].map(([x,y]) => toLL(x, y));
+  L.polygon(perim, { color:'#4ade80', weight:2, fillOpacity:0.05, dashArray:'8 5', interactive:false })
+    .addTo(_saSatLayer);
 
-  // Retângulo do perímetro (linha tracejada verde)
-  const perim = [[minX, minY],[maxX, minY],[maxX, maxY],[minX, maxY]].map(([x, y]) => toLL(x, y));
-  L.polygon(perim, {
-    color: '#4ade80', weight: 2, fillOpacity: 0.04,
-    dashArray: '8 5', interactive: false
-  }).addTo(_saSatLayer);
-
-  // Marcador de centro
+  // Cruz central
   L.circleMarker([lat0, lng0], {
-    radius: 7, color: '#fff', weight: 2, fillColor: '#4ade80', fillOpacity: 1, interactive: false
-  }).bindTooltip('Centro do plantio', { permanent: false }).addTo(_saSatLayer);
+    radius:6, color:'#fff', weight:2, fillColor:'#4ade80', fillOpacity:1, interactive:false
+  }).bindTooltip(`Centro · ${lat0.toFixed(5)}, ${lng0.toFixed(5)}`, { sticky:true })
+    .addTo(_saSatLayer);
 
-  // Renderer canvas para performance (todos os marcadores em 1 canvas)
+  // Renderer canvas para performance
   const renderer = L.canvas({ padding: 0.5 });
 
-  // Desenha cada planta
+  // Raio visual adaptado ao zoom (atualiza no evento zoom)
+  const getRadius = () => {
+    const z = _saSatMap.getZoom();
+    return z >= 18 ? 5 : z >= 16 ? 4 : z >= 14 ? 3 : 2;
+  };
+
+  // Cores e estilos por sistema
+  const waterSystems = ['piscicultura'];
+  const isWater = waterSystems.includes(sysKey);
+
   positions.forEach(p => {
     const si  = Math.min(p.speciesIdx || 0, nSp - 1);
     const sp  = variant?.species?.[si];
-    const col = sp?.color || '#4ade80';
+    const col = sp?.color || sys?.color || '#4ade80';
     const ll  = toLL(p.x, p.y);
-    L.circleMarker(ll, {
-      renderer,
-      radius: 4,
-      color: col,
-      fillColor: col,
-      fillOpacity: 0.82,
-      weight: 0.5,
-      interactive: false
-    }).addTo(_saSatLayer);
+
+    if (isWater) {
+      // Viveiros aparecem como polígonos azulados
+      L.circleMarker(ll, {
+        renderer, radius: getRadius() + 2,
+        color: '#0ea5e9', fillColor: '#0ea5e9', fillOpacity: 0.35, weight: 1, interactive: false
+      }).addTo(_saSatLayer);
+    } else {
+      L.circleMarker(ll, {
+        renderer, radius: getRadius(),
+        color: col, fillColor: col, fillOpacity: 0.85, weight: 0.5, interactive: false
+      }).addTo(_saSatLayer);
+    }
   });
 
-  // Ajusta zoom para mostrar toda a área
-  try {
-    const allLL = positions.map(p => toLL(p.x, p.y));
-    const bounds = L.latLngBounds(allLL);
-    _saSatMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 20 });
-  } catch (_) { /* ignora se bounds inválido */ }
+  // Zoom → re-render com novo raio
+  _saSatMap.off('zoomend', _saSatZoomHandler);
+  _saSatZoomHandler = () => sa_satDrawPlants();
+  _saSatMap.on('zoomend', _saSatZoomHandler);
+
+  // Legenda de espécies (Leaflet control #sa-sat-legend, canto inferior direito)
+  const legEl = document.getElementById('sa-sat-legend');
+  if (legEl && variant?.species?.length) {
+    const sysLabel = sys ? `${sys.icon} <strong>${sys.label}</strong>` : '';
+    legEl.innerHTML =
+      `<div style="font-size:10px;color:rgba(74,222,128,0.7);margin-bottom:5px">${sysLabel}</div>` +
+      variant.species.map(sp =>
+        `<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+          <span style="width:10px;height:10px;border-radius:50%;background:${sp.color};flex-shrink:0;display:inline-block;border:1px solid rgba(255,255,255,0.25)"></span>
+          <span style="font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px" title="${sp.name}">${sp.name}</span>
+        </div>`
+      ).join('');
+  }
 
   // Contador
   const countEl = document.getElementById('sa-sat-count');
-  if (countEl) countEl.textContent = `🌱 ${positions.length.toLocaleString('pt-BR')} plantas projetadas`;
+  if (countEl) {
+    const label = ['apicultura','meliponicultura'].includes(sysKey) ? 'colônias'
+                : sysKey === 'piscicultura' ? 'pontos'
+                : 'plantas';
+    countEl.textContent = `🌱 ${positions.length.toLocaleString('pt-BR')} ${label} projetadas`;
+  }
+
+  // Fit bounds
+  try {
+    const bounds = L.latLngBounds(positions.map(p => toLL(p.x, p.y)));
+    _saSatMap.fitBounds(bounds, { padding:[50,50], maxZoom:20 });
+  } catch(_) {}
 }
+let _saSatZoomHandler = null;

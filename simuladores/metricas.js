@@ -100,7 +100,7 @@ function sa_gerarRecomendacoes(state, variant, density, cobertura, richness) {
     recs.push('🚜 Para ILP/ILPF com bovinos e mecanização, espaçamento entre renques ≥14m facilita o trânsito de máquinas.');
   }
   if (['apicultura', 'meliponicultura'].includes(k)) {
-    recs.push('🌸 Instale colmeias próximas a floradas nativas. Raio de voo: 1-2 km para melipôneos, até 3 km para Apis mellifera.');
+    recs.push('🌸 Instale colmeias próximas a floradas nativas. Raio de voo: 1-2 km para meliponíneos, até 3 km para Apis mellifera.');
   }
   if (k === 'sisteminha') {
     recs.push('🏠 Posicione o tanque de peixe para capturar água da chuva e efluente orgânico da horta — reduz insumos externos.');
