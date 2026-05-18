@@ -692,9 +692,11 @@ function updatePlantio() {
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBABA: PROJEÇÃO SATÉLITE
 // ═══════════════════════════════════════════════════════════════════════════════
-let _saSatMap    = null;   // instância Leaflet
-let _saSatLayer  = null;   // L.layerGroup com plantas
-let _saSatCenter = { lat: -4.9, lng: -45.3 };
+let _saSatMap           = null;   // instância Leaflet
+let _saSatLayer         = null;   // L.layerGroup com plantas
+let _saSatCenter        = { lat: -4.9, lng: -45.3 };
+let _saSatBoundary      = null;   // polígono de perímetro (arrastável)
+let _saSatCornerMarkers = [];     // alças de canto arrastáveis
 
 // ─── Troca de subaba ─────────────────────────────────────────────────────────
 function sa_switchView(view) {
@@ -729,7 +731,7 @@ function sa_satInit() {
 
   if (_saSatMap) {
     _saSatMap.invalidateSize();
-    if (!_saSatLayer || _saSatLayer.getLayers().length === 0) sa_satDrawPlants();
+    if (!_saSatLayer || _saSatLayer.getLayers().length === 0) sa_satDrawPlants(true);
     return;
   }
 
@@ -757,7 +759,9 @@ function sa_satInit() {
     { attribution: '', maxZoom: 22, opacity: 0.65 }
   ).addTo(_saSatMap);
 
-  _saSatLayer = L.layerGroup().addTo(_saSatMap);
+  _saSatLayer         = L.layerGroup().addTo(_saSatMap);
+  _saSatBoundary      = null;
+  _saSatCornerMarkers = [];
 
   // Legenda de espécies — controle Leaflet no canto inferior direito
   const LegendCtrl = L.Control.extend({
@@ -793,10 +797,10 @@ function sa_satInit() {
     const lngEl = document.getElementById('sa-sat-lng');
     if (latEl) latEl.value = e.latlng.lat.toFixed(6);
     if (lngEl) lngEl.value = e.latlng.lng.toFixed(6);
-    sa_satDrawPlants();
+    sa_satDrawPlants(true);
   });
 
-  sa_satDrawPlants();
+  sa_satDrawPlants(true);
 }
 
 // ─── Popula datalist de municípios (lazy, usa MUNIC_DATA global) ─────────────
@@ -825,7 +829,7 @@ function sa_satSelectByName(name) {
   if (lngEl) lngEl.value = row[2];
   if (_saSatMap) {
     _saSatMap.setView([row[1], row[2]], 14);
-    sa_satDrawPlants();
+    sa_satDrawPlants(true);
   }
 }
 
@@ -837,14 +841,18 @@ function sa_satApplyCoords() {
   _saSatCenter = { lat, lng };
   if (_saSatMap) {
     _saSatMap.setView([lat, lng], 15);
-    sa_satDrawPlants();
+    sa_satDrawPlants(true);
   }
 }
 
 // ─── Desenha plantas no mapa satélite ────────────────────────────────────────
-function sa_satDrawPlants() {
+// autoFit=true → ajusta zoom/bounds para caber toda a área (navegação para novo local)
+// autoFit=false (default) → mantém o zoom atual do usuário (mudança de slider)
+function sa_satDrawPlants(autoFit) {
   if (!_saSatMap || !_saSatLayer) return;
   _saSatLayer.clearLayers();
+  _saSatBoundary      = null;
+  _saSatCornerMarkers = [];
 
   const positions = _saPositions;
   if (!positions || !positions.length) return;
@@ -869,10 +877,64 @@ function sa_satDrawPlants() {
   const mPerLng = 111319 * cosLat;
   const toLL = (x, y) => [lat0 + (y - worldCY) / mPerLat, lng0 + (x - worldCX) / mPerLng];
 
-  // Perímetro tracejado
-  const perim = [[minX,minY],[maxX,minY],[maxX,maxY],[minX,maxY]].map(([x,y]) => toLL(x, y));
-  L.polygon(perim, { color:'#4ade80', weight:2, fillOpacity:0.05, dashArray:'8 5', interactive:false })
+  // Perímetro tracejado — armazenado em _saSatBoundary para atualização dinâmica
+  const perimLL = [[minX,minY],[maxX,minY],[maxX,maxY],[minX,maxY]].map(([x,y]) => toLL(x, y));
+  _saSatBoundary = L.polygon(perimLL, { color:'#4ade80', weight:2.5, fillOpacity:0.05, dashArray:'8 5', interactive:false })
     .addTo(_saSatLayer);
+
+  // Alças de redimensionamento nos 4 cantos
+  perimLL.forEach((ll, i) => {
+    const icon = L.divIcon({
+      html: '<div style="width:14px;height:14px;background:#4ade80;border:2px solid #fff;border-radius:3px;cursor:nwse-resize;box-shadow:0 2px 6px rgba(0,0,0,0.7);transform:translate(-7px,-7px)"></div>',
+      className: '', iconSize: [0, 0], iconAnchor: [0, 0]
+    });
+    const cm = L.marker(ll, { icon, draggable: true, zIndexOffset: 2000 });
+
+    cm.on('dragstart', () => { _saSatMap.dragging.disable(); });
+
+    cm.on('drag', e => {
+      // Distância do canto arrastado até o centro do plantio em metros
+      const dx   = (e.latlng.lng - lng0) * mPerLng;
+      const dy   = (e.latlng.lat - lat0) * mPerLat;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      // Para quadrado centrado: distância ao canto = meia-aresta * √2
+      const halfSide  = dist / Math.SQRT2;
+      const newSide   = halfSide * 2;
+      const newAreaHa = Math.max(0.5, Math.min(1000, (newSide * newSide) / 10000));
+
+      _saState.area = Math.round(newAreaHa * 10) / 10;
+      const sl  = document.getElementById('sa-area');
+      const lbl = document.getElementById('sa-area-val');
+      if (sl)  sl.value = Math.min(+(sl.max || 500), _saState.area);
+      if (lbl) lbl.textContent = _saState.area.toFixed(1) + ' ha';
+
+      // Atualiza polígono de perímetro
+      const hLat = halfSide / mPerLat, hLng = halfSide / mPerLng;
+      const newPerimLL = [
+        [lat0 - hLat, lng0 - hLng],
+        [lat0 - hLat, lng0 + hLng],
+        [lat0 + hLat, lng0 + hLng],
+        [lat0 + hLat, lng0 - hLng]
+      ];
+      if (_saSatBoundary) _saSatBoundary.setLatLngs(newPerimLL);
+
+      // Move os demais cantos para manter o quadrado simétrico
+      _saSatCornerMarkers.forEach((m, j) => { if (j !== i) m.setLatLng(newPerimLL[j]); });
+
+      // Atualiza métricas em tempo real
+      _saMetrics = sa_calcMetricas(_saState, _saPositions);
+      sa_renderMetrics();
+    });
+
+    cm.on('dragend', () => {
+      _saSatMap.dragging.enable();
+      clearTimeout(_saDebounce);
+      _saDebounce = setTimeout(sa_runSimulation, 100);
+    });
+
+    cm.addTo(_saSatLayer);
+    _saSatCornerMarkers.push(cm);
+  });
 
   // Cruz central
   L.circleMarker([lat0, lng0], {
@@ -941,10 +1003,13 @@ function sa_satDrawPlants() {
     countEl.textContent = `🌱 ${positions.length.toLocaleString('pt-BR')} ${label} projetadas`;
   }
 
-  // Fit bounds
-  try {
-    const bounds = L.latLngBounds(positions.map(p => toLL(p.x, p.y)));
-    _saSatMap.fitBounds(bounds, { padding:[50,50], maxZoom:20 });
-  } catch(_) {}
+  // Fit bounds apenas quando solicitado (navegação para novo local)
+  // — omitir ao mudar sliders para preservar o zoom do usuário
+  if (autoFit) {
+    try {
+      const bounds = L.latLngBounds(positions.map(p => toLL(p.x, p.y)));
+      _saSatMap.fitBounds(bounds, { padding:[50,50], maxZoom:20 });
+    } catch(_) {}
+  }
 }
 let _saSatZoomHandler = null;
