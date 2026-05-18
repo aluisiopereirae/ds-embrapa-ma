@@ -9,6 +9,7 @@ let _saZoom = 1.0;
 let _saPanX = 0, _saPanY = 0;
 let _saDragging = false, _saDragX = 0, _saDragY = 0;
 let _saDebounce = null;
+let _saSatView = 'canvas'; // 'canvas' | 'sat' — declarado aqui para uso em sa_runSimulation
 
 // ─── Presets de layout (direção + padrão de linhas) ──────────────────────────
 // Cada preset define layout (gerador) + ângulo das linhas + rótulo visual
@@ -107,51 +108,111 @@ function _buildSaHTML() {
 
     <!-- ── Painel direito ─────────────────────────────────────────────────── -->
     <div>
-      <!-- Canvas card -->
-      <div class="chart-card" style="margin-bottom:12px">
-        <!-- Barra do canvas: título + zoom + menu -->
-        <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-          <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🌳 Vista Superior do Plantio</span>
+      <!-- Sub-abas de visualização -->
+      <div style="display:flex;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+        <button id="sa-vtab-canvas" onclick="sa_switchView('canvas')"
+          style="background:var(--green3);border:1px solid var(--green3);border-radius:8px;padding:5px 14px;cursor:pointer;font-size:11px;color:#fff;font-weight:600;transition:all .15s">
+          🌳 Vista Superior
+        </button>
+        <button id="sa-vtab-sat" onclick="sa_switchView('sat')"
+          style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 14px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s">
+          🛰️ Projeção Satélite
+        </button>
+      </div>
 
-          <!-- Controles de zoom -->
-          <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
-            <button onclick="sa_zoomOut()" title="Zoom −"
-              style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;color:var(--text2);line-height:1;display:flex;align-items:center;justify-content:center">−</button>
-            <span id="sa-zoom-label" style="font-size:10px;color:var(--text3);min-width:32px;text-align:center">1.0×</span>
-            <button onclick="sa_zoomIn()" title="Zoom +"
-              style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;color:var(--text2);line-height:1;display:flex;align-items:center;justify-content:center">+</button>
-            <button onclick="sa_zoomReset()" title="Resetar zoom"
-              style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:0 7px;height:26px;cursor:pointer;font-size:10px;color:var(--text3)">⟳</button>
-          </div>
-
-          <!-- Menu de exportação (três pontos) -->
-          <div style="position:relative;flex-shrink:0" id="sa-export-wrap">
-            <button onclick="sa_toggleExportMenu()" title="Exportar"
-              style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:16px;color:var(--text2);line-height:1;display:flex;align-items:center;justify-content:center">⋮</button>
-            <div id="sa-export-menu" style="display:none;position:absolute;right:0;top:30px;background:var(--card);border:1px solid var(--border);border-radius:8px;min-width:130px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,0.5);overflow:hidden">
-              <button onclick="sa_doExportPNG();sa_closeExportMenu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:9px 14px;font-size:12px;color:var(--text2);cursor:pointer" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='none'">📷 Exportar PNG</button>
-              <button onclick="sa_doExportJPG();sa_closeExportMenu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:9px 14px;font-size:12px;color:var(--text2);cursor:pointer" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='none'">🖼 Exportar JPG</button>
-              <button onclick="sa_doExportCSV();sa_closeExportMenu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:9px 14px;font-size:12px;color:var(--text2);cursor:pointer" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='none'">📊 Exportar CSV</button>
+      <!-- ── Vista Superior (canvas existente) ───────────────────────────── -->
+      <div id="sa-view-canvas">
+        <div class="chart-card" style="margin-bottom:12px">
+          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🌳 Vista Superior do Plantio</span>
+            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+              <button onclick="sa_zoomOut()" title="Zoom −"
+                style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;color:var(--text2);line-height:1;display:flex;align-items:center;justify-content:center">−</button>
+              <span id="sa-zoom-label" style="font-size:10px;color:var(--text3);min-width:32px;text-align:center">1.0×</span>
+              <button onclick="sa_zoomIn()" title="Zoom +"
+                style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;color:var(--text2);line-height:1;display:flex;align-items:center;justify-content:center">+</button>
+              <button onclick="sa_zoomReset()" title="Resetar zoom"
+                style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:0 7px;height:26px;cursor:pointer;font-size:10px;color:var(--text3)">⟳</button>
+            </div>
+            <div style="position:relative;flex-shrink:0" id="sa-export-wrap">
+              <button onclick="sa_toggleExportMenu()" title="Exportar"
+                style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:16px;color:var(--text2);line-height:1;display:flex;align-items:center;justify-content:center">⋮</button>
+              <div id="sa-export-menu" style="display:none;position:absolute;right:0;top:30px;background:var(--card);border:1px solid var(--border);border-radius:8px;min-width:130px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,0.5);overflow:hidden">
+                <button onclick="sa_doExportPNG();sa_closeExportMenu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:9px 14px;font-size:12px;color:var(--text2);cursor:pointer" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='none'">📷 Exportar PNG</button>
+                <button onclick="sa_doExportJPG();sa_closeExportMenu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:9px 14px;font-size:12px;color:var(--text2);cursor:pointer" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='none'">🖼 Exportar JPG</button>
+                <button onclick="sa_doExportCSV();sa_closeExportMenu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:9px 14px;font-size:12px;color:var(--text2);cursor:pointer" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='none'">📊 Exportar CSV</button>
+              </div>
             </div>
           </div>
+          <canvas id="sa-canvas"
+            style="width:100%;height:clamp(300px,50vh,520px);border-radius:8px;background:#0a1a0a;cursor:grab;display:block;touch-action:none"></canvas>
+          <div id="sa-canvas-info" style="font-size:10px;color:var(--text3);margin-top:5px;text-align:center;user-select:none">
+            🖱 Roda do mouse para zoom · Arraste para mover
+          </div>
         </div>
+        <div id="sa-alertas" style="margin-bottom:10px"></div>
+        <div class="chart-card" style="margin-bottom:12px">
+          <div class="chart-title">🔀 Comparação de Variantes — Sistema Atual</div>
+          <div class="chart-wrap" style="height:200px"><canvas id="sa-comp-chart"></canvas></div>
+        </div>
+        <div id="sa-recomendacoes"></div>
+        <div id="sa-desc-box" style="margin-top:10px"></div>
+      </div>
 
-        <canvas id="sa-canvas"
-          style="width:100%;height:clamp(300px,50vh,520px);border-radius:8px;background:#0a1a0a;cursor:grab;display:block;touch-action:none"></canvas>
-        <div id="sa-canvas-info" style="font-size:10px;color:var(--text3);margin-top:5px;text-align:center;user-select:none">
-          🖱 Roda do mouse para zoom · Arraste para mover
+      <!-- ── Projeção Satélite (nova subaba) ─────────────────────────────── -->
+      <div id="sa-view-sat" style="display:none">
+        <div class="chart-card">
+          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+            <span>🛰️ Projeção em Terreno Real — Satélite</span>
+            <button onclick="sa_satDrawPlants()"
+              style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;color:var(--text2)">
+              ⟳ Atualizar projeção
+            </button>
+          </div>
+
+          <!-- Seletor de localização -->
+          <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:180px">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:3px">Município (centro da propriedade):</div>
+              <select id="sa-sat-munic" class="sim-select" onchange="sa_satSetMunic()" style="width:100%">
+                <option value="">— Selecionar município —</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:3px">Latitude</div>
+              <input type="number" id="sa-sat-lat" value="-4.9" step="0.00001"
+                style="width:110px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text1);font-size:12px;font-family:inherit">
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:3px">Longitude</div>
+              <input type="number" id="sa-sat-lng" value="-45.3" step="0.00001"
+                style="width:110px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text1);font-size:12px;font-family:inherit">
+            </div>
+            <button onclick="sa_satApplyCoords()"
+              style="background:var(--green3);border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:11px;color:#fff;white-space:nowrap;font-weight:600">
+              📍 Ir para local
+            </button>
+          </div>
+
+          <!-- Dica de dados IBGE -->
+          <div style="background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.18);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--text3)">
+            💡 <strong style="color:var(--green)">Dica:</strong> Selecione o município para usar dados do IBGE/MUNIC_DATA como ponto de partida.
+            Em seguida clique no mapa para posicionar o centro exato da propriedade.
+            Os parâmetros de plantio do painel esquerdo são aplicados automaticamente.
+          </div>
+
+          <!-- Mapa Leaflet -->
+          <div id="sa-sat-map" style="height:520px;border-radius:8px;background:#111;overflow:hidden;border:1px solid var(--border)"></div>
+
+          <div style="font-size:10px;color:var(--text3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap">
+            <span>🛰️ Imagens © Esri World Imagery</span>
+            <span>📍 Clique no mapa para reposicionar o centro do plantio</span>
+            <span>🔍 Scroll / pinça para zoom dinâmico</span>
+            <span id="sa-sat-count"></span>
+          </div>
         </div>
       </div>
 
-      <div id="sa-alertas" style="margin-bottom:10px"></div>
-
-      <div class="chart-card" style="margin-bottom:12px">
-        <div class="chart-title">🔀 Comparação de Variantes — Sistema Atual</div>
-        <div class="chart-wrap" style="height:200px"><canvas id="sa-comp-chart"></canvas></div>
-      </div>
-
-      <div id="sa-recomendacoes"></div>
-      <div id="sa-desc-box" style="margin-top:10px"></div>
     </div>
   </div>
 </div>`;
@@ -446,6 +507,7 @@ function sa_runSimulation() {
   sa_renderRecomendacoes();
   sa_renderDesc();
   sa_renderCompChart();
+  if (_saSatView === 'sat') sa_satDrawPlants();
 
   const info = g('sa-canvas-info');
   if (info) {
@@ -564,4 +626,208 @@ function sa_doExportCSV() {
 // ─── Compatibilidade ──────────────────────────────────────────────────────────
 function updatePlantio() {
   initSimuladorAvancado('simtab-plantio');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SUBABA: PROJEÇÃO SATÉLITE
+// ═══════════════════════════════════════════════════════════════════════════════
+let _saSatMap    = null;   // instância Leaflet
+let _saSatLayer  = null;   // L.layerGroup com plantas
+let _saSatCenter = { lat: -4.9, lng: -45.3 };
+
+// ─── Troca de subaba ─────────────────────────────────────────────────────────
+function sa_switchView(view) {
+  _saSatView = view;
+  const cvDiv  = document.getElementById('sa-view-canvas');
+  const satDiv = document.getElementById('sa-view-sat');
+  const btnCv  = document.getElementById('sa-vtab-canvas');
+  const btnSat = document.getElementById('sa-vtab-sat');
+
+  const ON  = { background:'var(--green3)', borderColor:'var(--green3)', color:'#fff', fontWeight:'600' };
+  const OFF = { background:'none', borderColor:'var(--border)', color:'var(--text2)', fontWeight:'normal' };
+
+  if (view === 'sat') {
+    if (cvDiv)  cvDiv.style.display  = 'none';
+    if (satDiv) satDiv.style.display = 'block';
+    if (btnCv)  Object.assign(btnCv.style, OFF);
+    if (btnSat) Object.assign(btnSat.style, ON);
+    sa_satInit();
+  } else {
+    if (cvDiv)  cvDiv.style.display  = 'block';
+    if (satDiv) satDiv.style.display = 'none';
+    if (btnCv)  Object.assign(btnCv.style, ON);
+    if (btnSat) Object.assign(btnSat.style, OFF);
+    // Redesenha canvas (pode ter perdido tamanho enquanto estava oculto)
+    requestAnimationFrame(sa_redrawCanvas);
+  }
+}
+
+// ─── Inicializa mapa Leaflet (só uma vez) ────────────────────────────────────
+function sa_satInit() {
+  _sa_satPopulateMunic();
+
+  if (_saSatMap) {
+    _saSatMap.invalidateSize();
+    if (!_saSatLayer || _saSatLayer.getLayers().length === 0) sa_satDrawPlants();
+    return;
+  }
+
+  const mapEl = document.getElementById('sa-sat-map');
+  if (!mapEl || typeof L === 'undefined') return;
+
+  _saSatMap = L.map('sa-sat-map', {
+    center: [_saSatCenter.lat, _saSatCenter.lng],
+    zoom: 15,
+    zoomControl: true,
+    attributionControl: true
+  });
+
+  // Satélite Esri World Imagery (livre, sem chave de API)
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    { attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community', maxZoom: 22 }
+  ).addTo(_saSatMap);
+
+  // Rótulos de estradas/lugares sobre o satélite
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+    { attribution: '', maxZoom: 22, opacity: 0.65 }
+  ).addTo(_saSatMap);
+
+  _saSatLayer = L.layerGroup().addTo(_saSatMap);
+
+  // Clique no mapa reposiciona o centro do plantio
+  _saSatMap.on('click', e => {
+    _saSatCenter = { lat: e.latlng.lat, lng: e.latlng.lng };
+    const latEl = document.getElementById('sa-sat-lat');
+    const lngEl = document.getElementById('sa-sat-lng');
+    if (latEl) latEl.value = e.latlng.lat.toFixed(6);
+    if (lngEl) lngEl.value = e.latlng.lng.toFixed(6);
+    sa_satDrawPlants();
+  });
+
+  sa_satDrawPlants();
+}
+
+// ─── Popula select de municípios (lazy, usa MUNIC_DATA global) ───────────────
+function _sa_satPopulateMunic() {
+  const sel = document.getElementById('sa-sat-munic');
+  if (!sel || sel.dataset.populated) return;
+  const md = (typeof _getMD === 'function') ? _getMD() : (typeof MUNIC_DATA !== 'undefined' ? MUNIC_DATA : []);
+  if (!md.length) return;
+  const sorted = [...md].sort((a, b) => String(a[0]).localeCompare(String(b[0]), 'pt-BR'));
+  sel.innerHTML = '<option value="">— Selecionar município —</option>' +
+    sorted.map((r, i) => {
+      const origIdx = md.indexOf(r);
+      return `<option value="${origIdx}">${r[0]}</option>`;
+    }).join('');
+  sel.dataset.populated = '1';
+}
+
+// ─── Preenche lat/lng ao escolher município ──────────────────────────────────
+function sa_satSetMunic() {
+  const sel = document.getElementById('sa-sat-munic');
+  if (!sel || sel.value === '') return;
+  const md = (typeof _getMD === 'function') ? _getMD() : (typeof MUNIC_DATA !== 'undefined' ? MUNIC_DATA : []);
+  const row = md[+sel.value];
+  if (!row) return;
+  const lat = row[1], lng = row[2];
+  if (!lat || !lng) return;
+  _saSatCenter = { lat, lng };
+  const latEl = document.getElementById('sa-sat-lat');
+  const lngEl = document.getElementById('sa-sat-lng');
+  if (latEl) latEl.value = lat;
+  if (lngEl) lngEl.value = lng;
+  if (_saSatMap) {
+    _saSatMap.setView([lat, lng], 14);
+    sa_satDrawPlants();
+  }
+}
+
+// ─── Aplica coordenadas digitadas manualmente ─────────────────────────────────
+function sa_satApplyCoords() {
+  const lat = parseFloat(document.getElementById('sa-sat-lat')?.value);
+  const lng = parseFloat(document.getElementById('sa-sat-lng')?.value);
+  if (isNaN(lat) || isNaN(lng)) return;
+  _saSatCenter = { lat, lng };
+  if (_saSatMap) {
+    _saSatMap.setView([lat, lng], 15);
+    sa_satDrawPlants();
+  }
+}
+
+// ─── Desenha plantas no mapa satélite ────────────────────────────────────────
+function sa_satDrawPlants() {
+  if (!_saSatMap || !_saSatLayer) return;
+  _saSatLayer.clearLayers();
+
+  const positions = _saPositions;
+  if (!positions || !positions.length) return;
+
+  const variant = SA_SYSTEMS[_saState?.system]?.variants.find(v => v.id === _saState?.variant)
+               || SA_SYSTEMS[_saState?.system]?.variants[0];
+  const nSp = variant?.species?.length || 1;
+
+  // Bounding box das posições (metros) para calcular centro do plantio
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const p of positions) {
+    if (p.x < minX) minX = p.x;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.y > maxY) maxY = p.y;
+  }
+  const worldCX = (minX + maxX) / 2;
+  const worldCY = (minY + maxY) / 2;
+
+  const lat0    = _saSatCenter.lat;
+  const lng0    = _saSatCenter.lng;
+  const cosLat  = Math.cos(lat0 * Math.PI / 180);
+  const mPerLat = 111319;
+  const mPerLng = 111319 * cosLat;
+
+  // Função conversão metros → LatLng (relativo ao centro do plantio)
+  const toLL = (dx, dy) => [lat0 + (dy - worldCY) / mPerLat, lng0 + (dx - worldCX) / mPerLng];
+
+  // Retângulo do perímetro (linha tracejada verde)
+  const perim = [[minX, minY],[maxX, minY],[maxX, maxY],[minX, maxY]].map(([x, y]) => toLL(x, y));
+  L.polygon(perim, {
+    color: '#4ade80', weight: 2, fillOpacity: 0.04,
+    dashArray: '8 5', interactive: false
+  }).addTo(_saSatLayer);
+
+  // Marcador de centro
+  L.circleMarker([lat0, lng0], {
+    radius: 7, color: '#fff', weight: 2, fillColor: '#4ade80', fillOpacity: 1, interactive: false
+  }).bindTooltip('Centro do plantio', { permanent: false }).addTo(_saSatLayer);
+
+  // Renderer canvas para performance (todos os marcadores em 1 canvas)
+  const renderer = L.canvas({ padding: 0.5 });
+
+  // Desenha cada planta
+  positions.forEach(p => {
+    const si  = Math.min(p.speciesIdx || 0, nSp - 1);
+    const sp  = variant?.species?.[si];
+    const col = sp?.color || '#4ade80';
+    const ll  = toLL(p.x, p.y);
+    L.circleMarker(ll, {
+      renderer,
+      radius: 4,
+      color: col,
+      fillColor: col,
+      fillOpacity: 0.82,
+      weight: 0.5,
+      interactive: false
+    }).addTo(_saSatLayer);
+  });
+
+  // Ajusta zoom para mostrar toda a área
+  try {
+    const allLL = positions.map(p => toLL(p.x, p.y));
+    const bounds = L.latLngBounds(allLL);
+    _saSatMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 20 });
+  } catch (_) { /* ignora se bounds inválido */ }
+
+  // Contador
+  const countEl = document.getElementById('sa-sat-count');
+  if (countEl) countEl.textContent = `🌱 ${positions.length.toLocaleString('pt-BR')} plantas projetadas`;
 }
