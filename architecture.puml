@@ -1,0 +1,916 @@
+' ════════════════════════════════════════════════════════════════════════
+' DS EMBRAPA MARANHÃO — ARQUITETURA C4 MODEL COMPLETA
+' Módulos: Chat IA · GEE · Visão Geral · Mapa · Projeções ·
+'          Simuladores · Registrar · Dados · Guias
+' Fontes: Embrapa/MAPA · IBGE 2024 · SEEG · PRODES · MapBiomas
+' ════════════════════════════════════════════════════════════════════════
+
+
+' ╔══════════════════════════════════════════════════════════════════════╗
+' ║  C4 LEVEL 1 — CONTEXTO DO SISTEMA                                  ║
+' ╚══════════════════════════════════════════════════════════════════════╝
+@startuml C4_L1_Contexto_Sistema
+!include <C4/C4_Context.puml>
+LAYOUT_WITH_LEGEND()
+title "DS Embrapa MA — C4 Level 1: Contexto do Sistema"
+
+Person(usr_p, "Pesquisador / Tecnico\nEmbrapa (interno)", "Analisa indicadores de GEE,\nsistemas produtivos e projecoes\n2025-2050. Registra URTs.")
+Person(usr_e, "Usuario Externo\n(agricultor / gestor)", "Agricultor, extensionista\nou gestor publico - consulta\nmapas, simula plantio e guias.")
+Person(adm, "Administrador\nEmbrapa", "Cadastra e valida\nUnidades de Referencia\nTecnologica (URTs).")
+
+System(ds, "DS Embrapa MA\n(Dashboard Cientifico)", "SPA estatica GitHub Pages.\nIndicadores socioambientais,\nGEE, mapa interativo,\nsimuladores e chat IA.")
+
+System_Ext(bq, "Google BigQuery", "BD em nuvem: GEE (SEEG),\nPRODES, MapBiomas, IBGE.\n[integracao planejada]")
+System_Ext(claude, "Anthropic Claude API", "LLM - respostas contextuais\nvia chat integrado.\nContexto: municipio + GEE.")
+System_Ext(esri, "Esri ArcGIS Online", "Tiles de satelite para\nprojecao de plantio\nno terreno real (Leaflet).")
+System_Ext(ibge, "IBGE / SEEG / PRODES\n/ MapBiomas", "Fontes compiladas em\nMUNIC_DATA (221 municipios)\ncom 22 indicadores cada.")
+System_Ext(ls, "Browser LocalStorage", "Persistencia local dos\nregistros de URTs\n(chave: ds_embrapa_ma_v2).")
+
+Rel(usr_p, ds, "Analisa, simula\ne registra", "HTTPS / Browser")
+Rel(usr_e, ds, "Consulta e simula", "HTTPS / Browser")
+Rel(adm, ds, "Cadastra URTs", "HTTPS / Browser")
+Rel_D(ds, bq, "Consulta dados GEE\n[planejado]", "BigQuery REST API")
+Rel_D(ds, claude, "Contexto + pergunta\n-> resposta IA", "fetch() / REST JSON")
+Rel_D(ds, esri, "Tiles satelite\npara plantio", "HTTPS / Leaflet")
+Rel_R(ds, ibge, "MUNIC_DATA embutido\nno bundle estatico", "JS estatico")
+Rel_R(ds, ls, "Persiste e le\nregistros locais", "Web Storage API")
+@enduml
+
+
+' ╔══════════════════════════════════════════════════════════════════════╗
+' ║  C4 LEVEL 2 — CONTAINERS                                           ║
+' ╚══════════════════════════════════════════════════════════════════════╝
+@startuml C4_L2_Containers
+!theme plain
+skinparam defaultFontName Arial
+skinparam backgroundColor #0d1a0d
+skinparam defaultFontColor #d4f0d4
+skinparam arrowColor #4ade80
+skinparam arrowFontColor #86efac
+skinparam rectangleBackgroundColor #1a2a1a
+skinparam rectangleBorderColor #3a6a3a
+skinparam rectangleFontColor #e8f5e8
+skinparam packageBackgroundColor #0f1a0f
+skinparam packageBorderColor #2a5a2a
+skinparam packageFontColor #86efac
+skinparam componentBackgroundColor #1f3320
+skinparam componentBorderColor #3a6a3a
+skinparam componentFontColor #e8f5e8
+skinparam databaseBackgroundColor #142014
+skinparam databaseBorderColor #4ade80
+skinparam databaseFontColor #e8f5e8
+skinparam cloudBackgroundColor #1a1a2e
+skinparam cloudBorderColor #6060a0
+skinparam cloudFontColor #c0c0e0
+skinparam actorBackgroundColor #1a2a1a
+skinparam actorBorderColor #4ade80
+skinparam actorFontColor #e8f5e8
+skinparam noteBorderColor #2a5a2a
+skinparam noteBackgroundColor #0f1a0f
+skinparam noteFontColor #86efac
+skinparam legendBackgroundColor #0f1a0f
+skinparam legendBorderColor #2a5a2a
+
+title "DS Embrapa MA — C4 Level 2: Containers"
+
+actor "Pesquisador\nEmbrapa" as USR
+actor "Usuario\nExterno" as UEXT
+actor "Administrador" as ADM
+
+cloud "Google BigQuery\n[planejado]" as BQ
+cloud "Anthropic\nClaude API" as CLAUDE
+cloud "Esri ArcGIS\nOnline" as ESRI
+
+package "DS Embrapa MA — GitHub Pages (SPA Estatica)" {
+  component "Shell / Roteador\n(index.html)\n\nHTML5 + CSS3 + JS inline\nHeader nav (6 views), sidebar,\nchat flutuante, modal cadastro" as SHELL
+  component "Dados Embutidos\n(INITIAL_DATA + MUNIC_DATA)\n\n221 municipios MA (IBGE 2024)\n22 indicadores por municipio\nRegistros URTs + GEE historico" as DATA
+  component "Motor de Analise\n(proj-simuladores.js)\n\nComparacao Municipal\nClassificacao GEE\nConversao de Areas\nProjecoes 2025-2050" as PROJSIM
+  component "Simulador de Plantio\n(simuladores/simulador.js)\n\nOrquestra Vista Canvas\ne Projecao Satelite\ndebounce + drag resize" as PLSIM
+  component "Geradores de Layout\n(simuladores/layouts.js)\n\n7 algoritmos: linear, hexagonal,\ncircular, faixas, grid,\naleatório, mosaico" as LAY
+  component "Motor de Metricas\n(simuladores/metricas.js)\n\nShannon-H, carbono, renda,\npayback, empregos, alertas\ne recomendacoes" as MET
+  component "Renderizador Canvas\n(simuladores/visualizacao.js)\n\nHiDPI zoom/pan\nCanvas 2D por especie" as VIZ
+  component "Catalogo de Sistemas\n(simuladores/dados_agricolas.js)\n\nSA_SYSTEMS: 10 sistemas\nVariantes, especies, cores\ne parametros agronomicos" as DADAG
+  component "Modulo de Exportacao\n(simuladores/exportacao.js)\n\nPNG / JPG / CSV\ncom parametros e metricas" as EXP
+  database "LocalStorage\n(ds_embrapa_ma_v2)" as LS
+}
+
+USR  --> SHELL : "navega"
+UEXT --> SHELL : "consulta"
+ADM  --> SHELL : "cadastra URTs"
+
+SHELL  --> DATA   : "le INITIAL_DATA\ne MUNIC_DATA"
+SHELL  --> PROJSIM : "analise e\nsimuladores"
+SHELL  --> PLSIM   : "simulador\nde plantio"
+PLSIM  --> LAY     : "SA_LAYOUTS[key]\n.generate()"
+PLSIM  --> MET     : "sa_calcMetricas()"
+PLSIM  --> VIZ     : "sa_drawPlantacao()"
+PLSIM  --> DADAG   : "SA_SYSTEMS[key]"
+PLSIM  --> EXP     : "sa_export*()"
+PROJSIM --> DATA   : "MUNIC_DATA[]"
+SHELL  --> LS      : "saveData()\nloadData()"
+
+SHELL  ..> CLAUDE : "Chat: contexto\n+ pergunta -> IA"
+PLSIM  ..> ESRI   : "tiles satelite\nLeaflet"
+PROJSIM ..> BQ    : "[planejado]"
+@enduml
+
+
+' ╔══════════════════════════════════════════════════════════════════════╗
+' ║  C4 LEVEL 3a — VISAO GERAL + INDICADORES GEE                       ║
+' ╚══════════════════════════════════════════════════════════════════════╝
+@startuml C4_L3a_Visao_Geral
+!theme plain
+skinparam defaultFontName Arial
+skinparam backgroundColor #0d1a0d
+skinparam defaultFontColor #d4f0d4
+skinparam arrowColor #4ade80
+skinparam arrowFontColor #86efac
+skinparam componentBackgroundColor #1f3320
+skinparam componentBorderColor #3a6a3a
+skinparam componentFontColor #e8f5e8
+skinparam packageBackgroundColor #0f1a0f
+skinparam packageBorderColor #2a5a2a
+skinparam packageFontColor #86efac
+skinparam rectangleBackgroundColor #142014
+skinparam rectangleBorderColor #2a4a2a
+skinparam rectangleFontColor #d4f0d4
+skinparam noteBorderColor #2a5a2a
+skinparam noteBackgroundColor #0f1a0f
+skinparam noteFontColor #86efac
+
+title "DS Embrapa MA — C4 Level 3a: Modulo Visao Geral e Indicadores do Estado (GEE)"
+
+package "Modulo Visao Geral (#view-overview)" {
+
+  component "OverviewController\nshowView / switchOverviewTab\nInicializa graficos e KPIs" as OV_CTRL
+
+  package "Sub-tab: Sistemas Produtivos Embrapa" {
+    component "StatsGrid (#stats-grid)\nKPIs: registros, area total,\ncarbono, empregos, sistemas" as STATS
+    component "Grafico: Distribuicao\npor Sistema (Bar)" as CH_SIS
+    component "Grafico: Sistemas por\nMesorregiao (Bar)" as CH_REG
+    component "Grafico: Implantacoes\npor Ano (Line)" as CH_ANO
+    component "Grafico: Balanco\nde Carbono tCO2e (Bar)" as CH_CARB
+    component "Grafico: Renda Media\nR$/mes por Sistema (Horiz. Bar)" as CH_RENDA
+    component "Grafico: Area Total ha\npor Sistema (Doughnut)" as CH_AREA
+    component "Casos de Referencia (URTs)\nILP, ILPF, SAF, Apic, Pisc,\nFrut, Roca, Sist, Extrat" as REF
+  }
+
+  package "Sub-tab: Indicadores do Estado (GEE e socioeconomicos)" {
+    component "FiltrosEstado\nSeletor municipio\nSeletor indicador:\nGEE / IDH / PIB / Pobreza\nFome / Desmat / Queimadas\nPrecip / Temp / Lavoura" as FILT
+    component "StatsEstado\nKPIs: media MA, max, min,\nmunicípio destacado" as STATS_E
+    component "Indicador por Municipio\n221 municipios (full width)\nComparacao visual entre\ntodos os municipios do MA" as CH_MUN
+    component "Top 10 Municipios\n(Horiz. Bar)" as CH_TOP
+    component "Distribuicao por Bioma\nAmazonia / Cerrado / Transicao\n(Doughnut)" as CH_BIO
+    component "IDH x PIB per capita\n(Scatter)" as CH_SCAT
+    component "Cobertura Vegetal x GEE\n(Scatter)" as CH_VEG
+    component "Tabela Municipios (221)\nBusca + filtro bioma/regiao\nColunas: pop, IDH, PIB,\npobreza, desmat, GEE,\nlavoura, bovinos, pesca" as TAB_MUN
+    component "Exportador CSV\nexportData('munic')" as EXP_MUN
+  }
+
+  component "ChartMenu (tres pontos)\nPNG / JPG / CSV\npor grafico" as CMENU
+}
+
+OV_CTRL --> STATS    : "INITIAL_DATA"
+OV_CTRL --> CH_SIS   : "Chart.js"
+OV_CTRL --> CH_MUN   : "renderEstadoCharts()"
+FILT    --> CH_MUN   : "onchange"
+FILT    --> CH_TOP   : "filtra MUNIC_DATA"
+FILT    --> STATS_E  : "atualiza KPIs"
+CMENU   --> CH_SIS   : "exportacao"
+@enduml
+
+
+' ╔══════════════════════════════════════════════════════════════════════╗
+' ║  C4 LEVEL 3b — MAPA INTERATIVO                                     ║
+' ╚══════════════════════════════════════════════════════════════════════╝
+@startuml C4_L3b_Mapa
+!theme plain
+skinparam defaultFontName Arial
+skinparam backgroundColor #0d1a0d
+skinparam defaultFontColor #d4f0d4
+skinparam arrowColor #4ade80
+skinparam arrowFontColor #86efac
+skinparam componentBackgroundColor #1f3320
+skinparam componentBorderColor #3a6a3a
+skinparam componentFontColor #e8f5e8
+skinparam packageBackgroundColor #0f1a0f
+skinparam packageBorderColor #2a5a2a
+skinparam packageFontColor #86efac
+skinparam cloudBackgroundColor #1a1a2e
+skinparam cloudBorderColor #6060a0
+skinparam cloudFontColor #c0c0e0
+
+title "DS Embrapa MA — C4 Level 3b: Modulo Mapa Interativo"
+
+cloud "Esri ArcGIS Online\n(World Imagery)" as ESRI
+cloud "OpenStreetMap\n(camada normal)" as OSM
+
+package "Modulo Mapa (#view-map)" {
+
+  component "MapController\nshowView('map')\ninitMap() — L.map\nsetMapLayer(type)" as MAP_CTRL
+
+  component "LayerManager\nnormal (OSM)\nsatellite (Esri)\nhybrid (Esri + Labels)" as LAYER
+
+  component "MapToolbar\nCamadas: Normal / Satelite / Hibrido\nBotoes: Sistemas / Heatmaps" as TOOLBAR
+
+  package "Painel de Sistemas Produtivos" {
+    component "SistemaToggleButtons\nILP/ILPF / SAF / Apicultura\nMeliponicultura / Sisteminha\nPiscicultura / Extrativismo\nFruticultura / Roca" as SYS_BTN
+    component "SistemaLayerRenderer\ntoggleSysLayer(sysKey)\nL.circleMarker colorizado\npor sistema produtivo" as SYS_LAYER
+    component "SistemaPopup\nmunicípio, produtor, area,\nsistema, ano, carbono, renda" as SYS_POP
+    component "SistemaFilterChips\nfiltros rapidos na sidebar" as SYS_CHIPS
+  }
+
+  package "Painel de Heatmaps" {
+    component "HeatmapToggleButtons\nGEE / Desmatamento\nPopulacao / Renda\nQueimadas / IDH" as HM_BTN
+    component "HeatmapRenderer\nL.heatLayer com MUNIC_DATA\nnormalizado por variavel" as HM_RENDER
+  }
+
+  component "FilterSidebar\nSistema, Mesorregiao,\nBioma, Escala, Status,\nAno de implantacao" as FSIDEBAR
+
+  component "MapPoints (URTs)\nL.circleMarker por URT\nColorizado por sistema\nClicavel -> popup" as MAP_PTS
+
+  component "RefCaseButtons\nshowRefCase(key)\nFoca no mapa + popup\ndo caso de referencia" as REF_BTN
+
+  component "DownloadMapImage\nhtml2canvas\nPNG / JPG do mapa" as DL_MAP
+
+  component "L.map (instancia Leaflet)\nL.tileLayer (base)\nL.layerGroup (URTs)\nL.heatLayer (heatmaps)\nL.popup (detalhes)" as LEAFLET
+}
+
+MAP_CTRL --> LAYER    : "setMapLayer()"
+MAP_CTRL --> MAP_PTS  : "renderMapPoints()"
+SYS_BTN  --> SYS_LAYER : "toggleSysLayer()"
+HM_BTN   --> HM_RENDER : "showHeatmap()"
+SYS_LAYER --> LEAFLET  : "addTo / removeFrom"
+HM_RENDER --> LEAFLET  : "addTo / removeFrom"
+MAP_PTS  --> SYS_POP   : "on('click')"
+LAYER    --> ESRI      : "tiles satelite/hibrido\nHTTPS"
+LAYER    --> OSM       : "tiles normal\nHTTPS"
+FSIDEBAR --> MAP_PTS   : "filtra e re-renderiza"
+@enduml
+
+
+' ╔══════════════════════════════════════════════════════════════════════╗
+' ║  C4 LEVEL 3c — PROJECOES GEE 2025-2050 + ANALISE COMPARATIVA      ║
+' ╚══════════════════════════════════════════════════════════════════════╝
+@startuml C4_L3c_Projecoes_GEE
+!theme plain
+skinparam defaultFontName Arial
+skinparam backgroundColor #0d1a0d
+skinparam defaultFontColor #d4f0d4
+skinparam arrowColor #4ade80
+skinparam arrowFontColor #86efac
+skinparam componentBackgroundColor #1f3320
+skinparam componentBorderColor #3a6a3a
+skinparam componentFontColor #e8f5e8
+skinparam packageBackgroundColor #0f1a0f
+skinparam packageBorderColor #2a5a2a
+skinparam packageFontColor #86efac
+
+title "DS Embrapa MA — C4 Level 3c: Projecoes GEE 2025-2050 e Analise Comparativa Municipal"
+
+package "Modulo Projecoes (#view-proj)" {
+
+  component "ProjecoesController\nshowProjSubTab(tab)\n3 sub-tabs:\nCenarios / Analise / Simuladores" as PCTRL
+
+  package "Sub-tab: Cenarios 2025-2050" {
+    component "ScenarioCards\n🔴 BAU (tendencia)\n🟡 Moderado (ABC+/NDC)\n🟢 Embrapa (sistemas)\n🔵 Ideal (meta 2050)" as CARDS
+    component "SeletorVariavel\nGEE / Desmat\nTemperatura / Seq. Carbono" as SEL_VAR
+    component "Comparativo Cenarios\n2025-2050 (full width)\nLine multi-serie" as CH_MAIN
+    component "Temperatura Projetada\npor Cenario (Line)" as CH_TEMP
+    component "Desmatamento Projetado\nkm2/ano (Bar)" as CH_DESM
+    component "Sequestro Carbono\nILPF+SAF Mt C (Area)" as CH_SEQ
+    component "GEE Historico MA\n2000-2025 SEEG (Bar+Line)" as CH_HIST
+    component "Resumo 2050 por Cenario\nGEE / Delta vs BAU\nDesmat / Temp / Seq" as TAB_2050
+  }
+
+  package "Sub-tab: Analise Comparativa Municipal" {
+    component "AnaliseComparativaController\nbuildAnaliseHTML()\ninjetado em #proj-analise" as ANAL_CTRL
+    component "SeletorMunicipios\nPesquisa multiplos\nmunicipios simultaneos" as MUN_SEL
+    component "SeletorIndicadorGEE\nGEE / IDH / PIB\nPobreza / Fome / Desmat\nQueimadas / Lavoura / Pesca" as IND_SEL
+    component "ClassificadorGEE\n🔴 Critico\n🟡 Atencao\n🟢 Adequado\nThresholds por indicador:\ngee_kt, desmat_km2,\nfome%, pob%, idh" as GEE_CLASS
+    component "GraficoComparativo\nRadar + Bar por municipio" as CH_COMP
+    component "TabelaRankingMunicipal\nRanking com badge de risco\npor indicador selecionado" as TAB_RANK
+  }
+
+  component "Sub-tab: Simuladores\n[ver diagrama L3d]" as SIM_LINK
+}
+
+PCTRL   --> CARDS      : "renderProjCharts()"
+SEL_VAR --> CH_MAIN    : "onchange re-renderiza"
+PCTRL   --> ANAL_CTRL  : "buildAnaliseHTML()"
+IND_SEL --> GEE_CLASS  : "classifica MUNIC_DATA"
+IND_SEL --> CH_COMP    : "atualiza grafico"
+GEE_CLASS --> TAB_RANK : "badges de risco GEE"
+@enduml
+
+
+' ╔══════════════════════════════════════════════════════════════════════╗
+' ║  C4 LEVEL 3d — SIMULADORES DE CENARIOS                            ║
+' ╚══════════════════════════════════════════════════════════════════════╝
+@startuml C4_L3d_Simuladores
+!theme plain
+skinparam defaultFontName Arial
+skinparam backgroundColor #0d1a0d
+skinparam defaultFontColor #d4f0d4
+skinparam arrowColor #4ade80
+skinparam arrowFontColor #86efac
+skinparam componentBackgroundColor #1f3320
+skinparam componentBorderColor #3a6a3a
+skinparam componentFontColor #e8f5e8
+skinparam packageBackgroundColor #0f1a0f
+skinparam packageBorderColor #2a5a2a
+skinparam packageFontColor #86efac
+skinparam cloudBackgroundColor #1a1a2e
+skinparam cloudBorderColor #6060a0
+skinparam cloudFontColor #c0c0e0
+
+title "DS Embrapa MA — C4 Level 3d: Simuladores de Cenarios"
+
+cloud "Esri World Imagery\n(tiles satelite)" as ESRI
+
+package "Sub-tab: Simuladores (#proj-simuladores)" {
+
+  package "Simulador: Conversao de Areas Degradadas" {
+    component "PainelParametros\n% area degradada MA\nSistema produtivo\nHorizonte temporal (anos)\nAtualiza automatico" as CONV_P
+    component "MetricasConversao\n👷 Empregos\n💰 Renda anual\n💨 Sequestro CO2eq\n🌫 GEE evitado\n🌡 Reducao temp\n💸 Investimento" as CONV_M
+    component "Trajetoria Temporal\n(Line Chart)" as CONV_T
+    component "Comparativo Sistemas\n(Horiz. Bar Chart)" as CONV_C
+    component "runConversaoSim()\nareaHa = pct/100 * 1.800.000ha\ntempRed = sys.temp_red * frac\ngeeEvit = areaHa * sys.seq_co2\nMA_DEGRADED_HA = 1.800.000ha" as RUN_CONV
+  }
+
+  package "Simulador: Plantio Agronomico" {
+
+    component "PainelEsquerdo (sim-card)\nSistema (SA_SYSTEMS)\nVariante\nLayout (7 opcoes)\nSliders: Area / Espacamentos\nAngulo / Exportacao" as PLEFT
+
+    package "Sub-aba: Vista Superior do Plantio" {
+      component "Canvas 2D (#sa-canvas)\nHiDPI zoom/pan\nPlantas por especie" as CVS
+      component "PainelMetricas\n🌱 Plantas / 📐 Densidade\n📊 Shannon-H / 💰 Renda\n💸 Invest / ⏱ Payback\n💨 Carbono / 🌫 GEE\n🌳 Cobertura / 👷 Empregos\n💧 Hidrico\n+ 🐝 Colmeias / 🐟 Tanques\n+ 🐓 Galinhas / 🐄 UA" as MET_P
+      component "PainelAlertas\nEspacamento / Densidade\nArea / Cobertura copa\nLicenca ambiental" as ALERT
+      component "GraficoComparativo\nRenda, carbono, empregos\npor variante (Horiz. Bar)" as COMP_CH
+      component "PainelRecomendacoes\nrecomendacoes agronomicas\npor sistema e estado" as REC
+      component "BotoesExportacao\nPNG / JPG / CSV" as EXP_BTN
+    }
+
+    package "Sub-aba: Projecao Satelite" {
+      component "ControlesMapa\nPesquisa municipio (datalist)\nLat/Lng manuais\nBotao Ir para local" as SAT_CTRL
+      component "MapaSatelite Leaflet\nEsri World Imagery\nWorld Boundaries overlay\nscrollWheelZoom ativo\nClique reposiciona centro" as SAT_MAP
+      component "PlantOverlay (L.canvas)\nL.circleMarker por planta\npor speciesIdx / cor\nAte 2.500 plantas\nRaio adaptado ao zoom" as PLANT_OV
+      component "PerimetroArea (drag)\n_saSatBoundary: L.polygon\n_saSatCornerMarkers: 4 alcas\ndrag -> resize ao vivo\ndragend -> runSimulation\nautoFit=true so na navegacao" as PERIM
+      component "LegendaEspecies\nLeaflet Control bottomright\nicone + nome por especie\natualiza com o sistema" as LEGEND
+    }
+
+    component "Estado do Simulador\n_saState / _saPositions\n_saMetrics\narea, spacings, angle,\nlayout, system, variant" as STATE
+
+    component "sa_onSlider() + debounce\n1. Atualiza _saState sincr.\n2. sa_calcMetricas() imediato\n3. sa_renderMetrics() imediato\n4. setTimeout(runSim, 280ms)" as SLIDER
+
+    component "sa_runSimulation()\nSA_LAYOUTS[layout].generate()\n_saRotatePositions() se linear\nSa_calcMetricas()\nsa_drawPlantacao() ou\nsa_satDrawPlants()" as RUN_SIM
+  }
+}
+
+CONV_P   --> RUN_CONV : "onchange slider"
+RUN_CONV --> CONV_M   : "impactos"
+RUN_CONV --> CONV_T   : "Chart.js"
+RUN_CONV --> CONV_C   : "Chart.js"
+
+PLEFT    --> SLIDER   : "eventos input"
+SLIDER   --> STATE    : "atualiza sincrono"
+SLIDER   --> MET_P    : "renderMetrics() imediato"
+SLIDER   --> RUN_SIM  : "debounce 280ms"
+RUN_SIM  --> CVS      : "sa_drawPlantacao()"
+RUN_SIM  --> PLANT_OV : "sa_satDrawPlants()"
+PERIM    --> RUN_SIM  : "dragend -> 100ms"
+PERIM    --> MET_P    : "drag -> metricas ao vivo"
+SAT_MAP  --> ESRI     : "Leaflet HTTPS"
+@enduml
+
+
+' ╔══════════════════════════════════════════════════════════════════════╗
+' ║  C4 LEVEL 3e — CHAT IA                                             ║
+' ╚══════════════════════════════════════════════════════════════════════╝
+@startuml C4_L3e_Chat_IA
+!theme plain
+skinparam defaultFontName Arial
+skinparam backgroundColor #0d1a0d
+skinparam defaultFontColor #d4f0d4
+skinparam arrowColor #4ade80
+skinparam arrowFontColor #86efac
+skinparam componentBackgroundColor #1f3320
+skinparam componentBorderColor #3a6a3a
+skinparam componentFontColor #e8f5e8
+skinparam packageBackgroundColor #0f1a0f
+skinparam packageBorderColor #2a5a2a
+skinparam packageFontColor #86efac
+skinparam cloudBackgroundColor #1a1a2e
+skinparam cloudBorderColor #6060a0
+skinparam cloudFontColor #c0c0e0
+skinparam databaseBackgroundColor #142014
+skinparam databaseBorderColor #4ade80
+skinparam databaseFontColor #e8f5e8
+
+title "DS Embrapa MA — C4 Level 3e: Modulo Chat IA (Assistente Embrapa)"
+
+cloud "Anthropic Claude API\nclaude-sonnet\nPOST /v1/messages" as CLAUDE
+database "LocalStorage\n(api-key)" as LS_KEY
+
+package "Modulo Chat IA (painel flutuante — canto inferior direito)" {
+
+  component "ChatToggleButton\nicone 💬 fixo\nabre/fecha painel" as CHAT_BTN
+
+  component "ChatPanel (#chat-panel)\n380px x 520px\nheader + mensagens\n+ setup + input" as PANEL
+
+  component "ApiKeySetup\nInput Anthropic API key\nBotao Salvar -> localStorage\nVisivel quando sem chave" as API_SETUP
+
+  component "ExemplosDeUso\n'Qual sistema para cerrado?'\n'Compare GEE municipios'\n'Layout para 5ha SAF?'\nClique -> envia automatico" as EXEMPLOS
+
+  component "MessageHistory\n.chat-msg.user (direita)\n.chat-msg.assistant (esq)\n.chat-msg.sys-note (sistema)\nScroll suave para ultima" as HIST
+
+  component "TypingIndicator\n3 pontos animados\nduante fetch -> some\nao receber resposta" as TYPING
+
+  component "ContextBuilder\nbuildChatContext()\n- View ativa\n- Municipio filtrado\n- Sistema produtivo\n- Indicadores GEE MA\n- MUNIC_DATA selecionado\n- Instrucoes Embrapa" as CTX
+
+  component "ClaudeApiClient\nfetch() POST HTTPS\nx-api-key + anthropic-version\n{model, messages, max_tokens}\nResponde: content[0].text" as API_CLI
+
+  component "MessageRenderer\nFormata resposta Claude\nInsere .chat-msg.assistant\nTrata erros com msg amigavel" as MSG_R
+
+  component "InputRow\nTextarea multi-linha\nEnter = envia\nShift+Enter = nova linha\nDesabilitado durante request" as INPUT
+}
+
+CHAT_BTN --> PANEL    : "toggle"
+INPUT    --> CTX      : "buildChatContext()"
+CTX      --> API_CLI  : "system prompt\n+ historico"
+API_CLI  --> LS_KEY   : "le x-api-key"
+API_CLI  --> CLAUDE   : "POST /v1/messages\nHTTPS / REST JSON"
+CLAUDE   --> API_CLI  : "{content[{text}]}"
+API_CLI  --> MSG_R    : "texto resposta"
+API_CLI  --> TYPING   : "mostra -> oculta"
+MSG_R    --> HIST     : "append .assistant"
+INPUT    --> HIST     : "append .user"
+EXEMPLOS --> INPUT    : "preenche + dispara"
+API_SETUP --> LS_KEY  : "localStorage\n.setItem(key)"
+@enduml
+
+
+' ╔══════════════════════════════════════════════════════════════════════╗
+' ║  C4 LEVEL 3f — REGISTRAR + DADOS + GUIAS                          ║
+' ╚══════════════════════════════════════════════════════════════════════╝
+@startuml C4_L3f_Registrar_Dados_Guias
+!theme plain
+skinparam defaultFontName Arial
+skinparam backgroundColor #0d1a0d
+skinparam defaultFontColor #d4f0d4
+skinparam arrowColor #4ade80
+skinparam arrowFontColor #86efac
+skinparam componentBackgroundColor #1f3320
+skinparam componentBorderColor #3a6a3a
+skinparam componentFontColor #e8f5e8
+skinparam packageBackgroundColor #0f1a0f
+skinparam packageBorderColor #2a5a2a
+skinparam packageFontColor #86efac
+skinparam databaseBackgroundColor #142014
+skinparam databaseBorderColor #4ade80
+skinparam databaseFontColor #e8f5e8
+
+title "DS Embrapa MA — C4 Level 3f: Modulos Registrar, Dados e Guias"
+
+database "LocalStorage\n(ds_embrapa_ma_v2)" as LS
+
+package "Modulo Registrar" {
+  component "BotaoRegistrar\nabre modal de cadastro" as REG_BTN
+  component "ModalCadastro\n#modal-overlay\nform dinamico por sistema" as MODAL
+  component "FormBuilder\nbuildModalForm(sysKey)\nMunicipio, lat/lng, area,\nbioma, escala, produtor,\nindicadores economicos" as FORM
+  component "ValidationEngine\nvalida obrigatorios\nnumericos e coords MA" as VALID
+  component "DataStore\nsaveData() -> localStorage\nloadData() <- localStorage\nInicia com INITIAL_DATA" as DSTORE
+  component "ToastNotification\nfeedback 3s:\ncadastro salvo / erro" as TOAST
+}
+
+package "Modulo Dados" {
+  component "DadosController\nswitchDataTab(tab)\nrenderiza tabelas filtradas" as D_CTRL
+  component "FilterBar\nbusca textual\nfiltro por sistema" as FBAR
+  component "Registros DB\ntodos os registros URTs\nsistema, municipio, area" as TAB_REG
+  component "Piscicultura\nproducao kg/ano\nespecie / tipo" as TAB_PIS
+  component "Apicultura\nmel kg/ano / tipo" as TAB_APIC
+  component "Fruticultura\nfruta / producao / valor" as TAB_FRUT
+  component "Extrativismo\nproduto / producao / valor" as TAB_EXT
+  component "Municipios\n221 municipios IBGE 2024\npop, IDH, PIB, GEE..." as TAB_MUN
+  component "ExportEngine\nexportData(type)\nCSV: db/munic/apic\npisc/frut/extrat" as EXP_E
+}
+
+package "Modulo Guias" {
+  component "GuiasController\nswitchGuideTab(tab)" as G_CTRL
+  component "Sistemas Produtivos\n#guide-content\nILP/ILPF, SAF, Apic,\nMelipon, Sist, Pisc,\nExtrat, Frut, Roca\nDesc + GEE + regiao" as G_SIS
+  component "Tecnologias Embrapa\n#guide-content-tech\nBRS Forrageiras\nILPF Rede / Sisteminha\nABC+ / Baixo Carbono" as G_TEC
+}
+
+REG_BTN --> MODAL  : "abre"
+MODAL   --> FORM   : "form dinamico"
+FORM    --> VALID  : "valida"
+VALID   --> DSTORE : "salva se valido"
+DSTORE  --> LS     : "JSON.stringify"
+DSTORE  --> TOAST  : "notifica"
+
+D_CTRL  --> TAB_REG : "localStorage"
+FBAR    --> TAB_REG : "filtra"
+EXP_E   --> LS      : "le para CSV"
+
+G_CTRL  --> G_SIS  : "renderGuides()"
+G_CTRL  --> G_TEC  : "renderTechGuides()"
+@enduml
+
+
+' ╔══════════════════════════════════════════════════════════════════════╗
+' ║  C4 LEVEL 4a — CODIGO: MOTOR DE SIMULACAO DE PLANTIO              ║
+' ╚══════════════════════════════════════════════════════════════════════╝
+@startuml C4_L4a_Codigo_Simulacao
+!theme plain
+skinparam defaultFontName Arial
+skinparam backgroundColor #0d1a0d
+skinparam classBackgroundColor #1a2a1a
+skinparam classBorderColor #3a6a3a
+skinparam classFontColor #e8f5e8
+skinparam classHeaderBackgroundColor #0f3020
+skinparam arrowColor #4ade80
+skinparam arrowFontColor #86efac
+skinparam packageBackgroundColor #0f1a0f
+skinparam packageBorderColor #2a5a2a
+skinparam packageFontColor #86efac
+skinparam stereotypeFontColor #86efac
+skinparam defaultFontColor #d4f0d4
+
+title "DS Embrapa MA — C4 Level 4a: Codigo — Motor de Simulacao de Plantio"
+
+package "simuladores/layouts.js" {
+  interface Layout {
+    +label : String
+    +icon  : String
+    +generate(areaM2, sRow, sPlant,\n  angleRad, nSpecies) : PlantPosition[]
+  }
+  class SA_LAYOUTS {
+    +linear       : Layout
+    +hexagonal    : Layout
+    +circular     : Layout
+    +faixas       : Layout
+    +grid         : Layout
+    +random       : Layout
+    +mosaico      : Layout
+  }
+  class PlantPosition {
+    +x          : Number
+    +y          : Number
+    +row        : Number
+    +col        : Number
+    +speciesIdx : Number
+  }
+  SA_LAYOUTS ..|> Layout
+  Layout ..> PlantPosition : "retorna []"
+}
+
+package "simuladores/dados_agricolas.js" {
+  class SA_SYSTEMS {
+    +ilpf, ilp, saf
+    +apicultura, meliponicultura
+    +sisteminha, piscicultura
+    +extrativismo, fruticultura, roca
+  }
+  class SistemaProdutivo {
+    +label    : String
+    +icon     : String
+    +color    : String
+    +variants : Variante[]
+  }
+  class Variante {
+    +id           : String
+    +label        : String
+    +spacingRow   : Number
+    +spacingPlant : Number
+    +renda_ha     : Number
+    +invest_ha    : Number
+    +carbon_ha    : Number
+    +agua_ha      : Number
+    +empregos     : Number
+    +species      : Especie[]
+  }
+  class Especie {
+    +name   : String
+    +color  : String
+    +crown  : Number
+  }
+  SA_SYSTEMS *-- SistemaProdutivo
+  SistemaProdutivo *-- Variante
+  Variante *-- Especie
+}
+
+package "simuladores/simulador.js" {
+  class SimulatorState {
+    +system       : String
+    +variant      : String
+    +area         : Number
+    +spacingRow   : Number
+    +spacingPlant : Number
+    +angle        : Number
+    +layout       : String
+  }
+  class SatelliteState {
+    +_saSatMap           : L.Map
+    +_saSatLayer         : L.LayerGroup
+    +_saSatCenter        : Object
+    +_saSatBoundary      : L.Polygon
+    +_saSatCornerMarkers : L.Marker[]
+    +_saSatView          : String
+  }
+  class SimulatorFunctions {
+    +sa_runSimulation() : void
+    +sa_onSlider() : void
+    +_saRotatePositions(pts, rad) : PlantPosition[]
+    +sa_satInit() : void
+    +sa_satDrawPlants(autoFit?) : void
+    +sa_satSelectByName(name) : void
+    +sa_satApplyCoords() : void
+    +sa_switchView(view) : void
+  }
+  SimulatorFunctions --> SimulatorState
+  SimulatorFunctions --> SatelliteState
+  SimulatorFunctions --> SA_LAYOUTS   : "generate()"
+  SimulatorFunctions --> SA_SYSTEMS   : "SA_SYSTEMS[key]"
+}
+
+package "simuladores/metricas.js" {
+  class Metrics {
+    +nPlantas         : Number
+    +density          : Number
+    +richness         : Number
+    +shannonH         : Number
+    +rendaAnual       : Number
+    +investTotal      : Number
+    +paybackAnos      : Number
+    +carbonAnual      : Number
+    +geeAnual         : Number
+    +coberturaPercent : Number
+    +empregosGerados  : Number
+    +aguaAnual        : Number
+    +alertas          : Alerta[]
+    +recomendacoes    : String[]
+  }
+  class MetricasFunctions {
+    +sa_shannonIndex(counts) : Number
+    +sa_calcMetricas(state, pos) : Metrics
+    +sa_gerarRecomendacoes(...) : String[]
+  }
+  MetricasFunctions ..> Metrics : "retorna"
+}
+
+package "simuladores/visualizacao.js" {
+  class CanvasRenderer {
+    +sa_drawPlantacao(canvas,\n  state, positions, opts) : void
+  }
+}
+
+package "simuladores/exportacao.js" {
+  class ExportModule {
+    +sa_exportPNG(canvas, fn) : void
+    +sa_exportJPG(canvas, fn) : void
+    +sa_exportCSV(state, pos, m) : void
+  }
+}
+
+SimulatorFunctions --> MetricasFunctions : "sa_calcMetricas()"
+SimulatorFunctions --> CanvasRenderer    : "sa_drawPlantacao()"
+SimulatorFunctions --> ExportModule      : "sa_export*()"
+@enduml
+
+
+' ╔══════════════════════════════════════════════════════════════════════╗
+' ║  C4 LEVEL 4b — CODIGO: CLASSIFICACAO DE INDICADORES GEE           ║
+' ╚══════════════════════════════════════════════════════════════════════╝
+@startuml C4_L4b_Codigo_GEE
+!theme plain
+skinparam defaultFontName Arial
+skinparam backgroundColor #0d1a0d
+skinparam classBackgroundColor #1a2a1a
+skinparam classBorderColor #3a6a3a
+skinparam classFontColor #e8f5e8
+skinparam classHeaderBackgroundColor #0f3020
+skinparam arrowColor #4ade80
+skinparam arrowFontColor #86efac
+skinparam packageBackgroundColor #0f1a0f
+skinparam packageBorderColor #2a5a2a
+skinparam packageFontColor #86efac
+skinparam defaultFontColor #d4f0d4
+
+title "DS Embrapa MA — C4 Level 4b: Codigo — Classificacao de Indicadores GEE"
+
+package "index.html — Dados Municipais (IBGE 2024)" {
+  class MUNIC_DATA {
+    ' Array[221] — 22 colunas por municipio
+    +[0]  name          : String
+    +[1]  lat           : Number
+    +[2]  lng           : Number
+    +[3]  pop           : Number
+    +[4]  pib_pc        : Number
+    +[5]  pob_pct       : Number
+    +[6]  desmat_km2    : Number
+    +[7]  fome_pct      : Number
+    +[8]  gee_kt        : Number
+    +[9]  queimadas_ha  : Number
+    +[10] precip_mm     : Number
+    +[11] temp_c        : Number
+    +[12] lavoura_ha    : Number
+    +[13] bovinos       : Number
+    +[14] idh           : Number
+    +[15] cos_pct       : Number
+    +[16] assentamentos : Number
+    +[17] pesca_t       : Number
+    +[18] bioma         : String
+    +[19] regiao        : String
+    +[20] solo          : String
+    +[21] bacia         : String
+  }
+  class MC {
+    ' Indices de coluna (constante)
+    +name=0, lat=1, lng=2
+    +pop=3, pib=4, pob=5
+    +desmat=6, fome=7, gee=8
+    +queimadas=9, precip=10, temp=11
+    +lavoura=12, bovinos=13, idh=14
+    +cos=15, assent=16, pesca=17
+    +bioma=18, regiao=19, solo=20
+  }
+  MUNIC_DATA ..> MC : "indexado por"
+}
+
+package "proj-simuladores.js — Classificacao e Comparacao" {
+  class GEEThresholds {
+    ' Limiares de risco por indicador
+    +gee_kt       : {critico:50,   atencao:20}
+    +desmat_km2   : {critico:100,  atencao:30}
+    +fome_pct     : {critico:30,   atencao:15}
+    +pob_pct      : {critico:50,   atencao:30}
+    +queimadas_ha : {critico:5000, atencao:1000}
+    +idh          : {bom:0.6, atencao:0.5}
+  }
+  class RiscoGEE {
+    +nivel : String
+    +cor   : String
+    +badge : String
+    +score : Number
+  }
+  class AnaliseComparativa {
+    +buildAnaliseHTML() : String
+    +classifyMunicipio(row, ind) : RiscoGEE
+    +rankMunicipios(indicador) : Array
+    +buildComparisonChart(...) : ChartConfig
+    +filterByBioma(bioma) : Array
+    +_getMD() : MUNIC_DATA[]
+  }
+  AnaliseComparativa --> MUNIC_DATA     : "_getMD()"
+  AnaliseComparativa --> MC             : "indices coluna"
+  AnaliseComparativa --> GEEThresholds  : "classifica"
+  AnaliseComparativa ..> RiscoGEE       : "retorna"
+}
+
+package "proj-simuladores.js — Conversao de Areas" {
+  class SIM_SYSTEMS {
+    ' 10 sistemas produtivos
+    +[key].seq_co2   : Number
+    +[key].invest_ha : Number
+    +[key].renda_ha  : Number
+    +[key].empregos  : Number
+    +[key].carbon_ha : Number
+    +[key].temp_red  : Number
+    +[key].biodiv    : Number
+  }
+  class ConversaoSim {
+    ' MA_DEGRADED_HA = 1.800.000 ha
+    +runConversaoSim() : void
+    +calcImpacto(pct, sys, anos) : Impacto
+  }
+  class Impacto {
+    +areaHa         : Number
+    +empregos       : Number
+    +rendaAnual     : Number
+    +sequestroAnual : Number
+    +geeEvitado     : Number
+    +tempReducao    : Number
+    +investimento   : Number
+    +payback        : Number
+  }
+  ConversaoSim --> SIM_SYSTEMS  : "parametros"
+  ConversaoSim ..> Impacto      : "calcula"
+}
+
+package "proj-simuladores.js — Projecoes GEE" {
+  class GEEScenario {
+    +id    : String
+    +label : String
+    +color : String
+    +data  : YearlyValue[]
+  }
+  class YearlyValue {
+    +year       : Number
+    +gee_mt     : Number
+    +desmat_km2 : Number
+    +temp_c     : Number
+    +seq_mt     : Number
+  }
+  class ProjecoesFunctions {
+    +renderProjCharts() : void
+    +buildScenarioData(variable) : Array
+    +buildSummaryTable2050() : Array
+  }
+  GEEScenario *-- YearlyValue
+  ProjecoesFunctions --> GEEScenario : "renderiza"
+}
+@enduml
+
+
+' ╔══════════════════════════════════════════════════════════════════════╗
+' ║  DIAGRAMA DINAMICO — FLUXO: SIMULACAO + SATELITE                   ║
+' ╚══════════════════════════════════════════════════════════════════════╝
+@startuml C4_Dinamico_Fluxo
+!theme plain
+skinparam defaultFontName Arial
+skinparam backgroundColor #0d1a0d
+skinparam sequenceParticipantBackgroundColor #1a2a1a
+skinparam sequenceParticipantBorderColor #3a6a3a
+skinparam sequenceParticipantFontColor #e8f5e8
+skinparam sequenceArrowColor #4ade80
+skinparam sequenceArrowFontColor #86efac
+skinparam sequenceLifeLineBorderColor #2a5a2a
+skinparam sequenceGroupBackgroundColor #0f1a0f
+skinparam sequenceGroupBorderColor #2a5a2a
+skinparam sequenceGroupFontColor #86efac
+skinparam noteBorderColor #2a5a2a
+skinparam noteBackgroundColor #0f1a0f
+skinparam noteFontColor #86efac
+skinparam defaultFontColor #d4f0d4
+
+title "DS Embrapa MA — Fluxo Dinamico: Simulacao de Plantio e Projecao Satelite"
+
+actor "Pesquisador\nEmbrapa" as USR
+participant "Interface\n(index.html)" as UI
+participant "simulador.js\n_saState" as SIM
+participant "layouts.js\nSA_LAYOUTS" as LAY
+participant "metricas.js" as MET
+participant "visualizacao.js" as VIZ
+participant "dados_agricolas.js\nSA_SYSTEMS" as DAD
+participant "Esri Tiles\n(Leaflet)" as ESRI
+
+== 1. Configuracao inicial do simulador ==
+USR -> UI  : Seleciona sistema, variante e layout
+UI  -> SIM : sa_runSimulation()
+SIM -> DAD : SA_SYSTEMS[system]
+DAD --> SIM : SistemaProdutivo + Variante
+SIM -> LAY : generate(areaM2, sRow, sPlant, angle, nSp)
+LAY --> SIM : PlantPosition[] {x, y, speciesIdx}
+SIM -> MET : sa_calcMetricas(state, positions)
+MET --> SIM : Metrics {shannonH, renda, carbono...}
+SIM -> VIZ : sa_drawPlantacao(canvas, state, positions)
+VIZ --> UI  : canvas renderizado HiDPI
+SIM -> UI   : sa_renderMetrics() + sa_renderAlertas()
+
+== 2. Slider alterado — resposta imediata ==
+USR -> UI  : Move slider (Area / Espacamento / Angulo)
+UI  -> SIM : sa_onSlider()
+activate SIM
+SIM -> SIM : Atualiza _saState (sincrono)
+SIM -> MET : sa_calcMetricas(state, _saPositions)
+MET --> SIM : Metrics {}
+SIM -> UI   : sa_renderMetrics() IMEDIATO
+note right of UI : Cards atualizam sem\nespetar re-geracao\ndas posicoes
+SIM -> SIM : setTimeout(sa_runSimulation, 280ms)
+deactivate SIM
+
+... 280ms (debounce) ...
+
+SIM -> LAY : generate() com novos parametros
+LAY --> SIM : PlantPosition[] atualizado
+SIM -> MET : sa_calcMetricas() final
+SIM -> VIZ : sa_drawPlantacao() re-renderiza
+
+== 3. Ativa sub-aba Satelite ==
+USR -> UI  : Clica "Projecao Satelite"
+UI  -> SIM : sa_switchView('sat') -> sa_satInit()
+SIM -> ESRI : Leaflet TileLayer (World Imagery)
+ESRI --> SIM : tiles PNG via HTTPS
+SIM -> UI   : sa_satDrawPlants(autoFit=true)\nL.circleMarker por planta\nfitBounds -> enquadra plantio
+
+== 4. Pesquisa de municipio ==
+USR -> UI  : Digita municipio no datalist
+UI  -> SIM : sa_satSelectByName(name)
+SIM -> SIM : _saSatCenter = {lat, lng}\n_saSatMap.setView([lat,lng], 14)
+SIM -> UI   : sa_satDrawPlants(autoFit=true)\nfitBounds -> nova localizacao
+
+== 5. Redimensionar area arrastando canto ==
+USR -> UI  : Arrasta alca de canto (L.marker)
+UI  -> SIM : cm.on('drag', e)
+activate SIM
+SIM -> SIM : dist = sqrt(dx2+dy2)\nhalf = dist / sqrt(2)\nnewArea = (2*dist2)/10000 ha
+SIM -> UI   : Atualiza slider + label area
+SIM -> SIM : _saSatBoundary.setLatLngs()\ncorners movidos simetricamente
+SIM -> MET : sa_calcMetricas(state, _saPositions)
+SIM -> UI   : sa_renderMetrics() AO VIVO
+deactivate SIM
+
+USR -> UI  : Solta alca (dragend)
+UI  -> SIM : setTimeout(sa_runSimulation, 100ms)
+note right of SIM : Regenera posicoes\ncom nova area.\nZoom preservado\n(sem autoFit)
+@enduml
