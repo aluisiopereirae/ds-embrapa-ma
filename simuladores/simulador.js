@@ -42,8 +42,8 @@ function _buildSaHTML() {
   return `
 <div id="sa-root" style="font-size:13px">
 
-  <!-- Abas de sistema -->
-  <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+  <!-- Abas de sistema — ocultas na aba Recomendação IA -->
+  <div id="sa-sys-row" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">
     ${sysKeys.map(k =>
       `<button class="sa-sys-tab" data-sys="${k}" onclick="sa_selectSystem('${k}')"
         style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 11px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s">
@@ -52,10 +52,10 @@ function _buildSaHTML() {
     ).join('')}
   </div>
 
-  <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start">
+  <div id="sa-main-grid" style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start">
 
-    <!-- ── Painel esquerdo ────────────────────────────────────────────────── -->
-    <div>
+    <!-- ── Painel esquerdo — oculto na aba Recomendação IA ───────────────── -->
+    <div id="sa-left-col">
       <div class="sim-card" style="margin-bottom:12px">
         <div class="sim-card-title">⚙️ Configuração</div>
 
@@ -109,7 +109,7 @@ function _buildSaHTML() {
     <!-- ── Painel direito ─────────────────────────────────────────────────── -->
     <div>
       <!-- Sub-abas de visualização -->
-      <div style="display:flex;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);flex-wrap:wrap">
         <button id="sa-vtab-canvas" onclick="sa_switchView('canvas')"
           style="background:var(--green3);border:1px solid var(--green3);border-radius:8px;padding:5px 14px;cursor:pointer;font-size:11px;color:#fff;font-weight:600;transition:all .15s">
           🌳 Vista Superior
@@ -117,6 +117,10 @@ function _buildSaHTML() {
         <button id="sa-vtab-sat" onclick="sa_switchView('sat')"
           style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 14px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s">
           🛰️ Projeção Satélite
+        </button>
+        <button id="sa-vtab-rec" onclick="sa_switchView('rec')"
+          style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 14px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s">
+          🧠 Recomendação IA
         </button>
       </div>
 
@@ -209,6 +213,117 @@ function _buildSaHTML() {
             <span>📍 Clique no mapa → reposiciona o plantio</span>
             <span>🔍 Scroll / pinça para zoom</span>
             <span id="sa-sat-count"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Recomendação IA — Classificação Multi-Critério ──────────────── -->
+      <div id="sa-view-rec" style="display:none">
+
+        <!-- Barra de busca + badge -->
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+          <input type="text" id="rec-munic-input" list="rec-munic-list"
+            placeholder="🔍 Pesquisar município do MA para centralizar o mapa..."
+            onchange="rec_searchMunic(this.value)" oninput="rec_searchMunic(this.value)"
+            style="flex:1;min-width:220px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box">
+          <datalist id="rec-munic-list"></datalist>
+          <span style="font-size:10px;color:var(--text3);white-space:nowrap">ou clique no mapa</span>
+        </div>
+        <div id="rec-munic-badge" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 11px;margin-bottom:10px;font-size:11px;color:var(--text3)">
+          📍 Nenhum local selecionado — clique no mapa para iniciar a análise
+        </div>
+
+        <!-- Grid principal: Mapa | Resultados -->
+        <div style="display:grid;grid-template-columns:420px 1fr;gap:12px;align-items:start">
+
+          <!-- ── COLUNA ESQUERDA: Mapa + Características + Restrições ──── -->
+          <div>
+
+            <!-- Mapa interativo -->
+            <div class="chart-card" style="margin-bottom:10px">
+              <div class="chart-title" style="margin-bottom:6px">
+                🗺️ Terreno Real — Clique para Classificar
+              </div>
+              <div style="background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.12);border-radius:6px;padding:5px 9px;margin-bottom:7px;font-size:10px;color:var(--text3)">
+                💡 Clique em qualquer ponto · O algoritmo detecta município, solo, bioma, clima,
+                UCs, Terras Indígenas e Quilombos e classifica os 10 sistemas produtivos Embrapa.
+              </div>
+              <div id="rec-map" style="height:400px;border-radius:8px;background:#0a0f0a;overflow:hidden;border:1px solid var(--border)"></div>
+              <div style="font-size:10px;color:var(--text3);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap">
+                <span>🛰️ Esri Satellite + CartoDB Labels</span>
+                <span>🔴 UCs · 🟣 Terras Indígenas · 🟤 Quilombos</span>
+              </div>
+            </div>
+
+            <!-- Características ambientais e socioeconômicas -->
+            <div class="chart-card" style="margin-bottom:10px">
+              <div class="chart-title" style="margin-bottom:8px">🌍 Características do Local Detectadas</div>
+              <div id="rec-env-panel">
+                <span style="color:var(--text3);font-size:11px">Clique no mapa para detectar características...</span>
+              </div>
+            </div>
+
+            <!-- Restrições e impedimentos legais -->
+            <div class="chart-card">
+              <div class="chart-title" style="margin-bottom:8px">⚠️ Restrições e Impedimentos Legais</div>
+              <div id="rec-constraints-panel">
+                <span style="color:var(--text3);font-size:11px">Aguardando localização...</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ── COLUNA DIREITA: Pesos + Ranking + Gráficos + Multi-sistema -->
+          <div>
+
+            <!-- Pesos dos critérios (compacto, 2 colunas de sliders) -->
+            <div class="chart-card" style="margin-bottom:10px">
+              <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span>⚖️ Pesos dos Critérios de Avaliação</span>
+                <button onclick="rec_resetWeights()"
+                  style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:3px 9px;cursor:pointer;font-size:10px;color:var(--text3)">
+                  ↺ Resetar
+                </button>
+              </div>
+              <div id="rec-weights-panel">
+                <span style="color:var(--text3);font-size:11px">Carregando critérios...</span>
+              </div>
+            </div>
+
+            <!-- Ranking completo -->
+            <div class="chart-card" style="margin-bottom:10px">
+              <div class="chart-title" style="margin-bottom:8px">
+                🏆 Sistemas Recomendados pela IA
+                <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:5px">Pontuação 0–100 · MCDA ponderado</span>
+              </div>
+              <div id="rec-ranking">
+                <span style="color:var(--text3);font-size:11px">Clique em um ponto no mapa para classificar os 10 sistemas...</span>
+              </div>
+            </div>
+
+            <!-- Radar + Barras lado a lado -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+              <div class="chart-card">
+                <div class="chart-title" style="margin-bottom:5px;font-size:11px">📡 Top 3 · Multi-Critério</div>
+                <div style="height:240px"><canvas id="rec-radar"></canvas></div>
+              </div>
+              <div class="chart-card">
+                <div class="chart-title" style="margin-bottom:5px;font-size:11px">📊 Pontuação Geral</div>
+                <div style="height:240px"><canvas id="rec-bar"></canvas></div>
+              </div>
+            </div>
+
+            <!-- Planejamento multi-sistema -->
+            <div class="chart-card">
+              <div class="chart-title" style="margin-bottom:8px">
+                🔗 Planejamento Multi-sistema
+                <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:5px">Combine 2–3 sistemas e calcule métricas integradas</span>
+              </div>
+              <div id="rec-multisys">
+                <span style="color:var(--text3);font-size:11px">Selecione um local para ativar o planejamento...</span>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -703,23 +818,35 @@ function sa_switchView(view) {
   _saSatView = view;
   const cvDiv  = document.getElementById('sa-view-canvas');
   const satDiv = document.getElementById('sa-view-sat');
+  const recDiv = document.getElementById('sa-view-rec');
   const btnCv  = document.getElementById('sa-vtab-canvas');
   const btnSat = document.getElementById('sa-vtab-sat');
+  const btnRec = document.getElementById('sa-vtab-rec');
 
   const ON  = { background:'var(--green3)', borderColor:'var(--green3)', color:'#fff', fontWeight:'600' };
   const OFF = { background:'none', borderColor:'var(--border)', color:'var(--text2)', fontWeight:'normal' };
 
+  if (cvDiv)  cvDiv.style.display  = view === 'canvas' ? 'block' : 'none';
+  if (satDiv) satDiv.style.display = view === 'sat'    ? 'block' : 'none';
+  if (recDiv) recDiv.style.display = view === 'rec'    ? 'block' : 'none';
+  if (btnCv)  Object.assign(btnCv.style,  view === 'canvas' ? ON : OFF);
+  if (btnSat) Object.assign(btnSat.style, view === 'sat'    ? ON : OFF);
+  if (btnRec) Object.assign(btnRec.style, view === 'rec'    ? ON : OFF);
+
+  // Oculta painel esquerdo e botões de sistema na aba Recomendação IA
+  const sysRow  = document.getElementById('sa-sys-row');
+  const leftCol = document.getElementById('sa-left-col');
+  const grid    = document.getElementById('sa-main-grid');
+  const isRec   = view === 'rec';
+  if (sysRow)  sysRow.style.display          = isRec ? 'none' : 'flex';
+  if (leftCol) leftCol.style.display         = isRec ? 'none' : 'block';
+  if (grid)    grid.style.gridTemplateColumns = isRec ? '1fr'  : '300px 1fr';
+
   if (view === 'sat') {
-    if (cvDiv)  cvDiv.style.display  = 'none';
-    if (satDiv) satDiv.style.display = 'block';
-    if (btnCv)  Object.assign(btnCv.style, OFF);
-    if (btnSat) Object.assign(btnSat.style, ON);
     sa_satInit();
+  } else if (view === 'rec') {
+    if (typeof rec_init === 'function') rec_init();
   } else {
-    if (cvDiv)  cvDiv.style.display  = 'block';
-    if (satDiv) satDiv.style.display = 'none';
-    if (btnCv)  Object.assign(btnCv.style, ON);
-    if (btnSat) Object.assign(btnSat.style, OFF);
     // Redesenha canvas (pode ter perdido tamanho enquanto estava oculto)
     requestAnimationFrame(sa_redrawCanvas);
   }
