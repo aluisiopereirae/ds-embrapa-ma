@@ -737,7 +737,7 @@ function rec_renderBar(scores) {
     data: {
       labels: scores.map(s => s.icon + ' ' + s.label),
       datasets: [{
-        label: 'Pontuação IA',
+        label: 'Pontuação do Recomendador',
         data: scores.map(s => s.score),
         backgroundColor: scores.map(s => s.color + 'cc'),
         borderColor: scores.map(s => s.color),

@@ -123,7 +123,7 @@ function _buildSaHTML() {
         </button>
         <button id="sa-vtab-rec" onclick="sa_switchView('rec')"
           style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 14px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s">
-          🧠 Recomendação IA
+          🧠 Recomendação
         </button>
       </div>
 
@@ -237,12 +237,12 @@ function _buildSaHTML() {
         </div>
 
         <!-- Grid principal: Mapa | Resultados -->
-        <div style="display:grid;grid-template-columns:420px 1fr;gap:12px;align-items:start">
+        <div style="display:grid;grid-template-columns:minmax(460px,480px) 1fr;gap:12px;align-items:start">
 
-          <!-- ── COLUNA ESQUERDA: Mapa + Características + Restrições ──── -->
+          <!-- ── COLUNA ESQUERDA: Mapa + Restrições + Características + Multi-sistema ── -->
           <div>
 
-            <!-- Mapa interativo -->
+            <!-- Mapa interativo + Restrições dentro do mesmo card -->
             <div class="chart-card" style="margin-bottom:10px">
               <div class="chart-title" style="margin-bottom:6px">
                 🗺️ Terreno Real — Clique para Classificar
@@ -251,10 +251,20 @@ function _buildSaHTML() {
                 💡 Clique em qualquer ponto · O algoritmo detecta município, solo, bioma, clima,
                 UCs, Terras Indígenas e Quilombos e classifica os 10 sistemas produtivos Embrapa.
               </div>
-              <div id="rec-map" style="height:400px;border-radius:8px;background:#0a0f0a;overflow:hidden;border:1px solid var(--border)"></div>
-              <div style="font-size:10px;color:var(--text3);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap">
+              <div id="rec-map" style="height:clamp(420px,55vh,580px);border-radius:8px;background:#0a0f0a;overflow:hidden;border:1px solid var(--border)"></div>
+              <div style="font-size:10px;color:var(--text3);margin-top:6px;margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap">
                 <span>🛰️ Esri Satellite + CartoDB Labels</span>
                 <span>🔴 UCs · 🟣 Terras Indígenas · 🟤 Quilombos</span>
+              </div>
+
+              <!-- Restrições e impedimentos legais — dentro do card do mapa -->
+              <div style="border-top:1px solid var(--border);padding-top:10px">
+                <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:7px;display:flex;align-items:center;gap:5px">
+                  ⚠️ Restrições e Impedimentos Legais
+                </div>
+                <div id="rec-constraints-panel">
+                  <span style="color:var(--text3);font-size:11px">Aguardando localização...</span>
+                </div>
               </div>
             </div>
 
@@ -266,17 +276,20 @@ function _buildSaHTML() {
               </div>
             </div>
 
-            <!-- Restrições e impedimentos legais -->
+            <!-- Planejamento multi-sistema — abaixo de Características -->
             <div class="chart-card">
-              <div class="chart-title" style="margin-bottom:8px">⚠️ Restrições e Impedimentos Legais</div>
-              <div id="rec-constraints-panel">
-                <span style="color:var(--text3);font-size:11px">Aguardando localização...</span>
+              <div class="chart-title" style="margin-bottom:8px">
+                🔗 Planejamento Multi-sistema
+                <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:5px">Combine 2–3 sistemas e calcule métricas integradas</span>
+              </div>
+              <div id="rec-multisys">
+                <span style="color:var(--text3);font-size:11px">Selecione um local para ativar o planejamento...</span>
               </div>
             </div>
 
           </div>
 
-          <!-- ── COLUNA DIREITA: Pesos + Ranking + Gráficos + Multi-sistema -->
+          <!-- ── COLUNA DIREITA: Pesos + Ranking + Gráficos ────────────────── -->
           <div>
 
             <!-- Pesos dos critérios (compacto, 2 colunas de sliders) -->
@@ -296,7 +309,7 @@ function _buildSaHTML() {
             <!-- Ranking completo -->
             <div class="chart-card" style="margin-bottom:10px">
               <div class="chart-title" style="margin-bottom:8px">
-                🏆 Sistemas Recomendados pela IA
+                🏆 Sistemas Recomendados
                 <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:5px">Pontuação 0–100 · MCDA ponderado</span>
               </div>
               <div id="rec-ranking">
@@ -305,7 +318,7 @@ function _buildSaHTML() {
             </div>
 
             <!-- Radar + Barras lado a lado -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div class="chart-card">
                 <div class="chart-title" style="margin-bottom:5px;font-size:11px">📡 Top 3 · Multi-Critério</div>
                 <div style="height:240px"><canvas id="rec-radar"></canvas></div>
@@ -313,17 +326,6 @@ function _buildSaHTML() {
               <div class="chart-card">
                 <div class="chart-title" style="margin-bottom:5px;font-size:11px">📊 Pontuação Geral</div>
                 <div style="height:240px"><canvas id="rec-bar"></canvas></div>
-              </div>
-            </div>
-
-            <!-- Planejamento multi-sistema -->
-            <div class="chart-card">
-              <div class="chart-title" style="margin-bottom:8px">
-                🔗 Planejamento Multi-sistema
-                <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:5px">Combine 2–3 sistemas e calcule métricas integradas</span>
-              </div>
-              <div id="rec-multisys">
-                <span style="color:var(--text3);font-size:11px">Selecione um local para ativar o planejamento...</span>
               </div>
             </div>
 
