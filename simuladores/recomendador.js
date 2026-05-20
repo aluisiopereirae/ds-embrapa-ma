@@ -74,6 +74,11 @@ const REC_QUILOMBOS = [
 // precip/temp: [[limInf, limSup, score], ...] — interpolação linear entre segmentos
 // bioma/solo: mapa chave→score
 // Parâmetros agronômicos: valores da literatura Embrapa / SEEG / MapBiomas
+// laborIntensity: 0=extensivo 1=muito intensivo em mão-de-obra
+// bovinosBonus: true → ganha com tradição pecuária local
+// pescaTradBonus: true → ganha com tradição pesqueira local
+// settle: true → ganha com presença de assentamentos de reforma agrária
+// floodPenalty: true → perde em áreas alagadiças; floodBonus: true → ganha
 const REC_COMPAT = {
   ilpf: {
     label:'ILPF', icon:'🐄', color:'#22c55e', desc:'Integração Lavoura-Pecuária-Floresta',
@@ -82,6 +87,7 @@ const REC_COMPAT = {
     bioma: {'Cerrado':1.0,'Transição':0.90,'Amazônia':0.70},
     solo:  {'Latossolo':1.00,'Argissolo':0.90,'Nitossolo':0.85,'Cambissolo':0.75,'Plintossolo':0.55,'Gleissolo':0.30,'Neossolo':0.50,'Espodossolo':0.25},
     minArea:10, aguaSens:0.50, mktSens:0.70, desmatBonus:true,
+    laborIntensity:0.35, bovinosBonus:true, pescaTradBonus:false, settle:false, floodPenalty:true,
     gee_seq:10.2, renda_ha:4800, invest_ha:3200, empregos_100ha:15, biodiv:7.0, payback:5.0, cobertura:35,
   },
   ilp: {
@@ -91,6 +97,7 @@ const REC_COMPAT = {
     bioma: {'Cerrado':1.0,'Transição':0.85,'Amazônia':0.60},
     solo:  {'Latossolo':1.00,'Argissolo':0.90,'Nitossolo':0.80,'Cambissolo':0.70,'Plintossolo':0.50,'Gleissolo':0.25,'Neossolo':0.45,'Espodossolo':0.20},
     minArea:5, aguaSens:0.60, mktSens:0.65, desmatBonus:false,
+    laborIntensity:0.30, bovinosBonus:true, pescaTradBonus:false, settle:false, floodPenalty:true,
     gee_seq:4.5, renda_ha:3800, invest_ha:2500, empregos_100ha:8, biodiv:4.5, payback:3.0, cobertura:0,
   },
   saf: {
@@ -100,6 +107,7 @@ const REC_COMPAT = {
     bioma: {'Amazônia':1.0,'Transição':0.95,'Cerrado':0.80},
     solo:  {'Latossolo':1.00,'Argissolo':0.95,'Nitossolo':0.90,'Cambissolo':0.85,'Gleissolo':0.65,'Plintossolo':0.75,'Neossolo':0.55,'Espodossolo':0.40},
     minArea:1, aguaSens:0.35, mktSens:0.50, desmatBonus:true, forestBonus:true,
+    laborIntensity:0.55, bovinosBonus:false, pescaTradBonus:false, settle:true, floodPenalty:false,
     gee_seq:14.8, renda_ha:5200, invest_ha:2800, empregos_100ha:25, biodiv:9.5, payback:6.0, cobertura:70,
   },
   apicultura: {
@@ -109,6 +117,7 @@ const REC_COMPAT = {
     bioma: {'Cerrado':1.0,'Transição':0.90,'Amazônia':0.75},
     solo:  {'Latossolo':0.85,'Argissolo':0.85,'Gleissolo':0.80,'Plintossolo':0.80,'Cambissolo':0.85,'Nitossolo':0.85,'Neossolo':0.80,'Espodossolo':0.75},
     minArea:0.5, aguaSens:0.30, mktSens:0.45, desmatBonus:false, floraBonus:true,
+    laborIntensity:0.30, bovinosBonus:false, pescaTradBonus:false, settle:false, floodPenalty:false,
     gee_seq:0.8, renda_ha:6800, invest_ha:1500, empregos_100ha:18, biodiv:7.5, payback:2.0, cobertura:0,
   },
   meliponicultura: {
@@ -118,6 +127,7 @@ const REC_COMPAT = {
     bioma: {'Amazônia':1.0,'Transição':0.90,'Cerrado':0.80},
     solo:  {'Latossolo':0.85,'Argissolo':0.85,'Gleissolo':0.80,'Plintossolo':0.80,'Cambissolo':0.85,'Nitossolo':0.85,'Neossolo':0.75,'Espodossolo':0.70},
     minArea:0.2, aguaSens:0.25, mktSens:0.40, desmatBonus:false, floraBonus:true, forestBonus:true,
+    laborIntensity:0.25, bovinosBonus:false, pescaTradBonus:false, settle:false, floodPenalty:false,
     gee_seq:0.5, renda_ha:7500, invest_ha:1200, empregos_100ha:20, biodiv:8.5, payback:2.0, cobertura:0,
   },
   sisteminha: {
@@ -127,7 +137,9 @@ const REC_COMPAT = {
     bioma: {'Cerrado':0.90,'Transição':0.95,'Amazônia':0.90},
     solo:  {'Latossolo':0.90,'Argissolo':0.90,'Gleissolo':0.75,'Plintossolo':0.80,'Cambissolo':0.85,'Nitossolo':0.85,'Neossolo':0.75,'Espodossolo':0.65},
     minArea:0.05, aguaSens:0.55, mktSens:0.20, desmatBonus:false, socialBonus:true,
-    gee_seq:1.2, renda_ha:9500, invest_ha:2200, empregos_100ha:45, biodiv:5.5, payback:1.5, cobertura:20,
+    laborIntensity:0.80, bovinosBonus:false, pescaTradBonus:false, settle:true, floodPenalty:false,
+    // renda_ha reduzida de 9500 → 4200 (subsistência + excedente modesto, não agronegócio)
+    gee_seq:1.2, renda_ha:4200, invest_ha:2200, empregos_100ha:45, biodiv:5.5, payback:1.5, cobertura:20,
   },
   piscicultura: {
     label:'Piscicultura', icon:'🐟', color:'#3b82f6', desc:'Piscicultura em tanques escavados',
@@ -136,6 +148,7 @@ const REC_COMPAT = {
     bioma: {'Amazônia':0.90,'Transição':0.95,'Cerrado':0.75},
     solo:  {'Gleissolo':1.00,'Plintossolo':0.90,'Argissolo':0.75,'Latossolo':0.70,'Cambissolo':0.60,'Nitossolo':0.70,'Neossolo':0.40,'Espodossolo':0.35},
     minArea:0.5, aguaSens:0.90, mktSens:0.55, desmatBonus:false, waterBonus:true, lowlandBonus:true,
+    laborIntensity:0.45, bovinosBonus:false, pescaTradBonus:true, settle:false, floodBonus:true,
     gee_seq:1.5, renda_ha:8200, invest_ha:4500, empregos_100ha:22, biodiv:3.5, payback:3.5, cobertura:0,
   },
   extrativismo: {
@@ -145,6 +158,7 @@ const REC_COMPAT = {
     bioma: {'Amazônia':1.0,'Transição':0.85,'Cerrado':0.65},
     solo:  {'Latossolo':0.85,'Argissolo':0.85,'Gleissolo':0.75,'Plintossolo':0.80,'Cambissolo':0.80,'Nitossolo':0.85,'Neossolo':0.60,'Espodossolo':0.55},
     minArea:5, aguaSens:0.25, mktSens:0.35, desmatBonus:true, forestBonus:true, forestReq:true, resexBonus:true,
+    laborIntensity:0.40, bovinosBonus:false, pescaTradBonus:true, settle:false, floodBonus:true,
     gee_seq:12.5, renda_ha:3200, invest_ha:800, empregos_100ha:30, biodiv:9.0, payback:1.0, cobertura:80,
   },
   fruticultura: {
@@ -154,6 +168,7 @@ const REC_COMPAT = {
     bioma: {'Cerrado':0.90,'Transição':1.00,'Amazônia':0.80},
     solo:  {'Latossolo':1.00,'Argissolo':0.95,'Nitossolo':0.90,'Cambissolo':0.80,'Plintossolo':0.60,'Gleissolo':0.45,'Neossolo':0.55,'Espodossolo':0.35},
     minArea:1, aguaSens:0.65, mktSens:0.70, desmatBonus:false,
+    laborIntensity:0.60, bovinosBonus:false, pescaTradBonus:false, settle:true, floodPenalty:true,
     gee_seq:5.5, renda_ha:7200, invest_ha:5500, empregos_100ha:35, biodiv:6.0, payback:4.0, cobertura:50,
   },
   roca: {
@@ -163,7 +178,9 @@ const REC_COMPAT = {
     bioma: {'Cerrado':0.85,'Transição':0.95,'Amazônia':0.90},
     solo:  {'Latossolo':0.90,'Argissolo':0.90,'Gleissolo':0.70,'Plintossolo':0.75,'Cambissolo':0.85,'Nitossolo':0.85,'Neossolo':0.70,'Espodossolo':0.55},
     minArea:0.2, aguaSens:0.50, mktSens:0.15, desmatBonus:false, socialBonus:true,
-    gee_seq:2.5, renda_ha:4200, invest_ha:600, empregos_100ha:40, biodiv:5.0, payback:1.0, cobertura:15,
+    laborIntensity:0.75, bovinosBonus:false, pescaTradBonus:false, settle:true, floodPenalty:true,
+    // renda_ha reduzida de 4200 → 2800 (roça é principalmente subsistência)
+    gee_seq:2.5, renda_ha:2800, invest_ha:600, empregos_100ha:40, biodiv:5.0, payback:1.0, cobertura:15,
   },
 };
 
@@ -304,66 +321,107 @@ function rec_scoreSystem(sysKey, env, constraints, weights) {
   const sys = REC_COMPAT[sysKey];
   if (!sys || !env) return null;
 
-  // Compatibilidade climática e pedológica
+  // ── Compatibilidade climática e pedológica ────────────────────────────
   const precipScore = rec_interpCurve(env.precip_mm, sys.precip);
   const tempScore   = rec_interpCurve(env.temp_c,    sys.temp);
   const biomaScore  = sys.bioma[env.bioma] ?? 0.70;
   const soloScore   = rec_matchSolo(env.solo, sys.solo);
 
-  // Altitude
+  // ── Altitude ──────────────────────────────────────────────────────────
   const alt = env.altitude;
   let altMult = 1.0;
   if (sysKey === 'piscicultura' && alt > 400) altMult = rec_clamp(1 - (alt-400)/1500, 0.3, 1.0);
   if (['ilpf','ilp'].includes(sysKey) && alt > 900) altMult = 0.55;
   if (sysKey === 'saf' && alt > 950) altMult = 0.65;
 
-  // Água / bacia — bônus para piscicultura em gleissolo ou bacia hídrica
-  let aguaMult = 1.0;
-  if (sys.waterBonus) {
-    if ((env.solo||'').includes('Gleissolo')) aguaMult = 1.20;
-    else if (env.bacia && !env.bacia.includes('Oceân')) aguaMult = 1.10;
+  // ── Detecção de área alagadiça ────────────────────────────────────────
+  const soloAlagado   = /gleissolo|plintossolo/i.test(env.solo || '');
+  const regiaoAlagada = /baixada|litoral|mearim|munim|turiaçu|itapecuru|amazôn/i.test((env.regiao || '') + ' ' + (env.bacia || ''));
+  const isFloodable   = soloAlagado || (regiaoAlagada && (env.precip_mm || 0) > 1100);
+
+  let floodMult = 1.0;
+  if (isFloodable) {
+    if (sys.floodBonus)        floodMult = 1.45;  // piscicultura / extrativismo prosperam
+    else if (sys.floodPenalty) floodMult = 0.70;  // ilp/ilpf/roca/fruticultura prejudicados
+    else                        floodMult = 0.90;  // outros — leve penalidade
   }
 
-  // Floresta remanescente — beneficia SAF, extrativismo, meliponicultura
+  // ── Água / bacia — bônus adicional para sistemas hídricos ─────────────
+  let aguaMult = 1.0;
+  if (sys.waterBonus) {
+    if (soloAlagado)                                     aguaMult = 1.25;
+    else if (env.bacia && !/oceân/i.test(env.bacia))     aguaMult = 1.10;
+  }
+
+  // ── Floresta remanescente ─────────────────────────────────────────────
   let florestMult = 1.0;
   if (sys.forestBonus || sys.forestReq) {
     florestMult = 0.30 + (env.cos_pct / 100) * 1.0;
     florestMult = rec_clamp(florestMult, sys.forestReq ? 0.20 : 0.50, 1.30);
   }
 
-  // Score ambiental base (40% do total)
+  // ── Score ambiental base (40% do total) ──────────────────────────────
   const climaBase = (precipScore * 0.45 + tempScore * 0.35 + biomaScore * 0.20) * altMult;
   const soloBase  = soloScore * aguaMult * florestMult;
-  const envScore  = rec_clamp(climaBase * 0.60 + soloBase * 0.40, 0, 1);
+  const envScore  = rec_clamp((climaBase * 0.60 + soloBase * 0.40) * floodMult, 0, 1);
 
-  // Bônus contextuais
+  // ── Fator de disponibilidade de mão-de-obra ───────────────────────────
+  // Sistemas intensivos em trabalho precisam de população local suficiente
+  const popNorm    = rec_clamp(Math.log10((env.pop || 1000) + 1) / 5.7, 0.2, 1.0);
+  const assentNorm = rec_clamp((env.assentamentos || 0) / 25, 0, 1);
+  const laborAvail = rec_clamp(popNorm * 0.65 + assentNorm * 0.35, 0.20, 1.0);
+  // Quanto mais intensivo o sistema, mais prejudicado se população baixa
+  const laborFit   = rec_clamp(1 - (sys.laborIntensity || 0) * (1 - laborAvail), 0.30, 1.0);
+
+  // ── Multiplicador de tradição/contexto local ──────────────────────────
+  // Usa bovinos, pesca_t, lavoura_ha e assentamentos para calibrar
+  const bovinosNorm = rec_clamp((env.bovinos || 0) / 150000, 0, 1);
+  const pescaNorm   = rec_clamp((env.pesca_t  || 0) / 300, 0, 1);
+  const lavouraNorm = rec_clamp((env.lavoura_ha || 0) / 50000, 0, 1);
+  const settlNorm   = rec_clamp((env.assentamentos || 0) / 20, 0, 1);
+
+  let tradicaoMult = 1.0;
+  if (sys.bovinosBonus)   tradicaoMult += bovinosNorm * 0.20;  // ILPF/ILP perto de regiões pecuárias
+  if (sys.pescaTradBonus) tradicaoMult += pescaNorm   * 0.25;  // piscicultura/extrativismo perto de áreas pesqueiras
+  if (sys.settle)         tradicaoMult += settlNorm   * 0.15;  // sistemas familiares ganham com assentamentos
+  // SAF e roça ganham com tradição agrícola (lavoura)
+  if (['saf','roca','fruticultura'].includes(sysKey)) tradicaoMult += lavouraNorm * 0.10;
+  tradicaoMult = rec_clamp(tradicaoMult, 0.80, 1.40);
+
+  // ── Bônus contextuais ─────────────────────────────────────────────────
   const idh_norm   = rec_clamp((env.idh - 0.40) / 0.45, 0, 1);
   const mktScore   = 1 - sys.mktSens * (1 - idh_norm);
-  const socialMult = sys.socialBonus
-    ? 1 + rec_clamp(((env.pob_pct||0) + (env.fome_pct||0)) / 180, 0, 0.40)
-    : 1.0;
   const desmatMult = sys.desmatBonus
-    ? 1 + rec_clamp((env.desmat_km2||0) / 800, 0, 0.25)
+    ? 1 + rec_clamp((env.desmat_km2 || 0) / 800, 0, 0.25)
     : 1.0;
-  const queimaRisk = rec_clamp((env.queimadas||0) / 60000, 0, 1);
+  const queimaRisk = rec_clamp((env.queimadas || 0) / 60000, 0, 1);
   const queimaMult = ['saf','extrativismo'].includes(sysKey) ? (1 - queimaRisk * 0.20)
                    : sysKey === 'roca' ? (1 - queimaRisk * 0.25)
                    : 1.0;
 
-  // Pontuações por critério normalizadas (0-1)
+  // ── Impacto social: alta pobreza/fome favorece sistemas de subsistência ─
+  const vulnerabilidade = rec_clamp(((env.pob_pct || 0) + (env.fome_pct || 0)) / 180, 0, 1);
+  // Sisteminha e roça têm maior aderência social em contextos de alta vulnerabilidade
+  const socialCtx = sys.socialBonus
+    ? 0.50 + vulnerabilidade * 0.50
+    : rec_clamp(1 - vulnerabilidade * 0.25, 0.70, 1.0);
+
+  // ── Pontuações por critério normalizadas (0-1) ────────────────────────
+  // renda normalizada por 8500 (max realista p/ piscicultura/apicultura)
+  const rendaNorm = rec_clamp(sys.renda_ha / 8500, 0, 1);
   const crit = {
     gee:      rec_clamp(sys.gee_seq / 15.0, 0, 1) * desmatMult,
-    renda:    rec_clamp(sys.renda_ha / 9500, 0, 1) * mktScore,
+    renda:    rendaNorm * mktScore * tradicaoMult,
     biodiv:   sys.biodiv / 10,
-    empregos: rec_clamp(sys.empregos_100ha / 45, 0, 1) * socialMult,
-    social:   0.40 * (1 - rec_clamp((env.pob_pct||0)/100,0,1)) + 0.60 * (socialMult-1+1),
+    empregos: rec_clamp(sys.empregos_100ha / 45, 0, 1) * laborFit * tradicaoMult,
+    social:   socialCtx,
     clima:    envScore * queimaMult,
     invest:   rec_clamp(1 - (sys.invest_ha - 600) / 4900, 0, 1),
     payback:  rec_clamp(1 - (sys.payback - 1.0) / 6.0, 0, 1),
-    agua:     rec_clamp(1 - sys.aguaSens * (1 - Math.min(1, env.precip_mm / 1500)), 0, 1),
+    agua:     rec_clamp(1 - sys.aguaSens * (1 - Math.min(1, (env.precip_mm || 0) / 1500)), 0, 1),
   };
 
-  // Pontuação ponderada pelos critérios
+  // ── Pontuação ponderada pelos critérios ───────────────────────────────
   let wSum = 0, sSum = 0;
   REC_CRITERIA.forEach(cr => {
     const w = rec_clamp((weights[cr.id] ?? cr.default) / 100, 0, 1);
@@ -372,10 +430,10 @@ function rec_scoreSystem(sysKey, env, constraints, weights) {
   });
   const critScore = wSum > 0 ? sSum / wSum : 0;
 
-  // Combinação: 40% ambiente + 60% critérios ponderados
+  // ── Combinação final: 40% ambiente + 60% critérios ───────────────────
   const rawScore = envScore * 0.40 + critScore * 0.60;
 
-  // Multiplicador de restrições legais
+  // ── Multiplicador de restrições legais ────────────────────────────────
   let constraintMult = 1.0;
   let constraintAlert = null;
 
@@ -431,6 +489,9 @@ function rec_scoreSystem(sysKey, env, constraints, weights) {
     constraintMult,
     constraintAlert,
     crit,
+    // fatores contextuais para exibição no painel
+    ctx: { isFloodable, floodMult: +floodMult.toFixed(2), laborFit: +laborFit.toFixed(2),
+           tradicaoMult: +tradicaoMult.toFixed(2), laborAvail: +laborAvail.toFixed(2) },
     params: { gee_seq: sys.gee_seq, renda_ha: sys.renda_ha, invest_ha: sys.invest_ha,
                empregos_100ha: sys.empregos_100ha, payback: sys.payback, biodiv: sys.biodiv,
                cobertura: sys.cobertura, minArea: sys.minArea },
@@ -522,9 +583,26 @@ function rec_renderEnv(env) {
         <div style="color:var(--text3);font-size:10px">🍽 ${env.fome_pct?.toFixed(1)}% inseg. alimentar</div>
       </div>
       <div style="background:var(--bg3);border-radius:6px;padding:7px 9px">
-        <div style="color:var(--text3);font-size:10px;margin-bottom:2px">🔥 Queimadas</div>
+        <div style="color:var(--text3);font-size:10px;margin-bottom:2px">🔥 Queimadas / Pecuária</div>
         <div style="font-weight:600">${(env.queimadas||0).toLocaleString('pt-BR')} ha/ano</div>
         <div style="color:var(--text3);font-size:10px">🐄 ${(env.bovinos||0).toLocaleString('pt-BR')} bovinos</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;padding:7px 9px">
+        <div style="color:var(--text3);font-size:10px;margin-bottom:2px">👥 Pop. / Assentamentos</div>
+        <div style="font-weight:600">${(env.pop||0).toLocaleString('pt-BR')} hab</div>
+        <div style="color:var(--text3);font-size:10px">🏘 ${env.assentamentos||0} assentamentos</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;padding:7px 9px">
+        <div style="color:var(--text3);font-size:10px;margin-bottom:2px">🐟 Pesca / Lavoura</div>
+        <div style="font-weight:600">${(env.pesca_t||0).toLocaleString('pt-BR')} t pesca/ano</div>
+        <div style="color:var(--text3);font-size:10px">🌾 ${(env.lavoura_ha||0).toLocaleString('pt-BR')} ha lavoura</div>
+      </div>
+      <div style="background:${/gleissolo|plintossolo/i.test(env.solo||'')||/baixada|litoral/i.test((env.regiao||'')+(env.bacia||''))?'#1e3a5f':'var(--bg3)'};border-radius:6px;padding:7px 9px">
+        <div style="color:var(--text3);font-size:10px;margin-bottom:2px">💧 Área Alagadiça</div>
+        <div style="font-weight:600;color:${/gleissolo|plintossolo/i.test(env.solo||'')?'#38bdf8':'var(--text)'}">
+          ${/gleissolo|plintossolo/i.test(env.solo||'')?'⚠️ Solo alagadiço':/baixada|litoral/i.test((env.regiao||'')+(env.bacia||''))?'🔵 Região de baixada':'✅ Sem risco de alagamento'}
+        </div>
+        <div style="color:var(--text3);font-size:10px">${env.regiao||''}</div>
       </div>
     </div>`;
 }
@@ -595,6 +673,11 @@ function rec_renderRanking(scores) {
         <span>⏱ ${s.params.payback}a payback</span>
         <span>🌿 ${s.params.biodiv}/10</span>
       </div>
+      ${s.ctx ? `<div style="display:flex;gap:8px;font-size:10px;margin-top:4px;flex-wrap:wrap">
+        ${s.ctx.isFloodable ? `<span style="color:#38bdf8">💧 Alagável ×${s.ctx.floodMult}</span>` : ''}
+        ${s.ctx.laborFit < 0.80 ? `<span style="color:#fb923c">👷 Mão-de-obra escassa ×${s.ctx.laborFit}</span>` : ''}
+        ${s.ctx.tradicaoMult > 1.05 ? `<span style="color:#86efac">⭐ Tradição local ×${s.ctx.tradicaoMult}</span>` : ''}
+      </div>` : ''}
       ${alertHtml}
     </div>`;
   }).join('');

@@ -42,22 +42,25 @@ function _buildSaHTML() {
   return `
 <div id="sa-root" style="font-size:13px">
 
-  <!-- Abas de sistema — ocultas na aba Recomendação IA -->
-  <div id="sa-sys-row" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">
-    ${sysKeys.map(k =>
-      `<button class="sa-sys-tab" data-sys="${k}" onclick="sa_selectSystem('${k}')"
-        style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 11px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s">
-        ${SA_SYSTEMS[k].icon} ${SA_SYSTEMS[k].label}
-      </button>`
-    ).join('')}
-  </div>
-
   <div id="sa-main-grid" style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start">
 
     <!-- ── Painel esquerdo — oculto na aba Recomendação IA ───────────────── -->
     <div id="sa-left-col">
       <div class="sim-card" style="margin-bottom:12px">
         <div class="sim-card-title">⚙️ Configuração</div>
+
+        <!-- Seleção de sistema produtivo -->
+        <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:5px">Sistema Produtivo:</div>
+          <div id="sa-sys-row" style="display:flex;gap:4px;flex-wrap:wrap">
+            ${sysKeys.map(k =>
+              `<button class="sa-sys-tab" data-sys="${k}" onclick="sa_selectSystem('${k}')"
+                style="background:none;border:1px solid var(--border);border-radius:7px;padding:4px 9px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s;white-space:nowrap">
+                ${SA_SYSTEMS[k].icon} ${SA_SYSTEMS[k].label}
+              </button>`
+            ).join('')}
+          </div>
+        </div>
 
         <div class="sim-param">
           <label style="font-size:11px;color:var(--text2)">Variante / Espécie:</label>
@@ -833,12 +836,10 @@ function sa_switchView(view) {
   if (btnSat) Object.assign(btnSat.style, view === 'sat'    ? ON : OFF);
   if (btnRec) Object.assign(btnRec.style, view === 'rec'    ? ON : OFF);
 
-  // Oculta painel esquerdo e botões de sistema na aba Recomendação IA
-  const sysRow  = document.getElementById('sa-sys-row');
+  // Oculta painel esquerdo na aba Recomendação IA (botões de sistema estão dentro dele)
   const leftCol = document.getElementById('sa-left-col');
   const grid    = document.getElementById('sa-main-grid');
   const isRec   = view === 'rec';
-  if (sysRow)  sysRow.style.display          = isRec ? 'none' : 'flex';
   if (leftCol) leftCol.style.display         = isRec ? 'none' : 'block';
   if (grid)    grid.style.gridTemplateColumns = isRec ? '1fr'  : '300px 1fr';
 
