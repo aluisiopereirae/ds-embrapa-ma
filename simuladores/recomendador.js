@@ -546,7 +546,7 @@ function rec_renderEnv(env) {
   const geeClass   = env.gee_kt > 50 ? 'var(--red)' : env.gee_kt > 20 ? 'var(--amber)' : 'var(--green)';
 
   el.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;font-size:11px">
       <div style="background:var(--bg3);border-radius:6px;padding:7px 9px">
         <div style="color:var(--text3);font-size:10px;margin-bottom:2px">Município</div>
         <div style="font-weight:600;color:var(--green)">${env.municipio}</div>
@@ -788,7 +788,7 @@ function rec_renderMultiSys(scores) {
     const s = REC_COMPAT[k];
     return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
       <span style="font-size:12px;width:22px">${s.icon}</span>
-      <span style="font-size:11px;width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.label}</span>
+      <span style="font-size:11px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.label}</span>
       <input type="range" min="5" max="90" value="${_recMultiSel[k]}" step="5"
         oninput="rec_onMultiSlider('${k}', +this.value)"
         style="flex:1;accent-color:${s.color}">
@@ -797,7 +797,7 @@ function rec_renderMultiSys(scores) {
   }).join('');
 
   el.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;align-items:start">
       <div>
         <div style="font-size:10px;color:var(--text3);margin-bottom:6px">Selecionar sistemas para combinar:</div>
         ${checkBoxes}
@@ -809,7 +809,7 @@ function rec_renderMultiSys(scores) {
     </div>
     <div style="background:var(--bg3);border-radius:8px;padding:10px;margin-top:10px">
       <div style="font-size:10px;color:var(--text3);margin-bottom:7px;font-weight:600">⚡ Métricas Combinadas (por ha total)</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:11px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;font-size:11px">
         <div style="text-align:center">
           <div style="font-size:18px;font-weight:700;color:var(--green)">${combGee.toFixed(1)}</div>
           <div style="color:var(--text3);font-size:10px">tCO₂/ha seq.</div>
@@ -908,11 +908,11 @@ function rec_addProtectedLayers() {
 function rec_buildWeightsPanel() {
   const el = document.getElementById('rec-weights-panel');
   if (!el) return;
-  el.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:3px 12px';
+  el.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:3px 12px';
   el.innerHTML = REC_CRITERIA.map(c => `
-    <div style="display:flex;align-items:center;gap:5px;padding:2px 0">
+    <div style="display:flex;align-items:center;gap:5px;padding:2px 0;min-width:0">
       <span style="font-size:12px;width:16px;flex-shrink:0">${c.icon}</span>
-      <span style="font-size:10px;width:120px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.label}</span>
+      <span style="font-size:10px;flex:1;min-width:0;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.label}</span>
       <input type="range" id="rec-w-${c.id}" min="0" max="100" value="${_recWeights[c.id]}"
         oninput="rec_onWeight('${c.id}', +this.value)"
         style="flex:1;accent-color:var(--green3);height:3px;min-width:60px">

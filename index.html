@@ -543,29 +543,38 @@ header {
 @media (max-width: 1280px) {
   .sidebar { width: 210px; min-width: 210px; }
   .logo-sub { font-size: 10px; }
+  header img[alt="Logo Embrapa"] { width: 90px; }
 }
 
 /* ── Tablet largo (≤ 1100px) ── */
 @media (max-width: 1100px) {
   .sidebar { width: 190px; min-width: 190px; }
   .logo-sub { display: none; }
+  .logo-info { padding-left: 10px !important; margin-left: 2px !important; }
+  header img[alt="Logo Embrapa"] { width: 76px; }
   .nav-btn { padding: 7px 10px; font-size: 12px; }
   #sa-main-grid { grid-template-columns: 260px 1fr !important; }
 }
 
 /* ── Tablet (≤ 900px) ── */
 @media (max-width: 900px) {
-  /* Sidebar recolhida por padrão — JS pode abrir */
   .sidebar { width: 180px; min-width: 180px; }
+  header img[alt="Logo Embrapa"] { width: 62px; }
+  .logo-text { font-size: 13px !important; }
+  /* Nav: rola horizontalmente sem quebrar linha */
+  .header-nav { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; gap: 2px; }
+  .nav-btn { white-space: nowrap; flex-shrink: 0; padding: 6px 9px; font-size: 11px; }
   /* Simulador: painel esquerdo vai para cima */
   #sa-main-grid { grid-template-columns: 1fr !important; }
+  /* Proj-simuladores grids */
+  #conv-grid, #plt-grid, #vuln-grid { grid-template-columns: 1fr !important; }
   /* Recomendação IA: colunas empilham */
   #rec-main-grid { grid-template-columns: 1fr !important; }
   /* Análise comparativa */
   #comp-layout { grid-template-columns: 1fr !important; }
   /* Radar + bar empilham */
   #rec-charts-grid { grid-template-columns: 1fr !important; }
-  /* Mapa IA menor */
+  /* Mapas menores */
   #rec-map { height: clamp(320px, 45vh, 480px) !important; }
   #comp-map-container { height: 320px; }
 }
@@ -573,7 +582,7 @@ header {
 /* ── Mobile (≤ 768px) ── */
 @media (max-width: 768px) {
   /* Estrutura base */
-  header { padding: 0 12px; height: 56px; }
+  header { padding: 0 10px; height: 56px; }
   .app { flex-direction: column; height: calc(100vh - 56px); }
   .sidebar {
     width: 100%; min-width: 100%; order: -1;
@@ -582,11 +591,15 @@ header {
   .sidebar.collapsed { width: 48px; min-width: 48px; height: auto; max-height: none; }
   .main { width: 100%; }
 
-  /* Header */
-  .logo-text { font-size: 16px; }
-  .logo-icon { width: 32px; height: 32px; font-size: 16px; border-radius: 8px; }
-  .header-nav { gap: 1px; }
-  .nav-btn { padding: 6px 8px; font-size: 11px; }
+  /* Logo */
+  header img[alt="Logo Embrapa"] { width: 50px; }
+  .logo-info { padding-left: 8px !important; margin-left: 2px !important; }
+  .logo-text { font-size: 13px !important; }
+
+  /* Nav rola horizontalmente */
+  .header-nav { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; gap: 1px; scrollbar-width: none; }
+  .header-nav::-webkit-scrollbar { display: none; }
+  .nav-btn { white-space: nowrap; flex-shrink: 0; padding: 6px 8px; font-size: 11px; }
 
   /* Abas */
   .tabs { padding: 8px 10px 0; gap: 2px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
@@ -604,23 +617,25 @@ header {
   .table-wrap { max-height: 50vh; }
   .map-toolbar { flex-wrap: wrap; gap: 6px; }
 
-  /* Simulador */
+  /* Simulador principal */
   #sa-main-grid { grid-template-columns: 1fr !important; }
   #sa-left-col { margin-bottom: 10px; }
   #rec-main-grid { grid-template-columns: 1fr !important; }
   #rec-charts-grid { grid-template-columns: 1fr !important; }
+  #conv-grid, #plt-grid, #vuln-grid { grid-template-columns: 1fr !important; }
 
   /* Mapas */
   #sa-sat-map { height: clamp(260px, 50vh, 380px) !important; }
   #rec-map { height: clamp(280px, 42vh, 420px) !important; }
   #comp-map-container { height: 280px; }
 
-  /* Inputs de localização (sat) */
+  /* Inputs lat/lng */
   #sa-sat-lat, #sa-sat-lng { width: 90px !important; }
 
-  /* Sub-abas do simulador */
+  /* Sub-abas */
   #proj-subtab-bar { flex-wrap: wrap; gap: 4px; }
   .proj-stab { padding: 6px 12px; font-size: 12px; }
+  .sim-tabs-inner { flex-wrap: wrap; gap: 4px; }
 
   /* Chat */
   #chat-panel { width: calc(100vw - 16px); right: 8px; bottom: 64px; }
@@ -630,9 +645,13 @@ header {
 @media (max-width: 540px) {
   header { height: 52px; }
   .app { height: calc(100vh - 52px); }
-  .logo-text { font-size: 14px; }
-  .logo-icon { display: none; }
-  .nav-btn { padding: 5px 7px; font-size: 10px; }
+  /* Logo só ícone — texto some */
+  header img[alt="Logo Embrapa"] { width: 38px; }
+  .logo-info { display: none; }
+  /* Nav: só ícones, texto das labels some */
+  .nav-btn { padding: 5px 7px; font-size: 11px; }
+  .nav-btn::before { content: attr(data-icon); }
+  /* Abas menores */
   .tabs { padding: 6px 8px 0; }
   .tab { padding: 7px 10px; font-size: 11px; }
   .panel { padding: 8px; }
@@ -641,9 +660,10 @@ header {
   .sim-card { padding: 12px; }
   #sa-sys-row { gap: 3px !important; }
   #sa-sys-row button { padding: 3px 7px !important; font-size: 10px !important; }
-  /* Radar e bar empilham em altura menor */
-  #rec-charts-grid canvas { max-height: 200px; }
+  /* Inputs lat/lng linha inteira */
+  #sa-sat-lat, #sa-sat-lng { width: 100% !important; min-width: 70px; }
   #chat-panel { bottom: 60px; }
+  #rec-ranking .sys-rank-row { flex-wrap: wrap; }
 }
 
 /* DOWNLOAD MENUS */
@@ -1042,7 +1062,7 @@ header {
     <!-- Logo inspirada na Embrapa (png vetorial em preto e branco) -->
     <img src="./layout_set_logo.png" alt="Logo Embrapa" width="110">
 
-    <div style="border-left:1px solid var(--border);padding-left:14px;margin-left:4px;">
+    <div class="logo-info" style="border-left:1px solid var(--border);padding-left:14px;margin-left:4px;">
       <div class="logo-text" style="font-size:15px;">Dados — <span>Embrapa Maranhão</span></div>
       <div class="logo-sub">Levantamento: <strong> Aluisio Pereira </strong>   | Fontes de dados: · Embrapa · IBGE · SEEG · PRODES · IMESC  · CAR  · MapBiomas  · BRLUC </div>
     </div>

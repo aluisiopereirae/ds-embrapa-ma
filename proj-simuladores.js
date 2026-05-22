@@ -574,7 +574,7 @@ function _buildSimHTML() {
 
 <!-- SIM 1: Conversão de Áreas Degradadas -->
 <div id="simtab-conversao">
-  <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start">
+  <div id="conv-grid" style="display:grid;grid-template-columns:minmax(240px,300px) 1fr;gap:16px;align-items:start">
     <div class="sim-card" style="margin:0">
       <div class="sim-card-title">🔄 Conversão de Áreas Degradadas no MA</div>
       <div style="font-size:11px;color:var(--text3);margin-bottom:14px">
@@ -600,14 +600,14 @@ function _buildSimHTML() {
     </div>
     <div style="display:flex;flex-direction:column;gap:14px">
       <div id="conv-results"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
         <div class="chart-card">
           <div class="chart-title">📈 Trajetória de Impacto ao Longo do Tempo</div>
-          <div class="chart-wrap" style="height:220px"><canvas id="conv-chart"></canvas></div>
+          <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="conv-chart"></canvas></div>
         </div>
         <div class="chart-card">
           <div class="chart-title">⚖️ Comparativo de Sistemas — Redução de GEE por ha em ${convState.years} anos</div>
-          <div class="chart-wrap" style="height:220px"><canvas id="conv-cmp-chart"></canvas></div>
+          <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="conv-cmp-chart"></canvas></div>
         </div>
       </div>
     </div>
@@ -616,7 +616,7 @@ function _buildSimHTML() {
 
 <!-- SIM 2: Plantio Interativo -->
 <div id="simtab-plantio" style="display:none">
-<div style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start">
+<div id="plt-grid" style="display:grid;grid-template-columns:minmax(240px,300px) 1fr;gap:16px;align-items:start">
 <div>
   <div class="sim-card">
     <div class="sim-card-title">🌱 Configuração do Plantio</div>
@@ -671,14 +671,14 @@ function _buildSimHTML() {
     <select class="comp-ind-select" id="meteo-sys" onchange="updateMeteoChart()">${sysOptions}</select>
   </div>
 </div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
   <div class="chart-card">
     <div class="chart-title">🌧 Precipitação e Temperatura Mensais</div>
-    <div class="chart-wrap" style="height:220px"><canvas id="meteo-chart"></canvas></div>
+    <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="meteo-chart"></canvas></div>
   </div>
   <div class="chart-card">
     <div class="chart-title">☀️ Radiação Solar e Meses Favoráveis ao Sistema</div>
-    <div class="chart-wrap" style="height:220px"><canvas id="meteo-solar-chart"></canvas></div>
+    <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="meteo-solar-chart"></canvas></div>
   </div>
 </div>
 <div class="sim-card" style="margin-top:14px">
@@ -689,7 +689,7 @@ function _buildSimHTML() {
 
 <!-- SIM 4: Vulnerabilidade -->
 <div id="simtab-vuln" style="display:none">
-<div style="display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start">
+<div id="vuln-grid" style="display:grid;grid-template-columns:minmax(240px,340px) 1fr;gap:16px;align-items:start">
 <div class="sim-card">
   <div class="sim-card-title">⚠️ Índice de Vulnerabilidade Municipal</div>
   <div style="font-size:11px;color:var(--text3);margin-bottom:12px">Combina indicadores para identificar municípios que mais necessitam de intervenção com sistemas produtivos sustentáveis.</div>
@@ -704,11 +704,11 @@ function _buildSimHTML() {
 <div>
   <div class="chart-card" style="margin-bottom:14px">
     <div class="chart-title">🔍 Radar de Indicadores — Município vs. Média MA</div>
-    <div class="chart-wrap" style="height:280px"><canvas id="vuln-radar-chart"></canvas></div>
+    <div class="chart-wrap" style="height:clamp(200px,42vh,280px)"><canvas id="vuln-radar-chart"></canvas></div>
   </div>
   <div class="chart-card">
     <div class="chart-title">🏅 Ranking — Top 20 Municípios mais Vulneráveis</div>
-    <div class="chart-wrap" style="height:300px"><canvas id="vuln-rank-chart"></canvas></div>
+    <div class="chart-wrap" style="height:clamp(220px,45vh,300px)"><canvas id="vuln-rank-chart"></canvas></div>
   </div>
 </div>
 </div>

@@ -97,7 +97,7 @@ function _buildSaHTML() {
       <!-- Layout / direção das linhas -->
       <div class="sim-card" style="margin-bottom:12px">
         <div class="sim-card-title">🗺 Direção e Padrão das Linhas</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(58px,1fr));gap:5px">
           ${layoutBtns}
         </div>
       </div>
@@ -160,7 +160,7 @@ function _buildSaHTML() {
         <div id="sa-alertas" style="margin-bottom:10px"></div>
         <div class="chart-card" style="margin-bottom:12px">
           <div class="chart-title">🔀 Comparação de Variantes — Sistema Atual</div>
-          <div class="chart-wrap" style="height:200px"><canvas id="sa-comp-chart"></canvas></div>
+          <div class="chart-wrap" style="height:clamp(160px,35vh,200px)"><canvas id="sa-comp-chart"></canvas></div>
         </div>
         <div id="sa-recomendacoes"></div>
         <div id="sa-desc-box" style="margin-top:10px"></div>
@@ -321,11 +321,11 @@ function _buildSaHTML() {
             <div id="rec-charts-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div class="chart-card">
                 <div class="chart-title" style="margin-bottom:5px;font-size:11px">📡 Top 3 · Multi-Critério</div>
-                <div style="height:240px"><canvas id="rec-radar"></canvas></div>
+                <div style="height:clamp(180px,40vh,240px)"><canvas id="rec-radar"></canvas></div>
               </div>
               <div class="chart-card">
                 <div class="chart-title" style="margin-bottom:5px;font-size:11px">📊 Pontuação Geral</div>
-                <div style="height:240px"><canvas id="rec-bar"></canvas></div>
+                <div style="height:clamp(180px,40vh,240px)"><canvas id="rec-bar"></canvas></div>
               </div>
             </div>
 
@@ -707,7 +707,7 @@ function sa_renderMetrics() {
     sysCells += cell('🐄','Cap. suporte', ua.toLocaleString('pt-BR'), 'UA', '#60a5fa');
   }
 
-  el.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+  el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px">
     ${cell('🌱','Plantas/Colônias', (m.nPlantas||0).toLocaleString('pt-BR'), '')}
     ${cell('📏','Densidade',        (m.density||0).toFixed(0), 'pl/ha')}
     ${cell('🌿','Espécies',         m.richness||0, '')}
