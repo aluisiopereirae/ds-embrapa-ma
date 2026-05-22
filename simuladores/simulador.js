@@ -209,7 +209,7 @@ function _buildSaHTML() {
           </div>
 
           <!-- Mapa Leaflet -->
-          <div id="sa-sat-map" style="height:520px;border-radius:8px;background:#111;overflow:hidden;border:1px solid var(--border)"></div>
+          <div id="sa-sat-map" style="height:clamp(300px,60vh,520px);border-radius:8px;background:#111;overflow:hidden;border:1px solid var(--border)"></div>
 
           <div style="font-size:10px;color:var(--text3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap">
             <span>🛰️ Esri World Imagery</span>
@@ -237,7 +237,7 @@ function _buildSaHTML() {
         </div>
 
         <!-- Grid principal: Mapa | Resultados -->
-        <div style="display:grid;grid-template-columns:minmax(460px,480px) 1fr;gap:12px;align-items:start">
+        <div id="rec-main-grid" style="display:grid;grid-template-columns:minmax(400px,480px) 1fr;gap:12px;align-items:start">
 
           <!-- ── COLUNA ESQUERDA: Mapa + Restrições + Características + Multi-sistema ── -->
           <div>
@@ -318,7 +318,7 @@ function _buildSaHTML() {
             </div>
 
             <!-- Radar + Barras lado a lado -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div id="rec-charts-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div class="chart-card">
                 <div class="chart-title" style="margin-bottom:5px;font-size:11px">📡 Top 3 · Multi-Critério</div>
                 <div style="height:240px"><canvas id="rec-radar"></canvas></div>

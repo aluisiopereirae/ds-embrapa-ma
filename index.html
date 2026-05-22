@@ -535,17 +535,115 @@ header {
 /* Overview sub-tab border for active system indicator */
 #active-sys-display { font-size: 11px; white-space: nowrap; }
 
-/* Responsiveness */
+/* ══════════════════════════════════════════════════
+   RESPONSIVE — breakpoints progressivos
+   ══════════════════════════════════════════════════ */
+
+/* ── Desktop médio (≤ 1280px) ── */
+@media (max-width: 1280px) {
+  .sidebar { width: 210px; min-width: 210px; }
+  .logo-sub { font-size: 10px; }
+}
+
+/* ── Tablet largo (≤ 1100px) ── */
+@media (max-width: 1100px) {
+  .sidebar { width: 190px; min-width: 190px; }
+  .logo-sub { display: none; }
+  .nav-btn { padding: 7px 10px; font-size: 12px; }
+  #sa-main-grid { grid-template-columns: 260px 1fr !important; }
+}
+
+/* ── Tablet (≤ 900px) ── */
+@media (max-width: 900px) {
+  /* Sidebar recolhida por padrão — JS pode abrir */
+  .sidebar { width: 180px; min-width: 180px; }
+  /* Simulador: painel esquerdo vai para cima */
+  #sa-main-grid { grid-template-columns: 1fr !important; }
+  /* Recomendação IA: colunas empilham */
+  #rec-main-grid { grid-template-columns: 1fr !important; }
+  /* Análise comparativa */
+  #comp-layout { grid-template-columns: 1fr !important; }
+  /* Radar + bar empilham */
+  #rec-charts-grid { grid-template-columns: 1fr !important; }
+  /* Mapa IA menor */
+  #rec-map { height: clamp(320px, 45vh, 480px) !important; }
+  #comp-map-container { height: 320px; }
+}
+
+/* ── Mobile (≤ 768px) ── */
 @media (max-width: 768px) {
-  .app { flex-direction: column; }
-  .sidebar { width: 100%; min-width: 100%; order: -1; }
-  .sidebar.collapsed { width: 48px; min-width: 48px; }
+  /* Estrutura base */
+  header { padding: 0 12px; height: 56px; }
+  .app { flex-direction: column; height: calc(100vh - 56px); }
+  .sidebar {
+    width: 100%; min-width: 100%; order: -1;
+    height: auto; max-height: 38vh; overflow-y: auto;
+  }
+  .sidebar.collapsed { width: 48px; min-width: 48px; height: auto; max-height: none; }
   .main { width: 100%; }
-  .map-toolbar { flex-wrap: wrap; }
+
+  /* Header */
+  .logo-text { font-size: 16px; }
+  .logo-icon { width: 32px; height: 32px; font-size: 16px; border-radius: 8px; }
+  .header-nav { gap: 1px; }
+  .nav-btn { padding: 6px 8px; font-size: 11px; }
+
+  /* Abas */
+  .tabs { padding: 8px 10px 0; gap: 2px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+  .tab { padding: 8px 11px; font-size: 12px; white-space: nowrap; }
+  .panel { padding: 12px; }
+
+  /* Cards e stats */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat-value { font-size: 22px; }
+  .charts-grid { grid-template-columns: 1fr; }
+  .chart-card { margin-bottom: 12px; }
+
+  /* Tabela */
   .data-table { font-size: 12px; }
   .table-wrap { max-height: 50vh; }
-  .stat-grid { grid-template-columns: 1fr; }
-  .chart-card { margin-bottom: 16px; }
+  .map-toolbar { flex-wrap: wrap; gap: 6px; }
+
+  /* Simulador */
+  #sa-main-grid { grid-template-columns: 1fr !important; }
+  #sa-left-col { margin-bottom: 10px; }
+  #rec-main-grid { grid-template-columns: 1fr !important; }
+  #rec-charts-grid { grid-template-columns: 1fr !important; }
+
+  /* Mapas */
+  #sa-sat-map { height: clamp(260px, 50vh, 380px) !important; }
+  #rec-map { height: clamp(280px, 42vh, 420px) !important; }
+  #comp-map-container { height: 280px; }
+
+  /* Inputs de localização (sat) */
+  #sa-sat-lat, #sa-sat-lng { width: 90px !important; }
+
+  /* Sub-abas do simulador */
+  #proj-subtab-bar { flex-wrap: wrap; gap: 4px; }
+  .proj-stab { padding: 6px 12px; font-size: 12px; }
+
+  /* Chat */
+  #chat-panel { width: calc(100vw - 16px); right: 8px; bottom: 64px; }
+}
+
+/* ── Mobile pequeno (≤ 540px) ── */
+@media (max-width: 540px) {
+  header { height: 52px; }
+  .app { height: calc(100vh - 52px); }
+  .logo-text { font-size: 14px; }
+  .logo-icon { display: none; }
+  .nav-btn { padding: 5px 7px; font-size: 10px; }
+  .tabs { padding: 6px 8px 0; }
+  .tab { padding: 7px 10px; font-size: 11px; }
+  .panel { padding: 8px; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .stat-value { font-size: 20px; }
+  .sim-card { padding: 12px; }
+  #sa-sys-row { gap: 3px !important; }
+  #sa-sys-row button { padding: 3px 7px !important; font-size: 10px !important; }
+  /* Radar e bar empilham em altura menor */
+  #rec-charts-grid canvas { max-height: 200px; }
+  #chat-panel { bottom: 60px; }
 }
 
 /* DOWNLOAD MENUS */
@@ -778,10 +876,6 @@ header {
 }
 #chat-send:hover { background: var(--green2); }
 #chat-send svg { width: 17px; height: 17px; fill: #fff; }
-@media (max-width: 480px) {
-  #chat-panel { width: calc(100vw - 16px); right: 8px; bottom: 80px; }
-}
-
 /* ═══ PROJ SUB-TABS ═══ */
 #proj-subtab-bar {
   display: flex; gap: 6px; padding: 0 0 16px 0; flex-wrap: wrap;
@@ -798,7 +892,6 @@ header {
 
 /* Análise comparativa */
 #comp-layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; align-items: start; }
-@media(max-width:900px){ #comp-layout { grid-template-columns: 1fr; } }
 #comp-map-container { height: 420px; border-radius: 12px; border: 1px solid var(--border); background: #0d1a0d; }
 .comp-ind-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
 .comp-ind-label { font-size: 11px; color: var(--text3); min-width: 80px; text-transform: uppercase; letter-spacing: 0.08em; }
@@ -1033,27 +1126,33 @@ header {
 
     <!-- HEATMAPS RÁPIDOS -->
     <div class="sidebar-section" style="border-top:1px solid var(--border); padding-top:12px;">
-      <div class="sidebar-label">Heatmaps Rápidos</div>
-      <button class="sys-btn" id="hmbtn-gee" onclick="toggleHeatmapSidebar('gee')"><span class="icon">☁</span> GEE<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-idh" onclick="toggleHeatmapSidebar('idh')"><span class="icon">📈</span> IDH<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-desmatamento" onclick="toggleHeatmapSidebar('desmatamento')"><span class="icon">🪓</span> Desmatamento<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-queimadas" onclick="toggleHeatmapSidebar('queimadas')"><span class="icon">🔥</span> Queimadas<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-precipitacao" onclick="toggleHeatmapSidebar('precipitacao')"><span class="icon">🌧</span> Precipitação<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-temperatura" onclick="toggleHeatmapSidebar('temperatura')"><span class="icon">🌡</span> Temperatura<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-pobreza" onclick="toggleHeatmapSidebar('pobreza')"><span class="icon">💸</span> Pobreza<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-fome" onclick="toggleHeatmapSidebar('fome')"><span class="icon">🍽</span> Fome<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-vegetacao" onclick="toggleHeatmapSidebar('vegetacao')"><span class="icon">🌳</span> Vegetação<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-lavoura" onclick="toggleHeatmapSidebar('lavoura')"><span class="icon">🌾</span> Lavoura<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-bovinos" onclick="toggleHeatmapSidebar('bovinos')"><span class="icon">🐄</span> Rebanho<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-pesca" onclick="toggleHeatmapSidebar('pesca')"><span class="icon">🐟</span> Pesca<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-indigena" onclick="toggleHeatmapSidebar('indigena')"><span class="icon">🪶</span> Terras Indígenas<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-quilombola" onclick="toggleHeatmapSidebar('quilombola')"><span class="icon">⚫</span> Quilombolas<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-assentamentos" onclick="toggleHeatmapSidebar('assentamentos')"><span class="icon">🏘</span> Assentamentos<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-bacia" onclick="toggleHeatmapSidebar('bacia')"><span class="icon">🏞</span> Bacias<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-caf" onclick="toggleHeatmapSidebar('caf')"><span class="icon">👩‍🌾</span> CAF Agricultura Familiar<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-pib" onclick="toggleHeatmapSidebar('pib')"><span class="icon">💰</span> PIB<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-populacao" onclick="toggleHeatmapSidebar('populacao')"><span class="icon">👥</span> População<span class="toggle-dot"></span></button>
-      <button class="sys-btn" id="hmbtn-alfabetizacao" onclick="toggleHeatmapSidebar('alfabetizacao')"><span class="icon">📚</span> Alfabetização<span class="toggle-dot"></span></button>
+      <button class="accordion-header" onclick="toggleAccordion('heatmaps-rapidos')">
+        <span style="flex:1">🗺️ Heatmaps Rápidos</span>
+      </button>
+      <div class="accordion-content" id="heatmaps-rapidos">
+        <div style="padding:0 0 8px;">
+          <button class="sys-btn" id="hmbtn-gee" onclick="toggleHeatmapSidebar('gee')"><span class="icon">☁</span> GEE<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-idh" onclick="toggleHeatmapSidebar('idh')"><span class="icon">📈</span> IDH<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-desmatamento" onclick="toggleHeatmapSidebar('desmatamento')"><span class="icon">🪓</span> Desmatamento<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-queimadas" onclick="toggleHeatmapSidebar('queimadas')"><span class="icon">🔥</span> Queimadas<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-precipitacao" onclick="toggleHeatmapSidebar('precipitacao')"><span class="icon">🌧</span> Precipitação<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-temperatura" onclick="toggleHeatmapSidebar('temperatura')"><span class="icon">🌡</span> Temperatura<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-pobreza" onclick="toggleHeatmapSidebar('pobreza')"><span class="icon">💸</span> Pobreza<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-fome" onclick="toggleHeatmapSidebar('fome')"><span class="icon">🍽</span> Fome<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-vegetacao" onclick="toggleHeatmapSidebar('vegetacao')"><span class="icon">🌳</span> Vegetação<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-lavoura" onclick="toggleHeatmapSidebar('lavoura')"><span class="icon">🌾</span> Lavoura<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-bovinos" onclick="toggleHeatmapSidebar('bovinos')"><span class="icon">🐄</span> Rebanho<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-pesca" onclick="toggleHeatmapSidebar('pesca')"><span class="icon">🐟</span> Pesca<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-indigena" onclick="toggleHeatmapSidebar('indigena')"><span class="icon">🪶</span> Terras Indígenas<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-quilombola" onclick="toggleHeatmapSidebar('quilombola')"><span class="icon">⚫</span> Quilombolas<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-assentamentos" onclick="toggleHeatmapSidebar('assentamentos')"><span class="icon">🏘</span> Assentamentos<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-bacia" onclick="toggleHeatmapSidebar('bacia')"><span class="icon">🏞</span> Bacias<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-caf" onclick="toggleHeatmapSidebar('caf')"><span class="icon">👩‍🌾</span> CAF Agricultura Familiar<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-pib" onclick="toggleHeatmapSidebar('pib')"><span class="icon">💰</span> PIB<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-populacao" onclick="toggleHeatmapSidebar('populacao')"><span class="icon">👥</span> População<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-alfabetizacao" onclick="toggleHeatmapSidebar('alfabetizacao')"><span class="icon">📚</span> Alfabetização<span class="toggle-dot"></span></button>
+        </div>
+      </div>
     </div><!-- /sidebar-inner -->
   </aside>
 
@@ -4267,7 +4366,7 @@ function toggleAccordion(id) {
 
 // Restaurar estado do accordion ao carregar
 window.addEventListener('load', () => {
-  const ids = ['sistemas-tech'];
+  const ids = ['sistemas-tech', 'heatmaps-rapidos'];
   ids.forEach(id => {
     const state = localStorage.getItem('accordion-' + id);
     const content = document.getElementById(id);
