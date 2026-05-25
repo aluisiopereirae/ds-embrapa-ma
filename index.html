@@ -1076,6 +1076,18 @@ header {
     <button class="nav-btn" onclick="showView('guide')">📖 Guias</button>
     <button id="settings-btn" onclick="openSettings()" title="Configurações de visual e interface">⚙️</button>
   </div>
+
+  <!-- Login Embrapa -->
+  <div style="display:flex;align-items:center;gap:8px;margin-left:8px;position:relative">
+    <button id="embrapa-login-btn"
+      onclick="embrapaLogin()"
+      style="background:linear-gradient(135deg,var(--green3),var(--teal));border:none;color:#fff;padding:7px 13px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;white-space:nowrap;transition:opacity 0.2s"
+      onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'"
+      title="Autenticar com credenciais corporativas Embrapa (OAuth 2.1)">
+      🔐 Entrar com Embrapa
+    </button>
+    <div id="embrapa-user-info" style="display:none;align-items:center;position:relative"></div>
+  </div>
 </header>
 
 <div class="app">
@@ -5663,5 +5675,6 @@ function useChatExample(btn) {
 })();
 </script>
 
+<script src="simuladores/embrapa-auth.js"></script>
 </body>
 </html>
