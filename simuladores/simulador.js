@@ -5,6 +5,7 @@ let _saState = null;
 let _saPositions = [];
 let _saMetrics = {};
 let _saCompChart = null;
+let _saSatCompChart = null;
 let _saZoom = 1.0;
 let _saPanX = 0, _saPanY = 0;
 let _saDragging = false, _saDragX = 0, _saDragY = 0;
@@ -221,6 +222,20 @@ function _buildSaHTML() {
             <span id="sa-sat-count"></span>
           </div>
         </div>
+
+        <!-- ── Painéis contextuais — espelham a vista superior ─────────────── -->
+        <div id="sa-sat-alertas" style="margin-top:10px"></div>
+
+        <div class="chart-card" style="margin-top:12px">
+          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px">
+            <span style="flex:1;min-width:0">🔀 Comparação de Variantes — Sistema Atual</span>
+            ${_dlMenu('dl-sat-comp',[{fn:"downloadChartImage('sa-sat-comp-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('sa-sat-comp-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('sa-sat-comp-chart')",lbl:'⬇ CSV'}])}
+          </div>
+          <div class="chart-wrap" style="height:clamp(160px,35vh,200px)"><canvas id="sa-sat-comp-chart"></canvas></div>
+        </div>
+
+        <div id="sa-sat-recomendacoes" style="margin-top:12px"></div>
+        <div id="sa-sat-desc-box" style="margin-top:10px"></div>
       </div>
 
       <!-- ── Recomendação IA — Classificação Multi-Critério ──────────────── -->
@@ -729,52 +744,59 @@ function sa_renderMetrics() {
 
 function sa_renderAlertas() {
   const el = document.getElementById('sa-alertas');
-  if (!el) return;
+  const elSat = document.getElementById('sa-sat-alertas');
+  if (!el && !elSat) return;
   const alertas = _saMetrics?.alertas || [];
-  if (!alertas.length) { el.innerHTML = ''; return; }
   const cl = { warning:'#fbbf24', error:'#f87171', info:'#60a5fa' };
   const ic = { warning:'⚠️', error:'❌', info:'ℹ️' };
-  el.innerHTML = alertas.map(a =>
-    `<div style="background:var(--bg2);border:1px solid ${cl[a.tipo]||'#fbbf24'};border-radius:8px;padding:7px 12px;margin-bottom:5px;font-size:11px;color:${cl[a.tipo]||'#fbbf24'}">
-       ${ic[a.tipo]||'⚠️'} ${a.msg}
-     </div>`
-  ).join('');
+  const html = alertas.length
+    ? alertas.map(a =>
+        `<div style="background:var(--bg2);border:1px solid ${cl[a.tipo]||'#fbbf24'};border-radius:8px;padding:7px 12px;margin-bottom:5px;font-size:11px;color:${cl[a.tipo]||'#fbbf24'}">
+           ${ic[a.tipo]||'⚠️'} ${a.msg}
+         </div>`
+      ).join('')
+    : '';
+  if (el)    el.innerHTML    = html;
+  if (elSat) elSat.innerHTML = html;
 }
 
 function sa_renderRecomendacoes() {
-  const el = document.getElementById('sa-recomendacoes');
-  if (!el) return;
+  const el    = document.getElementById('sa-recomendacoes');
+  const elSat = document.getElementById('sa-sat-recomendacoes');
+  if (!el && !elSat) return;
   const recs = _saMetrics?.recomendacoes || [];
-  if (!recs.length) { el.innerHTML = ''; return; }
-  el.innerHTML = `<div class="sim-card">
-    <div class="sim-card-title">💡 Recomendações Técnicas</div>
-    ${recs.map(r => `<div style="font-size:11px;color:var(--text2);padding:5px 0;border-bottom:1px solid var(--border2)">${r}</div>`).join('')}
-  </div>`;
+  const html = recs.length
+    ? `<div class="sim-card">
+        <div class="sim-card-title">💡 Recomendações Técnicas</div>
+        ${recs.map(r => `<div style="font-size:11px;color:var(--text2);padding:5px 0;border-bottom:1px solid var(--border2)">${r}</div>`).join('')}
+       </div>`
+    : '';
+  if (el)    el.innerHTML    = html;
+  if (elSat) elSat.innerHTML = html;
 }
 
 function sa_renderDesc() {
-  const el = document.getElementById('sa-desc-box');
-  if (!el) return;
+  const el    = document.getElementById('sa-desc-box');
+  const elSat = document.getElementById('sa-sat-desc-box');
+  if (!el && !elSat) return;
   const sys = SA_SYSTEMS[_saState?.system];
   const v = sys?.variants.find(x => x.id === _saState?.variant) || sys?.variants[0];
-  if (!v) { el.innerHTML = ''; return; }
-  el.innerHTML = `<div class="sim-card">
+  const html = v ? `<div class="sim-card">
     <div class="sim-card-title">${sys.icon} ${sys.label} — ${v.label}</div>
     <div style="font-size:11px;color:var(--text2);line-height:1.65;margin-bottom:8px">${v.desc}</div>
     <div style="font-size:10px;color:var(--text3)">📚 ${v.fonte}</div>
     ${v.species.length ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">
       ${v.species.map(sp => `<span style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:3px 9px;font-size:10px;color:var(--text2)">${sp.icon} ${sp.name}</span>`).join('')}
     </div>` : ''}
-  </div>`;
+  </div>` : '';
+  if (el)    el.innerHTML    = html;
+  if (elSat) elSat.innerHTML = html;
 }
 
 function sa_renderCompChart() {
-  const ctx = document.getElementById('sa-comp-chart');
-  if (!ctx) return;
-  if (_saCompChart) { try { _saCompChart.destroy(); } catch(e){} _saCompChart = null; }
   const comp = sa_compararVariantes(_saState?.system, _saState?.area || 10);
-  if (!comp.length) return;
-  _saCompChart = new Chart(ctx, {
+
+  const _buildCompCfg = (comp) => ({
     type: 'bar',
     data: {
       labels: comp.map(c => c.label.length > 18 ? c.label.slice(0, 17) + '…' : c.label),
@@ -794,6 +816,20 @@ function sa_renderCompChart() {
       }
     }
   });
+
+  // Vista superior
+  const ctx = document.getElementById('sa-comp-chart');
+  if (ctx) {
+    if (_saCompChart) { try { _saCompChart.destroy(); } catch(e){} _saCompChart = null; }
+    if (comp.length) _saCompChart = new Chart(ctx, _buildCompCfg(comp));
+  }
+
+  // Vista satélite — mesmo dado, canvas separado
+  const satCtx = document.getElementById('sa-sat-comp-chart');
+  if (satCtx) {
+    if (_saSatCompChart) { try { _saSatCompChart.destroy(); } catch(e){} _saSatCompChart = null; }
+    if (comp.length) _saSatCompChart = new Chart(satCtx, _buildCompCfg(comp));
+  }
 }
 
 // ─── Exportações ──────────────────────────────────────────────────────────────
