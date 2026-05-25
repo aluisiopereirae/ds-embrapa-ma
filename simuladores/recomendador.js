@@ -341,7 +341,7 @@ function rec_scoreSystem(sysKey, env, constraints, weights) {
 
   let floodMult = 1.0;
   if (isFloodable) {
-    if (sys.floodBonus)        floodMult = 1.45;  // piscicultura / extrativismo prosperam
+    if (sys.floodBonus)        floodMult = 1.20;  // piscicultura / extrativismo prosperam (calibrado MA)
     else if (sys.floodPenalty) floodMult = 0.70;  // ilp/ilpf/roca/fruticultura prejudicados
     else                        floodMult = 0.90;  // outros — leve penalidade
   }
@@ -349,21 +349,33 @@ function rec_scoreSystem(sysKey, env, constraints, weights) {
   // ── Água / bacia — bônus adicional para sistemas hídricos ─────────────
   let aguaMult = 1.0;
   if (sys.waterBonus) {
-    if (soloAlagado)                                     aguaMult = 1.25;
-    else if (env.bacia && !/oceân/i.test(env.bacia))     aguaMult = 1.10;
+    if (soloAlagado)                                     aguaMult = 1.12;
+    else if (env.bacia && !/oceân/i.test(env.bacia))     aguaMult = 1.05;
   }
 
   // ── Floresta remanescente ─────────────────────────────────────────────
   let florestMult = 1.0;
   if (sys.forestBonus || sys.forestReq) {
     florestMult = 0.30 + (env.cos_pct / 100) * 1.0;
-    florestMult = rec_clamp(florestMult, sys.forestReq ? 0.20 : 0.50, 1.30);
+    florestMult = rec_clamp(florestMult, sys.forestReq ? 0.10 : 0.50, 1.30);
   }
 
   // ── Score ambiental base (40% do total) ──────────────────────────────
   const climaBase = (precipScore * 0.45 + tempScore * 0.35 + biomaScore * 0.20) * altMult;
   const soloBase  = soloScore * aguaMult * florestMult;
-  const envScore  = rec_clamp((climaBase * 0.60 + soloBase * 0.40) * floodMult, 0, 1);
+
+  // ── Multiplicador de recuperação de área degradada ────────────────────
+  // Sistemas com desmatBonus (ILPF, SAF, ILP) ganham aptidão onde desmatamento é alto
+  // Extrativismo perde fortemente quando cobertura florestal < 25% (não há o que extrair)
+  let degradRecovMult = 1.0;
+  if (sys.desmatBonus && (env.desmat_km2 || 0) > 80) {
+    degradRecovMult = 1 + rec_clamp((env.desmat_km2 - 80) / 1600, 0, 0.15);
+  }
+  if (sysKey === 'extrativismo' && (env.cos_pct ?? 40) < 25) {
+    degradRecovMult = rec_clamp((env.cos_pct || 0) / 25, 0.15, 1.0);
+  }
+
+  const envScore  = rec_clamp((climaBase * 0.60 + soloBase * 0.40) * floodMult * degradRecovMult, 0, 1);
 
   // ── Fator de disponibilidade de mão-de-obra ───────────────────────────
   // Sistemas intensivos em trabalho precisam de população local suficiente
@@ -382,11 +394,11 @@ function rec_scoreSystem(sysKey, env, constraints, weights) {
 
   let tradicaoMult = 1.0;
   if (sys.bovinosBonus)   tradicaoMult += bovinosNorm * 0.20;  // ILPF/ILP perto de regiões pecuárias
-  if (sys.pescaTradBonus) tradicaoMult += pescaNorm   * 0.25;  // piscicultura/extrativismo perto de áreas pesqueiras
+  if (sys.pescaTradBonus) tradicaoMult += pescaNorm   * 0.15;  // piscicultura/extrativismo perto de áreas pesqueiras
   if (sys.settle)         tradicaoMult += settlNorm   * 0.15;  // sistemas familiares ganham com assentamentos
   // SAF e roça ganham com tradição agrícola (lavoura)
   if (['saf','roca','fruticultura'].includes(sysKey)) tradicaoMult += lavouraNorm * 0.10;
-  tradicaoMult = rec_clamp(tradicaoMult, 0.80, 1.40);
+  tradicaoMult = rec_clamp(tradicaoMult, 0.80, 1.30);
 
   // ── Bônus contextuais ─────────────────────────────────────────────────
   const idh_norm   = rec_clamp((env.idh - 0.40) / 0.45, 0, 1);
@@ -491,7 +503,8 @@ function rec_scoreSystem(sysKey, env, constraints, weights) {
     crit,
     // fatores contextuais para exibição no painel
     ctx: { isFloodable, floodMult: +floodMult.toFixed(2), laborFit: +laborFit.toFixed(2),
-           tradicaoMult: +tradicaoMult.toFixed(2), laborAvail: +laborAvail.toFixed(2) },
+           tradicaoMult: +tradicaoMult.toFixed(2), laborAvail: +laborAvail.toFixed(2),
+           degradRecovMult: +degradRecovMult.toFixed(2) },
     params: { gee_seq: sys.gee_seq, renda_ha: sys.renda_ha, invest_ha: sys.invest_ha,
                empregos_100ha: sys.empregos_100ha, payback: sys.payback, biodiv: sys.biodiv,
                cobertura: sys.cobertura, minArea: sys.minArea },
@@ -677,6 +690,8 @@ function rec_renderRanking(scores) {
         ${s.ctx.isFloodable ? `<span style="color:#38bdf8">💧 Alagável ×${s.ctx.floodMult}</span>` : ''}
         ${s.ctx.laborFit < 0.80 ? `<span style="color:#fb923c">👷 Mão-de-obra escassa ×${s.ctx.laborFit}</span>` : ''}
         ${s.ctx.tradicaoMult > 1.05 ? `<span style="color:#86efac">⭐ Tradição local ×${s.ctx.tradicaoMult}</span>` : ''}
+        ${s.ctx.degradRecovMult > 1.05 ? `<span style="color:#4ade80">🔄 Recuperação ×${s.ctx.degradRecovMult}</span>` : ''}
+        ${s.ctx.degradRecovMult < 0.80 ? `<span style="color:#f87171">⚠️ Floresta insuf. ×${s.ctx.degradRecovMult}</span>` : ''}
       </div>` : ''}
       ${alertHtml}
     </div>`;
@@ -908,15 +923,19 @@ function rec_addProtectedLayers() {
 function rec_buildWeightsPanel() {
   const el = document.getElementById('rec-weights-panel');
   if (!el) return;
-  el.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:3px 12px';
+  el.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px 12px';
   el.innerHTML = REC_CRITERIA.map(c => `
-    <div style="display:flex;align-items:center;gap:5px;padding:2px 0;min-width:0">
-      <span style="font-size:12px;width:16px;flex-shrink:0">${c.icon}</span>
-      <span style="font-size:10px;flex:1;min-width:0;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.label}</span>
-      <input type="range" id="rec-w-${c.id}" min="0" max="100" value="${_recWeights[c.id]}"
-        oninput="rec_onWeight('${c.id}', +this.value)"
-        style="flex:1;accent-color:var(--green3);height:3px;min-width:60px">
-      <span id="rec-wlbl-${c.id}" style="width:28px;text-align:right;font-size:10px;color:var(--accent);flex-shrink:0">${_recWeights[c.id]}%</span>
+    <div style="padding:2px 0;min-width:0">
+      <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
+        <span style="font-size:12px;width:16px;flex-shrink:0">${c.icon}</span>
+        <span style="font-size:10px;color:var(--text2);line-height:1.3;word-break:break-word">${c.label}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;padding-left:21px">
+        <input type="range" id="rec-w-${c.id}" min="0" max="100" value="${_recWeights[c.id]}"
+          oninput="rec_onWeight('${c.id}', +this.value)"
+          style="flex:1;accent-color:var(--green3);height:3px;min-width:50px">
+        <span id="rec-wlbl-${c.id}" style="width:28px;text-align:right;font-size:10px;color:var(--accent);flex-shrink:0">${_recWeights[c.id]}%</span>
+      </div>
     </div>`).join('');
 }
 

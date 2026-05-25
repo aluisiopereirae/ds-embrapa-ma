@@ -159,7 +159,7 @@ function _buildSaHTML() {
         </div>
         <div id="sa-alertas" style="margin-bottom:10px"></div>
         <div class="chart-card" style="margin-bottom:12px">
-          <div class="chart-title">🔀 Comparação de Variantes — Sistema Atual</div>
+          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span style="flex:1;min-width:0">🔀 Comparação de Variantes — Sistema Atual</span>${_dlMenu('dl-sa-comp',[{fn:"downloadChartImage('sa-comp-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('sa-comp-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('sa-comp-chart')",lbl:'⬇ CSV'}])}</div>
           <div class="chart-wrap" style="height:clamp(160px,35vh,200px)"><canvas id="sa-comp-chart"></canvas></div>
         </div>
         <div id="sa-recomendacoes"></div>
@@ -171,10 +171,13 @@ function _buildSaHTML() {
         <div class="chart-card">
           <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
             <span>🛰️ Projeção em Terreno Real — Satélite</span>
-            <button onclick="sa_satDrawPlants()"
-              style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;color:var(--text2)">
-              ⟳ Atualizar projeção
-            </button>
+            <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+              <button onclick="sa_satDrawPlants()"
+                style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;color:var(--text2)">
+                ⟳ Atualizar projeção
+              </button>
+              ${_dlMenu('dl-sat-view',[{fn:"downloadDivImage('sa-sat-map','png','projecao-satelite')",lbl:'⬇ PNG'},{fn:"downloadDivImage('sa-sat-map','jpg','projecao-satelite')",lbl:'⬇ JPG'}])}
+            </div>
           </div>
 
           <!-- Seletor de localização -->
@@ -231,6 +234,7 @@ function _buildSaHTML() {
             style="flex:1;min-width:220px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box">
           <datalist id="rec-munic-list"></datalist>
           <span style="font-size:10px;color:var(--text3);white-space:nowrap">ou clique no mapa</span>
+          ${_dlMenu('dl-rec-page',[{fn:"downloadRecPage('png')",lbl:'⬇ Página PNG'},{fn:"downloadRecPage('jpg')",lbl:'⬇ Página JPG'}])}
         </div>
         <div id="rec-munic-badge" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 11px;margin-bottom:10px;font-size:11px;color:var(--text3)">
           📍 Nenhum local selecionado — clique no mapa para iniciar a análise
@@ -244,8 +248,9 @@ function _buildSaHTML() {
 
             <!-- Mapa interativo + Restrições dentro do mesmo card -->
             <div class="chart-card" style="margin-bottom:10px">
-              <div class="chart-title" style="margin-bottom:6px">
-                🗺️ Terreno Real — Clique para Classificar
+              <div class="chart-title" style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:6px">
+                <span>🗺️ Terreno Real — Clique para Classificar</span>
+                ${_dlMenu('dl-rec-map',[{fn:"downloadDivImage('rec-map','png','terreno-real')",lbl:'⬇ PNG'},{fn:"downloadDivImage('rec-map','jpg','terreno-real')",lbl:'⬇ JPG'}])}
               </div>
               <div style="background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.12);border-radius:6px;padding:5px 9px;margin-bottom:7px;font-size:10px;color:var(--text3)">
                 💡 Clique em qualquer ponto · O algoritmo detecta município, solo, bioma, clima,
@@ -308,9 +313,9 @@ function _buildSaHTML() {
 
             <!-- Ranking completo -->
             <div class="chart-card" style="margin-bottom:10px">
-              <div class="chart-title" style="margin-bottom:8px">
-                🏆 Sistemas Recomendados
-                <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:5px">Pontuação 0–100 · MCDA ponderado</span>
+              <div class="chart-title" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:6px">
+                <span style="flex:1;min-width:0">🏆 Sistemas Recomendados <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:5px">Pontuação 0–100 · MCDA ponderado</span></span>
+                ${_dlMenu('dl-rec-rank',[{fn:"downloadDivImage('rec-ranking','png','sistemas-recomendados')",lbl:'⬇ PNG'},{fn:"downloadDivImage('rec-ranking','jpg','sistemas-recomendados')",lbl:'⬇ JPG'},{fn:"downloadRecRankingCSV()",lbl:'⬇ CSV'}])}
               </div>
               <div id="rec-ranking">
                 <span style="color:var(--text3);font-size:11px">Clique em um ponto no mapa para classificar os 10 sistemas...</span>
@@ -320,11 +325,11 @@ function _buildSaHTML() {
             <!-- Radar + Barras lado a lado -->
             <div id="rec-charts-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div class="chart-card">
-                <div class="chart-title" style="margin-bottom:5px;font-size:11px">📡 Top 3 · Multi-Critério</div>
+                <div class="chart-title" style="margin-bottom:5px;font-size:11px;display:flex;justify-content:space-between;align-items:center;gap:4px"><span>📡 Top 3 · Multi-Critério</span>${_dlMenu('dl-rec-radar',[{fn:"downloadChartImage('rec-radar','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('rec-radar','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('rec-radar')",lbl:'⬇ CSV'}])}</div>
                 <div style="height:clamp(180px,40vh,240px)"><canvas id="rec-radar"></canvas></div>
               </div>
               <div class="chart-card">
-                <div class="chart-title" style="margin-bottom:5px;font-size:11px">📊 Pontuação Geral</div>
+                <div class="chart-title" style="margin-bottom:5px;font-size:11px;display:flex;justify-content:space-between;align-items:center;gap:4px"><span>📊 Pontuação Geral</span>${_dlMenu('dl-rec-bar',[{fn:"downloadChartImage('rec-bar','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('rec-bar','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('rec-bar')",lbl:'⬇ CSV'}])}</div>
                 <div style="height:clamp(180px,40vh,240px)"><canvas id="rec-bar"></canvas></div>
               </div>
             </div>

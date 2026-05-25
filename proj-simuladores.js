@@ -299,11 +299,11 @@ function _buildAnaliseHTML() {
   </div>
   <div style="display:flex;flex-direction:column;gap:14px">
     <div class="chart-card" style="flex:1">
-      <div class="chart-title" id="comp-scatter-title">📊 Dispersão dos municípios</div>
+      <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px"><span id="comp-scatter-title">📊 Dispersão dos municípios</span>${_dlMenu('dl-comp-scatter',[{fn:"downloadChartImage('comp-scatter-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('comp-scatter-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('comp-scatter-chart')",lbl:'⬇ CSV'}])}</div>
       <div class="chart-wrap" style="height:200px"><canvas id="comp-scatter-chart"></canvas></div>
     </div>
     <div class="chart-card" style="flex:1">
-      <div class="chart-title" id="comp-rank-title">🏆 Top 10 — Indicador A</div>
+      <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px"><span id="comp-rank-title">🏆 Top 12 — Indicador A</span>${_dlMenu('dl-comp-rank',[{fn:"downloadChartImage('comp-rank-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('comp-rank-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('comp-rank-chart')",lbl:'⬇ CSV'}])}</div>
       <div class="chart-wrap" style="height:220px"><canvas id="comp-rank-chart"></canvas></div>
     </div>
   </div>
@@ -602,11 +602,11 @@ function _buildSimHTML() {
       <div id="conv-results"></div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
         <div class="chart-card">
-          <div class="chart-title">📈 Trajetória de Impacto ao Longo do Tempo</div>
+          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>📈 Trajetória de Impacto ao Longo do Tempo</span>${_dlMenu('dl-conv-traj',[{fn:"downloadChartImage('conv-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('conv-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('conv-chart')",lbl:'⬇ CSV'}])}</div>
           <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="conv-chart"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">⚖️ Comparativo de Sistemas — Redução de GEE por ha em ${convState.years} anos</div>
+          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span style="flex:1;min-width:0">⚖️ Comparativo de Sistemas — Redução de GEE por ha em ${convState.years} anos</span>${_dlMenu('dl-conv-cmp',[{fn:"downloadChartImage('conv-cmp-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('conv-cmp-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('conv-cmp-chart')",lbl:'⬇ CSV'}])}</div>
           <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="conv-cmp-chart"></canvas></div>
         </div>
       </div>

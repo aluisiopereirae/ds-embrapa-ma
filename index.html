@@ -4982,6 +4982,91 @@ function downloadChartCSV(chartId) {
   showToast('✅ CSV exportado: ' + filename);
 }
 
+// ── Helper: gera botão ⋮ com menu dropdown de download ───────────────────
+function _dlMenu(id, items) {
+  const s = 'display:block;width:100%;text-align:left;background:none;border:none;padding:8px 14px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap';
+  const btns = items.map(it =>
+    `<button style="${s}" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='none'" onclick="${it.fn};document.getElementById('${id}').style.display='none'">${it.lbl}</button>`
+  ).join('');
+  return `<div style="position:relative;flex-shrink:0"><button class="dl-menu-btn" title="Baixar" onclick="toggleDlMenu('${id}',this)" style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;color:var(--text2);line-height:1;display:flex;align-items:center;justify-content:center">⋮</button><div id="${id}" class="dl-menu" style="display:none;position:fixed;background:var(--card);border:1px solid var(--border2);border-radius:8px;min-width:140px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.6);overflow:hidden">${btns}</div></div>`;
+}
+
+function toggleDlMenu(id, btn) {
+  const menu = document.getElementById(id);
+  if (!menu) return;
+  const isOpen = menu.style.display === 'block';
+  document.querySelectorAll('.dl-menu').forEach(m => m.style.display = 'none');
+  if (!isOpen) {
+    if (btn) {
+      const r = btn.getBoundingClientRect();
+      Object.assign(menu.style, { top:(r.bottom+4)+'px', right:(window.innerWidth-r.right)+'px', left:'auto' });
+    }
+    menu.style.display = 'block';
+  }
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.dl-menu') && !e.target.classList.contains('dl-menu-btn'))
+    document.querySelectorAll('.dl-menu').forEach(m => m.style.display = 'none');
+}, true);
+
+// ── Download universal: qualquer div/mapa via html2canvas ─────────────────
+function downloadDivImage(divId, format, filename) {
+  const el = document.getElementById(divId);
+  if (!el) return;
+  document.querySelectorAll('.dl-menu').forEach(m => m.style.display = 'none');
+  const rect = el.getBoundingClientRect();
+  html2canvas(el, {
+    useCORS:true, allowTaint:true, backgroundColor:'#0a0f0a',
+    scale: window.devicePixelRatio || 2,
+    scrollX:-window.scrollX, scrollY:-window.scrollY,
+    width:rect.width, height:rect.height,
+    windowWidth:document.documentElement.clientWidth,
+    windowHeight:document.documentElement.clientHeight,
+    logging:false,
+  }).then(canvas => {
+    const a = document.createElement('a');
+    a.download = (filename || divId) + '.' + format;
+    a.href = canvas.toDataURL(format === 'jpg' ? 'image/jpeg' : 'image/png');
+    a.click();
+    showToast('✅ Imagem salva: ' + a.download);
+  }).catch(err => { console.error(err); showToast('❌ Erro ao capturar imagem'); });
+}
+
+// ── Download CSV do ranking de recomendações ──────────────────────────────
+function downloadRecRankingCSV() {
+  if (typeof _recScores === 'undefined' || !_recScores.length) {
+    showToast('⚠️ Selecione um ponto no mapa primeiro'); return;
+  }
+  let csv = 'Pos,Sistema,Pontuação,Score Ambiental,Score Critérios,GEE (tCO₂/ha),Renda (R$/ha),Empregos/100ha,Payback (anos),Biodiversidade\n';
+  _recScores.forEach((s, i) => {
+    csv += `${i+1},"${s.label}",${s.score},${s.envScore},${s.critScore},${s.params.gee_seq},${s.params.renda_ha},${s.params.empregos_100ha},${s.params.payback},${s.params.biodiv}\n`;
+  });
+  const a = document.createElement('a');
+  a.download = 'sistemas-recomendados.csv';
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.click();
+  showToast('✅ CSV exportado: sistemas-recomendados.csv');
+}
+
+// ── Download da página inteira de Recomendação ────────────────────────────
+function downloadRecPage(format) {
+  const el = document.getElementById('sa-view-rec');
+  if (!el) return;
+  document.querySelectorAll('.dl-menu').forEach(m => m.style.display = 'none');
+  showToast('⏳ Capturando página…');
+  html2canvas(el, {
+    useCORS:true, allowTaint:true, backgroundColor:'#0a0f0a', scale:1,
+    scrollX:-window.scrollX, scrollY:-window.scrollY, logging:false,
+  }).then(canvas => {
+    const fmt = format || 'png';
+    const a = document.createElement('a');
+    a.download = 'recomendacao-completa.' + fmt;
+    a.href = canvas.toDataURL(fmt === 'jpg' ? 'image/jpeg' : 'image/png');
+    a.click();
+    showToast('✅ Página salva: ' + a.download);
+  }).catch(err => { console.error(err); showToast('❌ Erro ao capturar página'); });
+}
+
 function downloadMapImage(format) {
   const mapContainer = document.getElementById('leaflet-map');
   if (!mapContainer) return;
