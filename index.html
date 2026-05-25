@@ -1071,24 +1071,65 @@ header {
     <button class="nav-btn active" onclick="showView('overview')">📊 Visão Geral</button>
     <button class="nav-btn" onclick="showView('map')">🗺 Mapa</button>
     <button class="nav-btn" onclick="showView('proj')">📈 Projeções</button>
-    <button class="nav-btn" onclick="showView('register')">➕ Registrar</button>
-    <button class="nav-btn" onclick="showView('data')">📋 Dados</button>
-    <button class="nav-btn" onclick="showView('guide')">📖 Guias</button>
-    <button id="settings-btn" onclick="openSettings()" title="Configurações de visual e interface">⚙️</button>
-  </div>
 
-  <!-- Login Embrapa -->
-  <div style="display:flex;align-items:center;gap:8px;margin-left:8px;position:relative">
-    <button id="embrapa-login-btn"
-      onclick="embrapaLogin()"
-      style="background:linear-gradient(135deg,var(--green3),var(--teal));border:none;color:#fff;padding:7px 13px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;white-space:nowrap;transition:opacity 0.2s"
-      onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'"
-      title="Autenticar com credenciais corporativas Embrapa (OAuth 2.1)">
-      🔐 Entrar com Embrapa
-    </button>
-    <div id="embrapa-user-info" style="display:none;align-items:center;position:relative"></div>
+    <!-- Submenu: Ferramentas -->
+    <div style="position:relative" id="tools-menu-wrap">
+      <button class="nav-btn" id="tools-menu-btn" onclick="toggleToolsMenu()"
+        style="display:flex;align-items:center;gap:5px">
+        🛠 Ferramentas <span style="font-size:9px;opacity:.7">▾</span>
+      </button>
+      <div id="tools-dropdown"
+        style="display:none;position:absolute;top:calc(100% + 6px);right:0;
+               background:var(--card);border:1px solid var(--border2);border-radius:10px;
+               padding:6px;min-width:190px;z-index:2000;
+               box-shadow:0 8px 24px rgba(0,0,0,0.55);
+               display:none;flex-direction:column;gap:2px">
+
+        <button class="nav-btn" onclick="showView('register');closeToolsMenu()"
+          style="width:100%;text-align:left;border-radius:7px">➕ Registrar</button>
+        <button class="nav-btn" onclick="showView('data');closeToolsMenu()"
+          style="width:100%;text-align:left;border-radius:7px">📋 Dados</button>
+        <button class="nav-btn" onclick="showView('guide');closeToolsMenu()"
+          style="width:100%;text-align:left;border-radius:7px">📖 Guias</button>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:4px 0">
+
+        <button class="nav-btn" onclick="openSettings();closeToolsMenu()"
+          style="width:100%;text-align:left;border-radius:7px">⚙️ Configurações</button>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:4px 0">
+
+        <button id="embrapa-login-btn"
+          onclick="embrapaLogin()"
+          style="width:100%;text-align:left;background:linear-gradient(135deg,var(--green3),var(--teal));
+                 border:none;color:#fff;padding:8px 12px;border-radius:7px;cursor:pointer;
+                 font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+                 transition:opacity 0.2s"
+          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'"
+          title="Autenticar com credenciais corporativas Embrapa (OAuth 2.1)">
+          🔐 Entrar com Embrapa
+        </button>
+        <div id="embrapa-user-info" style="display:none;align-items:center;position:relative"></div>
+
+      </div>
+    </div>
   </div>
 </header>
+
+<script>
+function toggleToolsMenu() {
+  const dd = document.getElementById('tools-dropdown');
+  dd.style.display = dd.style.display === 'flex' ? 'none' : 'flex';
+}
+function closeToolsMenu() {
+  const dd = document.getElementById('tools-dropdown');
+  if (dd) dd.style.display = 'none';
+}
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('tools-menu-wrap');
+  if (wrap && !wrap.contains(e.target)) closeToolsMenu();
+});
+</script>
 
 <div class="app">
   <!-- SIDEBAR -->
