@@ -673,16 +673,19 @@ function _buildSimHTML() {
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
   <div class="chart-card">
-    <div class="chart-title">🌧 Precipitação e Temperatura Mensais</div>
+    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>🌧 Precipitação e Temperatura Mensais</span>${_dlMenu('dl-meteo',[{fn:"downloadChartImage('meteo-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('meteo-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('meteo-chart')",lbl:'⬇ CSV'}])}</div>
     <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="meteo-chart"></canvas></div>
   </div>
   <div class="chart-card">
-    <div class="chart-title">☀️ Radiação Solar e Meses Favoráveis ao Sistema</div>
+    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>☀️ Radiação Solar e Meses Favoráveis ao Sistema</span>${_dlMenu('dl-meteo-solar',[{fn:"downloadChartImage('meteo-solar-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('meteo-solar-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('meteo-solar-chart')",lbl:'⬇ CSV'}])}</div>
     <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="meteo-solar-chart"></canvas></div>
   </div>
 </div>
 <div class="sim-card" style="margin-top:14px">
-  <div class="sim-card-title">📅 Calendário de Atividades Recomendado</div>
+  <div class="sim-card-title" style="justify-content:space-between">
+    <span>📅 Calendário de Atividades Recomendado</span>
+    ${_dlMenu('dl-meteo-cal',[{fn:"downloadDivImage('meteo-calendario','png','calendario-atividades')",lbl:'⬇ PNG'},{fn:"downloadDivImage('meteo-calendario','jpg','calendario-atividades')",lbl:'⬇ JPG'}])}
+  </div>
   <div id="meteo-calendario"></div>
 </div>
 </div>
@@ -703,11 +706,11 @@ function _buildSimHTML() {
 </div>
 <div>
   <div class="chart-card" style="margin-bottom:14px">
-    <div class="chart-title">🔍 Radar de Indicadores — Município vs. Média MA</div>
+    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>🔍 Radar de Indicadores — Município vs. Média MA</span>${_dlMenu('dl-vuln-radar',[{fn:"downloadChartImage('vuln-radar-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('vuln-radar-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('vuln-radar-chart')",lbl:'⬇ CSV'}])}</div>
     <div class="chart-wrap" style="height:clamp(200px,42vh,280px)"><canvas id="vuln-radar-chart"></canvas></div>
   </div>
   <div class="chart-card">
-    <div class="chart-title">🏅 Ranking — Top 20 Municípios mais Vulneráveis</div>
+    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>🏅 Ranking — Top 20 Municípios mais Vulneráveis</span>${_dlMenu('dl-vuln-rank',[{fn:"downloadChartImage('vuln-rank-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('vuln-rank-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('vuln-rank-chart')",lbl:'⬇ CSV'}])}</div>
     <div class="chart-wrap" style="height:clamp(220px,45vh,300px)"><canvas id="vuln-rank-chart"></canvas></div>
   </div>
 </div>
