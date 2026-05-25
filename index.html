@@ -584,12 +584,24 @@ header {
   /* Estrutura base */
   header { padding: 0 10px; height: 56px; }
   .app { flex-direction: column; height: calc(100vh - 56px); }
+
+  /* Sidebar expandida: faixa no topo */
   .sidebar {
     width: 100%; min-width: 100%; order: -1;
     height: auto; max-height: 38vh; overflow-y: auto;
+    flex-shrink: 0;
   }
-  .sidebar.collapsed { width: 48px; min-width: 48px; height: auto; max-height: none; }
-  .main { width: 100%; }
+
+  /* Sidebar retraída no mobile: some o conteúdo, mantém só o botão toggle */
+  .sidebar.collapsed {
+    width: 100%; min-width: 100%;
+    height: auto; max-height: none;
+    overflow: hidden;
+  }
+  .sidebar.collapsed .sidebar-inner { display: none; }
+
+  /* Main sempre ocupa o restante da altura */
+  .main { flex: 1; min-height: 0; width: 100%; overflow-y: auto; }
 
   /* Logo */
   header img[alt="Logo Embrapa"] { width: 50px; }
@@ -645,6 +657,10 @@ header {
 @media (max-width: 540px) {
   header { height: 52px; }
   .app { height: calc(100vh - 52px); }
+  /* Reforça o mesmo comportamento de sidebar retraída */
+  .sidebar.collapsed { width: 100%; min-width: 100%; }
+  .sidebar.collapsed .sidebar-inner { display: none; }
+  .main { flex: 1; min-height: 0; }
   /* Logo só ícone — texto some */
   header img[alt="Logo Embrapa"] { width: 38px; }
   .logo-info { display: none; }
@@ -1079,11 +1095,11 @@ header {
         🛠 Ferramentas <span style="font-size:9px;opacity:.7">▾</span>
       </button>
       <div id="tools-dropdown"
-        style="display:none;position:absolute;top:calc(100% + 6px);right:0;
+        style="display:none;position:fixed;
                background:var(--card);border:1px solid var(--border2);border-radius:10px;
-               padding:6px;min-width:190px;z-index:2000;
+               padding:6px;min-width:190px;z-index:9999;
                box-shadow:0 8px 24px rgba(0,0,0,0.55);
-               display:none;flex-direction:column;gap:2px">
+               flex-direction:column;gap:2px">
 
         <button class="nav-btn" onclick="showView('register');closeToolsMenu()"
           style="width:100%;text-align:left;border-radius:7px">➕ Registrar</button>
@@ -1119,7 +1135,27 @@ header {
 <script>
 function toggleToolsMenu() {
   const dd = document.getElementById('tools-dropdown');
-  dd.style.display = dd.style.display === 'flex' ? 'none' : 'flex';
+  const btn = document.getElementById('tools-menu-btn');
+  if (!dd || !btn) return;
+
+  if (dd.style.display === 'flex') {
+    dd.style.display = 'none';
+    return;
+  }
+
+  // Posiciona com fixed relativo ao botão (funciona dentro de qualquer overflow)
+  const r = btn.getBoundingClientRect();
+  dd.style.top  = (r.bottom + 4) + 'px';
+  dd.style.left = 'auto';
+  dd.style.right = (window.innerWidth - r.right) + 'px';
+  // Garante que não saia pela esquerda em telas pequenas
+  const minLeft = 8;
+  const ddWidth = 190;
+  if (r.right - ddWidth < minLeft) {
+    dd.style.right = 'auto';
+    dd.style.left  = minLeft + 'px';
+  }
+  dd.style.display = 'flex';
 }
 function closeToolsMenu() {
   const dd = document.getElementById('tools-dropdown');
@@ -1127,7 +1163,9 @@ function closeToolsMenu() {
 }
 document.addEventListener('click', function(e) {
   const wrap = document.getElementById('tools-menu-wrap');
-  if (wrap && !wrap.contains(e.target)) closeToolsMenu();
+  const dd   = document.getElementById('tools-dropdown');
+  if (!wrap || !dd) return;
+  if (!wrap.contains(e.target) && !dd.contains(e.target)) closeToolsMenu();
 });
 </script>
 
