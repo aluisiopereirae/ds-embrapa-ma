@@ -169,7 +169,7 @@ let compMarkersLayer = null;
 let _simCharts = {};     // chart.js instances keyed by id
 let _simInit = false;    // was initSimuladores already called?
 let compState = { indA: 'gee', indB: 'desmat' };
-let convState = { pct: 15, system: 'ilpf', years: 20 };
+let convState = { pct: 15, system: 'ilpf', years: 20, mode: 'individual', systems: [] };
 let meteoState = { munic: 'Grande São Luís' };
 let plantioState = { system: 'ilpf', area: 50, espaco_linha: 14, espaco_planta: 3, angulo: 0 };
 let vulnState = { munic: '' };
@@ -590,8 +590,22 @@ function _buildSimHTML() {
         <input type="range" class="sim-slider" id="conv-pct" min="1" max="100" value="${convState.pct}" oninput="updateConvSlider()">
       </div>
       <div class="sim-param">
+        <label>📊 Modo de análise:</label>
+        <div style="display:flex;gap:4px;margin-top:4px">
+          <button id="conv-mode-ind"  onclick="setConvMode('individual')" style="flex:1;padding:5px 2px;font-size:11px;border-radius:6px;cursor:pointer;background:#1a3a2a;border:1px solid #4ade80;color:#4ade80;font-weight:600">Individual</button>
+          <button id="conv-mode-mult" onclick="setConvMode('multiplos')"  style="flex:1;padding:5px 2px;font-size:11px;border-radius:6px;cursor:pointer;background:var(--bg3);border:1px solid var(--text3);color:var(--text2)">Múltiplos</button>
+          <button id="conv-mode-all"  onclick="setConvMode('todos')"      style="flex:1;padding:5px 2px;font-size:11px;border-radius:6px;cursor:pointer;background:var(--bg3);border:1px solid var(--text3);color:var(--text2)">Todos</button>
+        </div>
+      </div>
+      <div class="sim-param" id="conv-sys-row">
         <label>Sistema adotado:</label>
         <select class="sim-select" id="conv-sys" onchange="runConversaoSim()">${sysOptions}</select>
+      </div>
+      <div class="sim-param" id="conv-chk-row" style="display:none">
+        <label style="margin-bottom:4px">Sistemas selecionados:</label>
+        <div style="display:flex;flex-direction:column;gap:3px;max-height:190px;overflow-y:auto;padding-right:2px">
+          ${Object.entries(SIM_SYSTEMS).map(([k,s])=>`<label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);cursor:pointer"><input type="checkbox" class="conv-sys-chk" value="${k}" onchange="runConversaoSim()"> ${s.icon} ${s.label}</label>`).join('')}
+        </div>
       </div>
       <div class="sim-param">
         <label>Horizonte de tempo: <strong id="conv-years-val">${convState.years} anos</strong></label>
@@ -745,10 +759,38 @@ function showSimTab(tab) {
 }
 
 /* ─────────── SIMULADOR 1: CONVERSÃO DE ÁREAS ─────────── */
+
+// Dynamic adoption × maturation factor for year y and a given system.
+// adopt: S-curve ramp-up (slow start → rapid adoption → saturation)
+// matur: biomass / ecosystem maturation multiplier (grows beyond 1.0 for forested systems)
+// Returns combined factor (can exceed 1 for mature forested systems)
+function _convDynamic(y, sysKey) {
+  const cfg = {
+    ilp:             { ta: 3,  tm: 10, pk: 1.15 },
+    ilpf:            { ta: 5,  tm: 22, pk: 1.90 },
+    saf:             { ta: 6,  tm: 28, pk: 2.30 },
+    sisteminha:      { ta: 2,  tm:  5, pk: 1.10 },
+    apicultura:      { ta: 3,  tm: 10, pk: 1.25 },
+    meliponicultura: { ta: 3,  tm: 10, pk: 1.25 },
+    roca:            { ta: 2,  tm:  5, pk: 1.08 },
+    piscicultura:    { ta: 4,  tm: 12, pk: 1.40 },
+    extrativismo:    { ta: 5,  tm: 20, pk: 1.70 },
+    fruticultura:    { ta: 5,  tm: 18, pk: 1.60 },
+  };
+  const c = cfg[sysKey] || { ta: 4, tm: 12, pk: 1.30 };
+  // Sigmoid adoption (ta = inflection year, ~90% adoption at 2×ta)
+  const adopt = 1 / (1 + Math.exp(-2.2 * (y - c.ta) / c.ta));
+  // Maturation: linear rise to pk at tm, then gentle post-peak decline
+  const matur = y <= c.tm
+    ? 1 + (c.pk - 1) * (y / c.tm)
+    : c.pk * (1 - 0.12 * Math.min(1, (y - c.tm) / 30));
+  return adopt * matur;
+}
+
 function updateConvSlider() {
-  convState.pct = +document.getElementById('conv-pct').value;
+  convState.pct   = +document.getElementById('conv-pct').value;
   convState.years = +document.getElementById('conv-years').value;
-  convState.system = document.getElementById('conv-sys').value;
+  if (convState.mode === 'individual') convState.system = document.getElementById('conv-sys').value;
   const pv = document.getElementById('conv-pct-val');
   const yv = document.getElementById('conv-years-val');
   if (pv) pv.textContent = convState.pct + '%';
@@ -756,116 +798,183 @@ function updateConvSlider() {
   runConversaoSim();
 }
 
-function runConversaoSim() {
-  const sysKey = document.getElementById('conv-sys')?.value || convState.system;
-  convState.system = sysKey;
-  convState.pct = +document.getElementById('conv-pct')?.value || convState.pct;
-  convState.years = +document.getElementById('conv-years')?.value || convState.years;
+function setConvMode(mode) {
+  convState.mode = mode;
+  const sysRow  = document.getElementById('conv-sys-row');
+  const chkRow  = document.getElementById('conv-chk-row');
+  const modeMap = { individual:'ind', multiplos:'mult', todos:'all' };
+  Object.keys(modeMap).forEach(m => {
+    const btn = document.getElementById('conv-mode-' + modeMap[m]);
+    if (!btn) return;
+    const active = m === mode;
+    btn.style.background    = active ? '#1a3a2a' : 'var(--bg3)';
+    btn.style.border        = active ? '1px solid #4ade80' : '1px solid var(--text3)';
+    btn.style.color         = active ? '#4ade80' : 'var(--text2)';
+    btn.style.fontWeight    = active ? '600' : '400';
+  });
+  if (mode === 'individual') {
+    if (sysRow) sysRow.style.display = '';
+    if (chkRow) chkRow.style.display = 'none';
+  } else {
+    if (sysRow) sysRow.style.display = 'none';
+    if (chkRow) chkRow.style.display = '';
+    const chks = document.querySelectorAll('.conv-sys-chk');
+    if (mode === 'todos') {
+      chks.forEach(c => { c.checked = true; c.disabled = true; });
+    } else {
+      chks.forEach(c => { c.disabled = false; });
+    }
+  }
+  runConversaoSim();
+}
 
-  const sys = SIM_SYSTEMS[sysKey];
-  if (!sys) return;
+function runConversaoSim() {
+  convState.pct   = +document.getElementById('conv-pct')?.value   || convState.pct;
+  convState.years = +document.getElementById('conv-years')?.value || convState.years;
+  const mode   = convState.mode || 'individual';
   const areaHa = MA_DEGRADED_HA * convState.pct / 100;
   const years  = convState.years;
+  const resEl  = document.getElementById('conv-results');
 
-  // Impacto cumulativo no final do período
-  // (emissão evitada: antes emitia DEGRADED_EMISSION, agora sequestra sys.seq_co2)
-  const geeRedKtAnual = areaHa * (DEGRADED_EMISSION + sys.seq_co2) / 1000; // kt CO₂eq/ano
-  const geeTotalKt    = geeRedKtAnual * years;
-  const carbonoTotalMt = (areaHa * sys.carbon_ha * years) / 1e6;
-  const tempReducao   = sys.temp_red * (areaHa / MA_DEGRADED_HA);
-  const investTotal   = areaHa * sys.invest_ha;
-  const rendaAnual    = areaHa * sys.renda_ha;
-  const empregos      = (areaHa / 1000) * sys.empregos;
-  const pctGEE_MA     = (geeRedKtAnual / MA_GEE_KT * 100).toFixed(1);
+  let selKeys;
+  if (mode === 'individual') {
+    const sysKey = document.getElementById('conv-sys')?.value || convState.system;
+    convState.system = sysKey;
+    selKeys = [sysKey];
+  } else {
+    const checked = Array.from(document.querySelectorAll('.conv-sys-chk:checked')).map(c => c.value);
+    selKeys = checked.length ? checked : Object.keys(SIM_SYSTEMS);
+  }
+  convState.systems = selKeys;
 
-  // Results HTML
-  const resEl = document.getElementById('conv-results');
-  if (resEl) {
-    resEl.innerHTML = `
-    <div style="background:var(--bg2);border:1px solid var(--green3);border-radius:12px;padding:14px;margin-bottom:12px">
-      <div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:6px">✅ Resultado da Simulação — ${sys.icon} ${sys.label} em ${convState.pct}% das áreas degradadas (${(areaHa/1e6).toFixed(2)} M ha) em ${years} anos</div>
-    </div>
-    <div class="sim-result-grid">
-      <div class="sim-result-card">
-        <div class="sim-result-val" style="color:#4ade80">${geeRedKtAnual.toFixed(0)} kt</div>
-        <div class="sim-result-label">Redução GEE/ano (CO₂eq)</div>
+  const years_arr = Array.from({length: years + 1}, (_, i) => i);
+  const labels    = years_arr.map(y => 2025 + y);
+
+  if (mode === 'individual') {
+    const sys = SIM_SYSTEMS[selKeys[0]];
+    if (!sys) return;
+
+    const geeRedKtAnual  = areaHa * (DEGRADED_EMISSION + sys.seq_co2) / 1000;
+    const geeTotalKt     = geeRedKtAnual * years;
+    const carbonoTotalMt = areaHa * sys.carbon_ha * years / 1e6;
+    const tempReducao    = sys.temp_red * (areaHa / MA_DEGRADED_HA);
+    const investTotal    = areaHa * sys.invest_ha;
+    const rendaAnual     = areaHa * sys.renda_ha;
+    const empregos       = (areaHa / 1000) * sys.empregos;
+    const pctGEE_MA      = (geeRedKtAnual / MA_GEE_KT * 100).toFixed(1);
+
+    if (resEl) resEl.innerHTML = `
+      <div style="background:var(--bg2);border:1px solid var(--green3);border-radius:12px;padding:14px;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:6px">✅ Resultado da Simulação — ${sys.icon} ${sys.label} em ${convState.pct}% das áreas degradadas (${(areaHa/1e6).toFixed(2)} M ha) em ${years} anos</div>
       </div>
-      <div class="sim-result-card">
-        <div class="sim-result-val" style="color:#60a5fa">${(geeTotalKt/1000).toFixed(2)} Mt</div>
-        <div class="sim-result-label">GEE total evitado em ${years} anos</div>
+      <div class="sim-result-grid">
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#4ade80">${geeRedKtAnual.toFixed(0)} kt</div><div class="sim-result-label">Redução GEE/ano (CO₂eq)</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#60a5fa">${(geeTotalKt/1000).toFixed(2)} Mt</div><div class="sim-result-label">GEE total evitado em ${years} anos</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#86efac">${pctGEE_MA}%</div><div class="sim-result-label">% das emissões atuais do MA</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#2dd4bf">${carbonoTotalMt.toFixed(2)} Mt C</div><div class="sim-result-label">Carbono estocado no solo/biomassa</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#fbbf24">−${tempReducao.toFixed(2)}°C</div><div class="sim-result-label">Redução temperatura microclimática</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#f87171">R$ ${(investTotal/1e9).toFixed(2)} Bi</div><div class="sim-result-label">Investimento total necessário</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#c084fc">R$ ${(rendaAnual/1e9).toFixed(2)} Bi</div><div class="sim-result-label">Renda bruta gerada/ano</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#fb923c">${Math.round(empregos).toLocaleString('pt-BR')}</div><div class="sim-result-label">Empregos gerados</div></div>
+      </div>`;
+
+    // Baseline GEE without intervention: +0.8%/yr drift (continued deforestation pressure)
+    const baselineArr = years_arr.map(y => +(MA_GEE_KT * (1 + 0.008 * y)).toFixed(1));
+    // GEE with system: baseline minus growing reduction (adoption S-curve × maturation)
+    const geeArr = years_arr.map(y => +Math.max(
+      MA_GEE_KT * 0.25,
+      MA_GEE_KT * (1 + 0.008 * y) - geeRedKtAnual * _convDynamic(y, selKeys[0])
+    ).toFixed(1));
+    // Cumulative carbon: discrete integral of annual carbon rate × dynamic factor
+    const seqArr = [];
+    let _cumC = 0;
+    for (const y of years_arr) {
+      _cumC += areaHa * sys.carbon_ha * _convDynamic(y, selKeys[0]) / 1e6;
+      seqArr.push(_cumC.toFixed(3));
+    }
+    const ctx = document.getElementById('conv-chart'); if (!ctx) return;
+    _destroyChart('conv');
+    const opts = _darkChartDefaults();
+    opts.interaction = { mode:'index', intersect:false };
+    _simCharts['conv'] = new Chart(ctx, {
+      type:'line',
+      data: { labels, datasets: [
+        { label:'GEE MA sem intervenção (kt/ano)', data: baselineArr, borderColor:'rgba(248,113,113,0.40)', borderDash:[6,4], fill:false, tension:0.3, yAxisID:'y', pointRadius:0 },
+        { label:'GEE MA com sistema (kt/ano)', data: geeArr, borderColor:'#f87171', backgroundColor:'rgba(248,113,113,0.10)', fill:true, tension:0.4, yAxisID:'y' },
+        { label:'Carbono sequestrado (Mt C)', data: seqArr, borderColor:'#4ade80', backgroundColor:'rgba(74,222,128,0.10)', fill:true, tension:0.4, yAxisID:'y1' }
+      ]},
+      options: { ...opts, scales: {
+        x:  { ticks:{color:'#6b9b6b'}, grid:{color:'rgba(74,222,128,0.08)'} },
+        y:  { type:'linear', position:'left',  ticks:{color:'#f87171'}, grid:{color:'rgba(248,113,113,0.06)'}, title:{display:true,text:'GEE (kt CO₂eq/ano)',color:'#f87171'} },
+        y1: { type:'linear', position:'right', ticks:{color:'#4ade80'}, grid:{display:false}, title:{display:true,text:'Carbono acumulado (Mt C)',color:'#4ade80'} }
+      }}
+    });
+
+  } else {
+    // Multi-system: split area equally among selected systems
+    const N = selKeys.length;
+    const areaPerSys = areaHa / Math.max(1, N);
+    const sysList = selKeys.map(k => ({ key: k, ...SIM_SYSTEMS[k] })).filter(s => s.label);
+    if (!sysList.length) { if (resEl) resEl.innerHTML = ''; return; }
+
+    const totGeeRed   = sysList.reduce((a, s) => a + areaPerSys * (DEGRADED_EMISSION + s.seq_co2) / 1000, 0);
+    const totGeeTotal = totGeeRed * years;
+    const totCarbono  = sysList.reduce((a, s) => a + areaPerSys * s.carbon_ha * years / 1e6, 0);
+    const totTempRed  = sysList.reduce((a, s) => a + s.temp_red * (areaPerSys / MA_DEGRADED_HA), 0);
+    const totInvest   = sysList.reduce((a, s) => a + areaPerSys * s.invest_ha, 0);
+    const totRenda    = sysList.reduce((a, s) => a + areaPerSys * s.renda_ha, 0);
+    const totEmprego  = sysList.reduce((a, s) => a + (areaPerSys / 1000) * s.empregos, 0);
+    const pctGEE_MA   = (totGeeRed / MA_GEE_KT * 100).toFixed(1);
+    const sysLabel    = N <= 3 ? sysList.map(s => s.icon + ' ' + s.label).join(', ') : `${N} sistemas combinados`;
+
+    if (resEl) resEl.innerHTML = `
+      <div style="background:var(--bg2);border:1px solid var(--green3);border-radius:12px;padding:14px;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:4px">✅ Resultado Combinado — ${sysLabel}</div>
+        <div style="font-size:11px;color:var(--text3)">Área de ${convState.pct}% degradada (${(areaHa/1e6).toFixed(2)} M ha) dividida igualmente entre ${N} sistema${N > 1 ? 's' : ''} em ${years} anos</div>
       </div>
-      <div class="sim-result-card">
-        <div class="sim-result-val" style="color:#86efac">${pctGEE_MA}%</div>
-        <div class="sim-result-label">% das emissões atuais do MA</div>
-      </div>
-      <div class="sim-result-card">
-        <div class="sim-result-val" style="color:#2dd4bf">${carbonoTotalMt.toFixed(2)} Mt C</div>
-        <div class="sim-result-label">Carbono estocado no solo/biomassa</div>
-      </div>
-      <div class="sim-result-card">
-        <div class="sim-result-val" style="color:#fbbf24">−${tempReducao.toFixed(2)}°C</div>
-        <div class="sim-result-label">Redução temperatura microclimática</div>
-      </div>
-      <div class="sim-result-card">
-        <div class="sim-result-val" style="color:#f87171">R$ ${(investTotal/1e9).toFixed(2)} Bi</div>
-        <div class="sim-result-label">Investimento total necessário</div>
-      </div>
-      <div class="sim-result-card">
-        <div class="sim-result-val" style="color:#c084fc">R$ ${(rendaAnual/1e9).toFixed(2)} Bi</div>
-        <div class="sim-result-label">Renda bruta gerada/ano</div>
-      </div>
-      <div class="sim-result-card">
-        <div class="sim-result-val" style="color:#fb923c">${Math.round(empregos).toLocaleString('pt-BR')}</div>
-        <div class="sim-result-label">Empregos gerados</div>
-      </div>
-    </div>`;
+      <div class="sim-result-grid">
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#4ade80">${totGeeRed.toFixed(0)} kt</div><div class="sim-result-label">Redução GEE/ano (CO₂eq)</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#60a5fa">${(totGeeTotal/1000).toFixed(2)} Mt</div><div class="sim-result-label">GEE total evitado em ${years} anos</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#86efac">${pctGEE_MA}%</div><div class="sim-result-label">% das emissões atuais do MA</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#2dd4bf">${totCarbono.toFixed(2)} Mt C</div><div class="sim-result-label">Carbono estocado no solo/biomassa</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#fbbf24">−${totTempRed.toFixed(2)}°C</div><div class="sim-result-label">Redução temperatura microclimática</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#f87171">R$ ${(totInvest/1e9).toFixed(2)} Bi</div><div class="sim-result-label">Investimento total necessário</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#c084fc">R$ ${(totRenda/1e9).toFixed(2)} Bi</div><div class="sim-result-label">Renda bruta gerada/ano</div></div>
+        <div class="sim-result-card"><div class="sim-result-val" style="color:#fb923c">${Math.round(totEmprego).toLocaleString('pt-BR')}</div><div class="sim-result-label">Empregos gerados</div></div>
+      </div>`;
+
+    const ctx = document.getElementById('conv-chart'); if (!ctx) return;
+    _destroyChart('conv');
+    const opts = _darkChartDefaults();
+    opts.interaction = { mode:'index', intersect:false };
+    const datasets = sysList.map((s, i) => {
+      const geeRedBase = areaPerSys * (DEGRADED_EMISSION + s.seq_co2) / 1000;
+      const data = years_arr.map(y => +(geeRedBase * _convDynamic(y, s.key)).toFixed(1));
+      const col  = s.color || `hsl(${i * 360 / sysList.length},70%,60%)`;
+      return { label: s.icon + ' ' + s.label, data, borderColor: col, backgroundColor: col + '22', fill: false, tension: 0.4 };
+    });
+    _simCharts['conv'] = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets },
+      options: { ...opts, scales: {
+        x: { ticks:{color:'#6b9b6b'}, grid:{color:'rgba(74,222,128,0.08)'} },
+        y: { ticks:{color:'#4ade80'}, grid:{color:'rgba(74,222,128,0.06)'}, title:{display:true,text:'Redução GEE (kt CO₂eq/ano)',color:'#4ade80'} }
+      }}
+    });
   }
 
-  // Projection chart
-  const years_arr = Array.from({length: years+1}, (_,i) => i);
-  const geeArr = years_arr.map(y => {
-    const adoption = Math.min(1, y/5); // 5 anos de maturação gradual
-    return (MA_GEE_KT - geeRedKtAnual * adoption).toFixed(1);
-  });
-  const seqArr = years_arr.map(y => {
-    const adoption = Math.min(1, y/5);
-    return (areaHa * sys.carbon_ha * adoption * y / 1e6).toFixed(3);
-  });
-  const ctx = document.getElementById('conv-chart'); if (!ctx) return;
-  _destroyChart('conv');
-  const opts = _darkChartDefaults();
-  opts.interaction = { mode:'index', intersect:false };
-  _simCharts['conv'] = new Chart(ctx, {
-    type:'line',
-    data: {
-      labels: years_arr.map(y => 2025+y),
-      datasets: [
-        { label:'GEE MA (kt CO₂eq/ano)', data: geeArr, borderColor:'#f87171', backgroundColor:'rgba(248,113,113,0.1)', fill:true, tension:0.4, yAxisID:'y' },
-        { label:'Carbono sequestrado (Mt C)', data: seqArr, borderColor:'#4ade80', backgroundColor:'rgba(74,222,128,0.1)', fill:true, tension:0.4, yAxisID:'y1' }
-      ]
-    },
-    options: { ...opts, scales: {
-      x: { ticks:{color:'#6b9b6b'}, grid:{color:'rgba(74,222,128,0.08)'} },
-      y:  { type:'linear', position:'left',  ticks:{color:'#f87171'}, grid:{color:'rgba(248,113,113,0.06)'}, title:{display:true,text:'GEE (kt CO₂eq)',color:'#f87171'} },
-      y1: { type:'linear', position:'right', ticks:{color:'#4ade80'}, grid:{display:false}, title:{display:true,text:'Carbono (Mt C)',color:'#4ade80'} }
-    }}
-  });
-
-  // Comparison chart: all systems
+  // Comparison chart: always all systems with full areaHa
   const cmpCtx = document.getElementById('conv-cmp-chart'); if (!cmpCtx) return;
   _destroyChart('conv-cmp');
-  const sysKeys = Object.keys(SIM_SYSTEMS);
-  const cmpVals = sysKeys.map(k => {
-    const s = SIM_SYSTEMS[k];
-    return +(areaHa * (DEGRADED_EMISSION + s.seq_co2) * years / 1e6).toFixed(2);
-  });
+  const sysKeys   = Object.keys(SIM_SYSTEMS);
+  const cmpVals   = sysKeys.map(k => +(areaHa * (DEGRADED_EMISSION + SIM_SYSTEMS[k].seq_co2) * years / 1e6).toFixed(2));
   const cmpColors = sysKeys.map(k => SIM_SYSTEMS[k].color);
-  const cmpOpts = _darkChartDefaults();
+  const cmpOpts   = _darkChartDefaults();
   cmpOpts.plugins.legend = { display:false };
-  cmpOpts.scales.y.title = { display:true, text:'Mt CO₂eq evitado em '+years+' anos', color:'#a3c9a3' };
+  cmpOpts.scales.y.title = { display:true, text:'Mt CO₂eq evitado em ' + years + ' anos', color:'#a3c9a3' };
   _simCharts['conv-cmp'] = new Chart(cmpCtx, {
     type:'bar',
-    data: { labels: sysKeys.map(k=>SIM_SYSTEMS[k].icon+' '+SIM_SYSTEMS[k].label), datasets:[{
+    data: { labels: sysKeys.map(k => SIM_SYSTEMS[k].icon + ' ' + SIM_SYSTEMS[k].label), datasets:[{
       label:'GEE evitado (Mt CO₂eq)',
       data: cmpVals,
       backgroundColor: cmpColors,
