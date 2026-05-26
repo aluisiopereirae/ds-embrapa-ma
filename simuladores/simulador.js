@@ -94,6 +94,13 @@ function _buildSaHTML() {
           <input type="range" class="sim-slider" id="sa-ang" min="0" max="179" step="1" value="0"
             oninput="sa_onSlider()" onchange="sa_onSlider()">
         </div>
+        <div class="sim-param">
+          <label style="font-size:11px;color:var(--text2)">Nº de plantas: <strong id="sa-npl-val">auto</strong>
+            <span style="font-size:9px;color:var(--text3)"> — escala espaçamentos proporcionalmente</span>
+          </label>
+          <input type="range" class="sim-slider" id="sa-npl" min="5" max="2500" step="1" value="2500"
+            oninput="sa_onSlider()" onchange="sa_onSlider()">
+        </div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
           <input type="checkbox" id="sa-heatmap" style="accent-color:var(--green)" onchange="sa_redrawCanvas()">
           <label for="sa-heatmap" style="font-size:11px;color:var(--text2);cursor:pointer">Heatmap de densidade</label>
@@ -383,7 +390,8 @@ function initSimuladorAvancado(containerId) {
       spacingPlant: firstVariant.spacingPlant,
       angle: 0,
       layout: 'linear',
-      heatmap: false
+      heatmap: false,
+      nPlantas: 0
     };
 
     sa_renderSystemTabs();
@@ -545,6 +553,7 @@ function sa_selectSystem(sysKey) {
   _saState.spacingRow = v.spacingRow;
   _saState.spacingPlant = v.spacingPlant;
   _saState.area = SA_AREA_LIMITS[sysKey]?.def || 50;
+  _saState.nPlantas = 0;
   _saZoom = 1; _saPanX = 0; _saPanY = 0;
 
   // Adapta slider de área conforme limites do sistema
@@ -553,7 +562,7 @@ function sa_selectSystem(sysKey) {
   if (areaEl) {
     areaEl.min  = lim.min;
     areaEl.max  = lim.max;
-    areaEl.step = lim.max <= 2 ? 0.01 : lim.max <= 20 ? 0.1 : 1;
+    areaEl.step = lim.max <= 2 ? 0.01 : lim.max <= 50 ? 0.1 : 1;
     areaEl.value = lim.def;
   }
 
@@ -585,6 +594,7 @@ function sa_selectVariant(id) {
   _saState.variant = id;
   _saState.spacingRow = v.spacingRow;
   _saState.spacingPlant = v.spacingPlant;
+  _saState.nPlantas = 0;
   _saZoom = 1; _saPanX = 0; _saPanY = 0;
   sa_syncSliders();
   sa_runSimulation();
@@ -599,6 +609,8 @@ function sa_onSlider() {
     _saState.spacingRow   = +(g('sa-srow')?.value  || _saState.spacingRow);
     _saState.spacingPlant = +(g('sa-spl')?.value   || _saState.spacingPlant);
     _saState.angle        = +(g('sa-ang')?.value   || 0);
+    const _nplEl = g('sa-npl');
+    if (_nplEl) _saState.nPlantas = +_nplEl.value >= +_nplEl.max ? 0 : +_nplEl.value;
     // Recalcula métricas com posições atuais (resposta imediata para empregos, renda, etc.)
     _saMetrics = sa_calcMetricas(_saState, _saPositions);
     sa_renderMetrics();
@@ -615,6 +627,16 @@ function sa_syncSliders() {
   if (g('sa-srow')) g('sa-srow').value = _saState.spacingRow;
   if (g('sa-spl'))  g('sa-spl').value  = _saState.spacingPlant;
   if (g('sa-ang'))  g('sa-ang').value  = _saState.angle || 0;
+  // Atualiza slider de Nº de plantas: max = autoN com espaçamentos atuais
+  const nplEl = g('sa-npl');
+  if (nplEl) {
+    const autoN = Math.round(_saState.area * 10000 / Math.max(0.001, _saState.spacingRow * _saState.spacingPlant));
+    const cap   = Math.min(2500, Math.max(5, autoN));
+    nplEl.min   = 5;
+    nplEl.max   = cap;
+    nplEl.step  = cap <= 50 ? 1 : cap <= 500 ? 5 : 10;
+    nplEl.value = _saState.nPlantas > 0 ? Math.min(_saState.nPlantas, cap) : cap;
+  }
   sa_updateLabels();
 }
 
@@ -628,6 +650,16 @@ function sa_updateLabels() {
   if (g('sa-srow-val')) g('sa-srow-val').textContent = srow + ' m';
   if (g('sa-spl-val'))  g('sa-spl-val').textContent  = spl  + ' m';
   if (g('sa-ang-val'))  g('sa-ang-val').textContent  = ang  + '°';
+  // Nº de plantas: "auto (750)" quando no máximo, ou o número escolhido
+  const nplEl = g('sa-npl');
+  if (nplEl && g('sa-npl-val')) {
+    const autoN   = Math.round(area * 10000 / Math.max(0.001, srow * spl));
+    const cap     = Math.min(2500, Math.max(5, autoN));
+    const cur     = +nplEl.value;
+    g('sa-npl-val').textContent = cur >= cap
+      ? 'auto (' + cap.toLocaleString('pt-BR') + ')'
+      : cur.toLocaleString('pt-BR');
+  }
 }
 
 function sa_renderSystemTabs() {
@@ -659,6 +691,8 @@ function sa_runSimulation() {
   _saState.spacingPlant = +(g('sa-spl')?.value  || _saState.spacingPlant);
   _saState.angle        = +(g('sa-ang')?.value  || 0);
   _saState.heatmap      = g('sa-heatmap')?.checked || false;
+  const _nplEl2 = g('sa-npl');
+  if (_nplEl2) _saState.nPlantas = +_nplEl2.value >= +_nplEl2.max ? 0 : +_nplEl2.value;
   sa_updateLabels();
 
   const areaM2 = _saState.area * 10000;
@@ -668,8 +702,15 @@ function sa_runSimulation() {
   const angRad = (_saState.angle * Math.PI) / 180;
   const genFn  = SA_LAYOUTS[_saState.layout || 'linear'];
 
+  // Calcula espaçamentos efetivos para atingir o Nº de plantas desejado
+  const _autoN = areaM2 / Math.max(0.001, _saState.spacingRow * _saState.spacingPlant);
+  const _targetN = _saState.nPlantas > 0 ? _saState.nPlantas : Math.min(2500, _autoN);
+  const _sf = Math.sqrt(_autoN / Math.max(1, _targetN));         // factor > 1 → menos plantas, < 1 → mais
+  const _effRow = Math.max(0.10, _saState.spacingRow   * _sf);
+  const _effPl  = Math.max(0.05, _saState.spacingPlant * _sf);
+
   _saPositions = genFn
-    ? genFn.generate(areaM2, _saState.spacingRow, _saState.spacingPlant, angRad, nSp)
+    ? genFn.generate(areaM2, _effRow, _effPl, angRad, nSp)
     : [];
   // Layouts que não aplicam ângulo internamente: aplica rotação post-geração
   // Sisteminha: ângulo codifica posição do tanque, não rotação real
@@ -893,6 +934,7 @@ let _saSatCornerMarkers = [];     // alças de canto arrastáveis
 let _saSatBaseTile      = null;   // camada base atual (permutável)
 let _saSatRefTile       = null;   // camada de rótulos atual (permutável)
 let _saSatActiveBase    = 'esri-sat';
+let _saSatProvBtns      = {};     // referências diretas aos botões de provedor
 
 // Provedores de tiles disponíveis
 const _SAT_PROVIDERS = {
@@ -997,9 +1039,10 @@ function sa_satInit() {
       // stopPropagation sem preventDefault — não bloqueia clique nos botões filhos
       L.DomEvent.on(d, 'click dblclick mousedown touchstart', L.DomEvent.stopPropagation);
       L.DomEvent.on(d, 'wheel', L.DomEvent.stopPropagation);
+      _saSatProvBtns = {};
       Object.entries(_SAT_PROVIDERS).forEach(([key, prov]) => {
         const btn = L.DomUtil.create('button', '', d);
-        btn.id = `sa-sat-prov-${key}`;
+        _saSatProvBtns[key] = btn;          // guarda referência direta
         btn.textContent = prov.label;
         btn.title = prov.title;
         btn.style.borderRadius = '5px';
@@ -1125,10 +1168,9 @@ function sa_satSwitchProvider(key) {
 
   _saSatActiveBase = key;
 
-  // Atualiza realce de todos os botões
+  // Atualiza realce usando referências diretas (getElementById é instável dentro do Leaflet)
   Object.keys(_SAT_PROVIDERS).forEach(k => {
-    const btn = document.getElementById(`sa-sat-prov-${k}`);
-    if (btn) _satProvBtnApply(btn, k === key);
+    if (_saSatProvBtns[k]) _satProvBtnApply(_saSatProvBtns[k], k === key);
   });
 }
 

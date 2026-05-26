@@ -502,7 +502,7 @@ const SA_AREA_LIMITS = {
   ilp:             { min: 10,   max: 5000, def: 50  },
   ilpf:            { min: 10,   max: 3000, def: 50  },
   saf:             { min: 1,    max: 500,  def: 10  },
-  sisteminha:      { min: 0.02, max: 1,    def: 0.1 },
+  sisteminha:      { min: 0.02, max: 50,   def: 0.1 },
   apicultura:      { min: 1,    max: 200,  def: 20  },
   meliponicultura: { min: 0.5,  max: 50,   def: 5   },
   roca:            { min: 0.5,  max: 50,   def: 5   },
