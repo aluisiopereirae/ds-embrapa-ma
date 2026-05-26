@@ -260,6 +260,7 @@ header {
 .chart-title {
   font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600;
   color: var(--text); margin-bottom: 14px; display: flex;
+  overflow-wrap: break-word; word-break: break-word;
   align-items: center; gap: 8px;
 }
 .chart-wrap { position: relative; }
@@ -427,7 +428,7 @@ header {
 }
 .sec-title {
   font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700;
-  color: var(--text);
+  color: var(--text); overflow-wrap: break-word; word-break: break-word; min-width: 0;
 }
 
 /* PROGRESS BAR */
@@ -544,6 +545,8 @@ header {
   .sidebar { width: 210px; min-width: 210px; }
   .logo-sub { font-size: 10px; }
   header img[alt="Logo Embrapa"] { width: 90px; }
+  .sec-title { font-size: 15px; }
+  .chart-title { font-size: 13px; }
 }
 
 /* ── Tablet largo (≤ 1100px) ── */
@@ -554,6 +557,9 @@ header {
   header img[alt="Logo Embrapa"] { width: 76px; }
   .nav-btn { padding: 7px 10px; font-size: 12px; }
   #sa-main-grid { grid-template-columns: 260px 1fr !important; }
+  .logo-text { font-size: 13px !important; }
+  .sec-title { font-size: 14px; }
+  .chart-title { font-size: 12px; }
 }
 
 /* ── Tablet (≤ 900px) ── */
@@ -577,6 +583,10 @@ header {
   /* Mapas menores */
   #rec-map { height: clamp(320px, 45vh, 480px) !important; }
   #comp-map-container { height: 320px; }
+  /* Títulos */
+  .sec-title { font-size: 13px; }
+  .chart-title { font-size: 12px; }
+  .sec-header { flex-wrap: wrap; gap: 8px; }
 }
 
 /* ── Mobile (≤ 768px) ── */
@@ -617,6 +627,11 @@ header {
   .tabs { padding: 8px 10px 0; gap: 2px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
   .tab { padding: 8px 11px; font-size: 12px; white-space: nowrap; }
   .panel { padding: 12px; }
+
+  /* Títulos */
+  .sec-title { font-size: 13px; }
+  .chart-title { font-size: 12px; }
+  .sec-header { flex-wrap: wrap; gap: 8px; }
 
   /* Cards e stats */
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -671,6 +686,10 @@ header {
   .tabs { padding: 6px 8px 0; }
   .tab { padding: 7px 10px; font-size: 11px; }
   .panel { padding: 8px; }
+  /* Títulos */
+  .sec-title { font-size: 12px; }
+  .chart-title { font-size: 11px; }
+  .sec-header { flex-wrap: wrap; gap: 6px; }
   .stats-grid { grid-template-columns: 1fr; }
   .stat-value { font-size: 20px; }
   .sim-card { padding: 12px; }
@@ -1180,46 +1199,46 @@ document.addEventListener('click', function(e) {
     <div class="sidebar-inner">
     <!-- SISTEMAS & TECNOLOGIAS EMBRAPA - ACCORDION -->
     <div class="sidebar-section">
-      <button class="accordion-header" onclick="toggleAccordion('sistemas-tech')">
+      <button class="accordion-header" onclick="toggleAccordion('sistemas-tech')" title="Sistemas & Tecnologias Embrapa — expandir/recolher">
         <span style="flex:1">🌿 Sistemas & Tecnologias Embrapa</span>
       </button>
-      
+
       <div class="accordion-content" id="sistemas-tech">
         <!-- SISTEMAS PRINCIPAIS -->
         <div style="padding:0 12px 8px;">
           <div class="sidebar-sublabel" style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;padding:6px 4px 4px;margin-bottom:4px;border-bottom:1px solid var(--border)">Filtrar Sistemas</div>
-          
-          <button class="sys-btn active" id="techbtn-sys-all" onclick="toggleSysLayer('all', this)">
+
+          <button class="sys-btn active" id="techbtn-sys-all" onclick="toggleSysLayer('all', this)" title="Mostrar todos os sistemas no mapa">
             <span class="icon">🌍</span> Todos <span class="cnt" id="cnt-all">0</span><span class="toggle-dot"></span>
           </button>
-          <button class="sys-btn" id="techbtn-sys-ilpf" onclick="toggleSysLayer('ilpf', this)" title="ILPF">
+          <button class="sys-btn" id="techbtn-sys-ilpf" onclick="toggleSysLayer('ilpf', this)" title="ILPF — Integração Lavoura-Pecuária-Floresta: maior sequestro de carbono">
             <span class="icon" style="color:#4ade80">🌳</span> ILPF <span class="cnt" id="cnt-ilpf">0</span><span class="toggle-dot"></span>
           </button>
-          <button class="sys-btn" id="techbtn-sys-ilp" onclick="toggleSysLayer('ilp', this)">
+          <button class="sys-btn" id="techbtn-sys-ilp" onclick="toggleSysLayer('ilp', this)" title="ILP — Integração Lavoura-Pecuária: pastagem e lavoura em rotação">
             <span class="icon" style="color:#22c55e">🐄</span> ILP <span class="cnt" id="cnt-ilp">0</span><span class="toggle-dot"></span>
           </button>
-          <button class="sys-btn" id="techbtn-sys-saf" onclick="toggleSysLayer('saf', this)">
+          <button class="sys-btn" id="techbtn-sys-saf" onclick="toggleSysLayer('saf', this)" title="SAF — Sistema Agroflorestal: máximo sequestro de carbono e biodiversidade">
             <span class="icon" style="color:#2dd4bf">🌱</span> SAF <span class="cnt" id="cnt-saf">0</span><span class="toggle-dot"></span>
           </button>
-          <button class="sys-btn" id="techbtn-sys-apicultura" onclick="toggleSysLayer('apicultura', this)">
+          <button class="sys-btn" id="techbtn-sys-apicultura" onclick="toggleSysLayer('apicultura', this)" title="Apicultura — criação de abelhas, polinização e conservação de vegetação nativa">
             <span class="icon" style="color:#fbbf24">🐝</span> Apicultura <span class="cnt" id="cnt-apicultura">0</span><span class="toggle-dot"></span>
           </button>
-          <button class="sys-btn" id="techbtn-sys-meliponicultura" onclick="toggleSysLayer('meliponicultura', this)">
+          <button class="sys-btn" id="techbtn-sys-meliponicultura" onclick="toggleSysLayer('meliponicultura', this)" title="Meliponicultura — abelhas nativas sem ferrão: serviços ecossistêmicos e biodiversidade">
             <span class="icon" style="color:#f59e0b">🍯</span> Meliponicultura <span class="cnt" id="cnt-meliponicultura">0</span><span class="toggle-dot"></span>
           </button>
-          <button class="sys-btn" id="techbtn-sys-piscicultura" onclick="toggleSysLayer('piscicultura', this)">
+          <button class="sys-btn" id="techbtn-sys-piscicultura" onclick="toggleSysLayer('piscicultura', this)" title="Piscicultura — aquicultura continental: renda e segurança alimentar">
             <span class="icon" style="color:#60a5fa">🐟</span> Piscicultura <span class="cnt" id="cnt-piscicultura">0</span><span class="toggle-dot"></span>
           </button>
-          <button class="sys-btn" id="techbtn-sys-fruticultura" onclick="toggleSysLayer('fruticultura', this)">
+          <button class="sys-btn" id="techbtn-sys-fruticultura" onclick="toggleSysLayer('fruticultura', this)" title="Fruticultura — pomares diversificados: renda, sombreamento e recuperação de áreas">
             <span class="icon" style="color:#f472b6">🍎</span> Fruticultura <span class="cnt" id="cnt-fruticultura">0</span><span class="toggle-dot"></span>
           </button>
-          <button class="sys-btn" id="techbtn-sys-roca" onclick="toggleSysLayer('roca', this)">
+          <button class="sys-btn" id="techbtn-sys-roca" onclick="toggleSysLayer('roca', this)" title="Roça Sustentável — agricultura familiar sem queima: redução de GEE e queimadas">
             <span class="icon" style="color:#a78bfa">🌾</span> Roça Sustentável <span class="cnt" id="cnt-roca">0</span><span class="toggle-dot"></span>
           </button>
-          <button class="sys-btn" id="techbtn-sys-sisteminha" onclick="toggleSysLayer('sisteminha', this)">
+          <button class="sys-btn" id="techbtn-sys-sisteminha" onclick="toggleSysLayer('sisteminha', this)" title="Sisteminha Embrapa — produção integrada de subsistência: alta geração de emprego e renda">
             <span class="icon" style="color:#fb923c">🐓</span> Sisteminha <span class="cnt" id="cnt-sisteminha">0</span><span class="toggle-dot"></span>
           </button>
-          <button class="sys-btn" id="techbtn-sys-extrativismo" onclick="toggleSysLayer('extrativismo', this)">
+          <button class="sys-btn" id="techbtn-sys-extrativismo" onclick="toggleSysLayer('extrativismo', this)" title="Extrativismo Sustentável — babaçu, açaí, buriti: conservação florestal e renda">
             <span class="icon" style="color:#86efac">🌰</span> Extrativismo <span class="cnt" id="cnt-extrativismo">0</span><span class="toggle-dot"></span>
           </button>
         </div>
@@ -1227,41 +1246,41 @@ document.addEventListener('click', function(e) {
         <!-- TECNOLOGIAS COMPLEMENTARES EMBRAPA -->
         <div style="padding:0 12px 8px;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;">
           <div class="sidebar-sublabel" style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;padding:6px 4px 4px;margin-bottom:4px;border-bottom:1px solid var(--border)">Tecnologias Complementares</div>
-          <button class="sys-btn" id="techbtn-bab" onclick="toggleLayerGroup('bab_layer', this); showView('map');"><span class="icon">🌴</span> Babaçu<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="techbtn-reniva" onclick="toggleLayerGroup('reniva_layer', this); showView('map');"><span class="icon">🥕</span> RENIVA<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="techbtn-afere" onclick="toggleLayerGroup('afere_layer', this); showView('map');"><span class="icon">🧪</span> AFERE (Solo)<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="techbtn-veg" onclick="toggleLayerGroup('veg_layer', this); showView('map');"><span class="icon">🌿</span> Vegetação<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="techbtn-bab" onclick="toggleLayerGroup('bab_layer', this); showView('map');" title="Babaçu — áreas de ocorrência de babaçu no mapa"><span class="icon">🌴</span> Babaçu<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="techbtn-reniva" onclick="toggleLayerGroup('reniva_layer', this); showView('map');" title="RENIVA — Rede de Nivelamento de Variedades: unidades de referência no mapa"><span class="icon">🥕</span> RENIVA<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="techbtn-afere" onclick="toggleLayerGroup('afere_layer', this); showView('map');" title="AFERE — Análise da Fertilidade e Recuperação do Solo: pontos de monitoramento"><span class="icon">🧪</span> AFERE (Solo)<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="techbtn-veg" onclick="toggleLayerGroup('veg_layer', this); showView('map');" title="Vegetação — cobertura vegetal nativa no mapa (MapBiomas)"><span class="icon">🌿</span> Vegetação<span class="toggle-dot"></span></button>
         </div>
       </div>
     </div>
 
     <!-- HEATMAPS RÁPIDOS -->
     <div class="sidebar-section" style="border-top:1px solid var(--border); padding-top:12px;">
-      <button class="accordion-header" onclick="toggleAccordion('heatmaps-rapidos')">
+      <button class="accordion-header" onclick="toggleAccordion('heatmaps-rapidos')" title="Heatmaps Rápidos — expandir/recolher camadas de calor no mapa">
         <span style="flex:1">🗺️ Heatmaps Rápidos</span>
       </button>
       <div class="accordion-content" id="heatmaps-rapidos">
         <div style="padding:0 0 8px;">
-          <button class="sys-btn" id="hmbtn-gee" onclick="toggleHeatmapSidebar('gee')"><span class="icon">☁</span> GEE<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-idh" onclick="toggleHeatmapSidebar('idh')"><span class="icon">📈</span> IDH<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-desmatamento" onclick="toggleHeatmapSidebar('desmatamento')"><span class="icon">🪓</span> Desmatamento<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-queimadas" onclick="toggleHeatmapSidebar('queimadas')"><span class="icon">🔥</span> Queimadas<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-precipitacao" onclick="toggleHeatmapSidebar('precipitacao')"><span class="icon">🌧</span> Precipitação<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-temperatura" onclick="toggleHeatmapSidebar('temperatura')"><span class="icon">🌡</span> Temperatura<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-pobreza" onclick="toggleHeatmapSidebar('pobreza')"><span class="icon">💸</span> Pobreza<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-fome" onclick="toggleHeatmapSidebar('fome')"><span class="icon">🍽</span> Fome<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-vegetacao" onclick="toggleHeatmapSidebar('vegetacao')"><span class="icon">🌳</span> Vegetação<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-lavoura" onclick="toggleHeatmapSidebar('lavoura')"><span class="icon">🌾</span> Lavoura<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-bovinos" onclick="toggleHeatmapSidebar('bovinos')"><span class="icon">🐄</span> Rebanho<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-pesca" onclick="toggleHeatmapSidebar('pesca')"><span class="icon">🐟</span> Pesca<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-indigena" onclick="toggleHeatmapSidebar('indigena')"><span class="icon">🪶</span> Terras Indígenas<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-quilombola" onclick="toggleHeatmapSidebar('quilombola')"><span class="icon">⚫</span> Quilombolas<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-assentamentos" onclick="toggleHeatmapSidebar('assentamentos')"><span class="icon">🏘</span> Assentamentos<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-bacia" onclick="toggleHeatmapSidebar('bacia')"><span class="icon">🏞</span> Bacias<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-caf" onclick="toggleHeatmapSidebar('caf')"><span class="icon">👩‍🌾</span> CAF Agricultura Familiar<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-pib" onclick="toggleHeatmapSidebar('pib')"><span class="icon">💰</span> PIB<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-populacao" onclick="toggleHeatmapSidebar('populacao')"><span class="icon">👥</span> População<span class="toggle-dot"></span></button>
-          <button class="sys-btn" id="hmbtn-alfabetizacao" onclick="toggleHeatmapSidebar('alfabetizacao')"><span class="icon">📚</span> Alfabetização<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-gee" onclick="toggleHeatmapSidebar('gee')" title="GEE — Emissões de Gases de Efeito Estufa por município (kt CO₂eq/ano)"><span class="icon">☁</span> GEE<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-idh" onclick="toggleHeatmapSidebar('idh')" title="IDH — Índice de Desenvolvimento Humano municipal"><span class="icon">📈</span> IDH<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-desmatamento" onclick="toggleHeatmapSidebar('desmatamento')" title="Desmatamento — área desmatada por município (km²) — PRODES/INPE"><span class="icon">🪓</span> Desmatamento<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-queimadas" onclick="toggleHeatmapSidebar('queimadas')" title="Queimadas — focos de calor e área queimada por município (ha)"><span class="icon">🔥</span> Queimadas<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-precipitacao" onclick="toggleHeatmapSidebar('precipitacao')" title="Precipitação — média pluviométrica anual por município (mm)"><span class="icon">🌧</span> Precipitação<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-temperatura" onclick="toggleHeatmapSidebar('temperatura')" title="Temperatura — temperatura média anual por município (°C)"><span class="icon">🌡</span> Temperatura<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-pobreza" onclick="toggleHeatmapSidebar('pobreza')" title="Pobreza — percentual da população em situação de pobreza (%)"><span class="icon">💸</span> Pobreza<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-fome" onclick="toggleHeatmapSidebar('fome')" title="Insegurança Alimentar — percentual da população em situação de fome (%)"><span class="icon">🍽</span> Fome<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-vegetacao" onclick="toggleHeatmapSidebar('vegetacao')" title="Vegetação — percentual de cobertura vegetal nativa por município (MapBiomas)"><span class="icon">🌳</span> Vegetação<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-lavoura" onclick="toggleHeatmapSidebar('lavoura')" title="Lavoura — área total de lavoura por município (ha) — IBGE"><span class="icon">🌾</span> Lavoura<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-bovinos" onclick="toggleHeatmapSidebar('bovinos')" title="Rebanho Bovino — efetivo do rebanho por município (cabeças) — IBGE"><span class="icon">🐄</span> Rebanho<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-pesca" onclick="toggleHeatmapSidebar('pesca')" title="Pesca — produção de pesca continental e marinha por município (t)"><span class="icon">🐟</span> Pesca<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-indigena" onclick="toggleHeatmapSidebar('indigena')" title="Terras Indígenas — municípios com presença de terras indígenas homologadas (FUNAI)"><span class="icon">🪶</span> Terras Indígenas<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-quilombola" onclick="toggleHeatmapSidebar('quilombola')" title="Quilombolas — municípios com comunidades quilombolas certificadas (FCP)"><span class="icon">⚫</span> Quilombolas<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-assentamentos" onclick="toggleHeatmapSidebar('assentamentos')" title="Assentamentos — projetos de assentamento rural por município (INCRA)"><span class="icon">🏘</span> Assentamentos<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-bacia" onclick="toggleHeatmapSidebar('bacia')" title="Bacias Hidrográficas — distribuição de bacias hidrográficas no território"><span class="icon">🏞</span> Bacias<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-caf" onclick="toggleHeatmapSidebar('caf')" title="CAF — Cadastro da Agricultura Familiar: número de famílias cadastradas por município"><span class="icon">👩‍🌾</span> CAF Agricultura Familiar<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-pib" onclick="toggleHeatmapSidebar('pib')" title="PIB — Produto Interno Bruto per capita municipal (R$) — IBGE"><span class="icon">💰</span> PIB<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-populacao" onclick="toggleHeatmapSidebar('populacao')" title="População — total de habitantes por município (hab) — IBGE Censo"><span class="icon">👥</span> População<span class="toggle-dot"></span></button>
+          <button class="sys-btn" id="hmbtn-alfabetizacao" onclick="toggleHeatmapSidebar('alfabetizacao')" title="Alfabetização — taxa de alfabetização de adultos por município (%) — IBGE"><span class="icon">📚</span> Alfabetização<span class="toggle-dot"></span></button>
         </div>
       </div>
     </div><!-- /sidebar-inner -->
@@ -1684,7 +1703,7 @@ document.addEventListener('click', function(e) {
 
       <!-- ═══ SUB-TABS PROJEÇÕES ═══ -->
       <div id="proj-subtab-bar">
-        <button class="proj-stab active" data-tab="cenarios" onclick="showProjSubTab('cenarios')">📈 Cenários 2025–2050</button>
+        <button class="proj-stab active" data-tab="cenarios" onclick="showProjSubTab('cenarios')">📈 Cenários até 2050</button>
         <button class="proj-stab" data-tab="analise" onclick="showProjSubTab('analise')">🗺 Análise Comparativa Municipal</button>
         <button class="proj-stab" data-tab="simuladores" onclick="showProjSubTab('simuladores')">🧪 Simuladores de Cenários</button>
       </div>
@@ -1692,7 +1711,7 @@ document.addEventListener('click', function(e) {
       <!-- ═══ Cenários ═══ -->
       <div id="proj-cenarios">
       <div class="sec-header">
-        <div class="sec-title">📈 Projeções GEE 2025–2050 — Cenários Embrapa × SEEG × IPCC AR6</div>
+        <div class="sec-title">📈 Projeções GEE até 2050 — Cenários Embrapa × SEEG × IPCC AR6</div>
         <div style="display:flex;gap:8px;align-items:center;">
           <select class="map-select" id="proj-var" onchange="renderProjCharts()">
             <option value="gee">GEE (Mt CO₂eq)</option>
@@ -1709,7 +1728,7 @@ document.addEventListener('click', function(e) {
 
       <div class="charts-grid">
         <div class="chart-card" style="grid-column:1/-1">
-          <div class="chart-title">📊 Comparativo de Cenários 2025–2050</div>
+          <div class="chart-title">📊 Comparativo de Cenários até 2050</div>
           <div class="chart-wrap">
             <canvas id="chart-proj-main" height="120"></canvas>
             <button class="chart-menu-btn" onclick="toggleChartMenu('menu-proj-main')">⋮</button>
@@ -2379,7 +2398,7 @@ const EXTRAT_DATA = [
 
 
 
-// ═══ PROJEÇÕES GEE 2025-2050 — SEEG + IPCC AR6 + Embrapa ═══
+// ═══ PROJEÇÕES GEE até 2050 — SEEG + IPCC AR6 + Embrapa ═══
 // Dados históricos GEE Maranhão (Mt CO₂eq)
 const GEE_HIST = {2000:95.2,2001:98.5,2002:102.1,2003:115.3,2004:118.2,2005:112.5,
   2006:102.4,2007:98.2,2008:85.3,2009:78.6,2010:72.4,2011:68.5,
