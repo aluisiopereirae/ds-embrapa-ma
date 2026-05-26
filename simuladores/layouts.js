@@ -1,6 +1,10 @@
 // Geradores de Layout de Plantio — Módulo de Simuladores
 // Cada gerador retorna array de { x, y, row, col, speciesIdx }
 
+// Cache das zonas do Sisteminha para visualizacao.js desenhar fundos coloridos
+let SA_SISTEMINHA_ZONES = null;
+let SA_SISTEMINHA_BOUNDS = null;
+
 const SA_LAYOUTS = {
   linear: {
     label: 'Linear', icon: '≡', desc: 'Linhas paralelas tradicionais',
@@ -167,7 +171,120 @@ const SA_LAYOUTS = {
       }
       return pts;
     }
+  },
+
+  sisteminha: {
+    label: 'Sisteminha', icon: '🐓', desc: 'Zonas integradas: tanque, aves, horta, compostagem',
+    generate(areaM2, spacingRow, spacingPlant, tankCodeRad = 0, nSpecies = 4) {
+      const W = Math.sqrt(areaM2), H = areaM2 / W;
+      const ns = Math.max(1, nSpecies);
+      const tc = Math.round(tankCodeRad * 180 / Math.PI); // rad → graus: 0=centro, 45=canto, 90=lateral
+
+      // Mapeamento zona → índice de espécie conforme variante
+      // padrao(4):   0=hortaliças, 1=galinhas, 2=tilápia,    3=ervas
+      // ampliado(5): 0=hortaliças, 1=galinhas, 2=patos,      3=tilápia, 4=frutíferas
+      // completo(7): 0=hortaliças, 1=galinhas, 2=codornas,   3=patos,   4=tilápia, 5=frutíferas, 6=compost
+      const Z = {
+        horta: 0,
+        aves:  1,
+        cod:   ns >= 7 ? 2 : -1,
+        patos: ns >= 7 ? 3 : ns >= 5 ? 2 : -1,
+        tank:  ns >= 7 ? 4 : ns >= 5 ? 3 : 2,
+        fruti: ns >= 7 ? 5 : ns >= 5 ? 4 : -1,
+        comp:  ns >= 7 ? 6 : -1,
+        ervas: ns <= 4 ? 3 : -1,
+      };
+
+      // Monta array de zonas { type, x0, y0, x1, y1, spMult, srMult }
+      let zones = [];
+
+      if (tc >= 35 && tc <= 55) { // ─── canto superior-esquerdo ───────────
+        const lw = W * 0.38, th = H * 0.40, avh = H * 0.35;
+        zones.push({ t:'tank',  x0:0,      y0:0,          x1:lw,       y1:th,         sm:0.45, rm:0.45 });
+        if (Z.cod >= 0) {
+          zones.push({ t:'aves', x0:0,     y0:th,         x1:lw,       y1:th+avh*0.5, sm:0.65, rm:0.65 });
+          zones.push({ t:'cod',  x0:0,     y0:th+avh*0.5, x1:lw*0.52,  y1:th+avh,     sm:0.55, rm:0.55 });
+          zones.push({ t:'patos',x0:lw*0.52,y0:th+avh*0.5,x1:lw,       y1:th+avh,     sm:0.55, rm:0.55 });
+          zones.push({ t:'comp', x0:0,     y0:th+avh,     x1:lw*0.45,  y1:H,          sm:0.45, rm:0.45 });
+          zones.push({ t:'ervas',x0:lw*0.45,y0:th+avh,    x1:lw,       y1:H,          sm:0.50, rm:0.50 });
+        } else if (Z.patos >= 0) {
+          zones.push({ t:'aves', x0:0,     y0:th,         x1:lw,       y1:th+avh*0.55,sm:0.65, rm:0.65 });
+          zones.push({ t:'patos',x0:0,     y0:th+avh*0.55,x1:lw,       y1:th+avh,     sm:0.55, rm:0.55 });
+          zones.push({ t:'ervas',x0:0,     y0:th+avh,     x1:lw,       y1:H,          sm:0.50, rm:0.50 });
+        } else {
+          zones.push({ t:'aves', x0:0,     y0:th,         x1:lw,       y1:th+avh,     sm:0.65, rm:0.65 });
+          zones.push({ t:'ervas',x0:0,     y0:th+avh,     x1:lw,       y1:H,          sm:0.50, rm:0.50 });
+        }
+        zones.push({ t:'horta', x0:lw, y0:0,      x1:W, y1:H*0.60, sm:1.0, rm:1.0 });
+        zones.push({ t:(Z.fruti>=0?'fruti':'horta'), x0:lw, y0:H*0.60, x1:W, y1:H, sm:1.2, rm:1.2 });
+
+      } else if (tc >= 75 && tc <= 105) { // ─── lateral esquerda ────────────
+        const lw = W * 0.30;
+        zones.push({ t:'aves', x0:0,  y0:0,      x1:lw,       y1:H*0.20, sm:0.65, rm:0.65 });
+        zones.push({ t:'tank', x0:0,  y0:H*0.20, x1:lw,       y1:H*0.78, sm:0.45, rm:0.45 });
+        if (Z.patos >= 0) {
+          zones.push({ t:'patos',x0:0,    y0:H*0.78, x1:lw*0.55,  y1:H,      sm:0.55, rm:0.55 });
+          zones.push({ t:(Z.comp>=0?'comp':'ervas'), x0:lw*0.55, y0:H*0.78, x1:lw, y1:H, sm:0.45, rm:0.45 });
+        } else {
+          zones.push({ t:'ervas',x0:0,    y0:H*0.78, x1:lw,       y1:H,      sm:0.50, rm:0.50 });
+        }
+        zones.push({ t:'horta', x0:lw, y0:0,      x1:W,        y1:H*0.55, sm:1.0, rm:1.0 });
+        if (Z.fruti >= 0) {
+          zones.push({ t:'fruti', x0:lw, y0:H*0.55, x1:W*0.87, y1:H, sm:1.2, rm:1.2 });
+          zones.push({ t:(Z.comp>=0?'comp':'ervas'), x0:W*0.87, y0:H*0.78, x1:W, y1:H, sm:0.45, rm:0.45 });
+        } else {
+          zones.push({ t:'horta', x0:lw, y0:H*0.55, x1:W, y1:H, sm:1.0, rm:1.0 });
+        }
+
+      } else { // ─── tanque central ──────────────────────────────────────────
+        const cx0 = W*0.32, cx1 = W*0.68, cy0 = H*0.30, cy1 = H*0.70;
+        zones.push({ t:'horta', x0:0,   y0:0,   x1:W,   y1:cy0,  sm:1.0, rm:1.0 });
+        zones.push({ t:'aves',  x0:0,   y0:cy0, x1:cx0, y1:cy1,  sm:0.65,rm:0.65 });
+        zones.push({ t:'tank',  x0:cx0, y0:cy0, x1:cx1, y1:cy1,  sm:0.45,rm:0.45 });
+        if (Z.patos >= 0) {
+          zones.push({ t:'patos', x0:cx1, y0:cy0, x1:W*0.84, y1:cy1, sm:0.60, rm:0.60 });
+          zones.push({ t:'ervas', x0:W*0.84, y0:cy0, x1:W, y1:cy1,   sm:0.50, rm:0.50 });
+        } else {
+          zones.push({ t:'ervas', x0:cx1, y0:cy0, x1:W, y1:cy1,       sm:0.50, rm:0.50 });
+        }
+        if (Z.fruti >= 0) {
+          zones.push({ t:(Z.comp>=0?'comp':'ervas'), x0:0, y0:cy1, x1:W*0.13, y1:H, sm:0.45, rm:0.45 });
+          zones.push({ t:'fruti', x0:W*0.13, y0:cy1, x1:W, y1:H, sm:1.2, rm:1.2 });
+        } else {
+          zones.push({ t:'horta', x0:0, y0:cy1, x1:W, y1:H, sm:1.0, rm:1.0 });
+          if (Z.comp >= 0) zones.push({ t:'comp', x0:0, y0:H*0.87, x1:W*0.13, y1:H, sm:0.45, rm:0.45 });
+        }
+      }
+
+      // Filtra zonas com índice inválido e converte t→speciesIdx
+      const validZones = zones.map(z => ({ ...z, speciesIdx: Z[z.t] ?? 0 }))
+                               .filter(z => Z[z.t] !== undefined && Z[z.t] >= 0 && Z[z.t] < ns);
+
+      // Cache para visualizacao.js
+      SA_SISTEMINHA_ZONES  = validZones;
+      SA_SISTEMINHA_BOUNDS = { W, H };
+
+      // Gera posições por zona
+      const pts = [];
+      for (const z of validZones) {
+        const zW = z.x1 - z.x0, zH = z.y1 - z.y0;
+        const sp = spacingPlant * z.sm, sr = spacingRow * z.rm;
+        const cols = Math.max(1, Math.floor(zW / sp));
+        const rows = Math.max(1, Math.floor(zH / sr));
+        const cSp = zW / cols, rSp = zH / rows;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            pts.push({
+              x: z.x0 + (c + 0.5) * cSp,
+              y: z.y0 + (r + 0.5) * rSp,
+              row: r, col: c, speciesIdx: z.speciesIdx, zone: z.t
+            });
+          }
+        }
+      }
+      return pts;
+    }
   }
 };
 
-const SA_LAYOUT_ORDER = ['linear', 'hexagonal', 'circular', 'faixas', 'grid', 'random', 'mosaico'];
+const SA_LAYOUT_ORDER = ['linear', 'hexagonal', 'circular', 'faixas', 'grid', 'random', 'mosaico', 'sisteminha'];

@@ -25,6 +25,10 @@ const SA_LAYOUT_PRESETS = [
   { key: 'circular',layout: 'circular',  angle: 0,   icon: '◎',  label: 'Circular', desc: 'Anéis concêntricos — pomares e jardins produtivos' },
   { key: 'renques', layout: 'faixas',    angle: 0,   icon: '▤',  label: 'Renques',  desc: 'Faixas alternadas floresta + lavoura — ILPF' },
   { key: 'natural', layout: 'random',    angle: 0,   icon: '⁕',  label: 'Natural',  desc: 'Distribuição natural — SAF e extrativismo' },
+  // Presets exclusivos do Sisteminha (ocultos para outros sistemas)
+  { key: 'sist-canto',   layout: 'sisteminha', angle: 45, icon: '⌐', label: 'Canto',   desc: 'Tanque no canto superior-esquerdo — layout clássico Sisteminha Embrapa', systems: ['sisteminha'] },
+  { key: 'sist-centro',  layout: 'sisteminha', angle: 0,  icon: '◉', label: 'Centro',  desc: 'Tanque central — acesso ao tanque de todos os lados',                    systems: ['sisteminha'] },
+  { key: 'sist-lateral', layout: 'sisteminha', angle: 90, icon: '⊢', label: 'Lateral', desc: 'Tanque na lateral esquerda — espaço central livre para manejo',           systems: ['sisteminha'] },
 ];
 
 // ─── HTML da interface ────────────────────────────────────────────────────────
@@ -32,9 +36,10 @@ function _buildSaHTML() {
   const sysKeys = Object.keys(SA_SYSTEMS);
 
   const layoutBtns = SA_LAYOUT_PRESETS.map(p =>
-    `<button class="sa-layout-btn" data-preset="${p.key}" onclick="sa_selectPreset('${p.key}')"
+    `<button class="sa-layout-btn" data-preset="${p.key}" data-systems="${(p.systems||[]).join(',')}"
+      onclick="sa_selectPreset('${p.key}')"
       title="${p.desc}"
-      style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 3px;cursor:pointer;font-size:10px;color:var(--text2);text-align:center;transition:all .15s;line-height:1.3">
+      style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 3px;cursor:pointer;font-size:10px;color:var(--text2);text-align:center;transition:all .15s;line-height:1.3;display:${p.systems && p.systems.length ? 'none' : ''}">
       <div style="font-size:17px;line-height:1">${p.icon}</div>
       <div style="margin-top:2px;font-size:9px">${p.label}</div>
     </button>`
@@ -82,7 +87,7 @@ function _buildSaHTML() {
           <input type="range" class="sim-slider" id="sa-spl" min="0.1" max="15" step="0.1" value="3"
             oninput="sa_onSlider()" onchange="sa_onSlider()">
         </div>
-        <div class="sim-param">
+        <div class="sim-param" id="sa-ang-row">
           <label style="font-size:11px;color:var(--text2)">Ângulo das linhas: <strong id="sa-ang-val">0°</strong>
             <span style="font-size:9px;color:var(--text3)"> — ou use os botões abaixo</span>
           </label>
@@ -97,7 +102,7 @@ function _buildSaHTML() {
 
       <!-- Layout / direção das linhas -->
       <div class="sim-card" style="margin-bottom:12px">
-        <div class="sim-card-title">🗺 Direção e Padrão das Linhas</div>
+        <div class="sim-card-title" id="sa-layout-panel-title">🗺 Direção e Padrão das Linhas</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(58px,1fr));gap:5px">
           ${layoutBtns}
         </div>
@@ -541,6 +546,32 @@ function sa_selectSystem(sysKey) {
   _saState.spacingPlant = v.spacingPlant;
   _saState.area = SA_AREA_LIMITS[sysKey]?.def || 50;
   _saZoom = 1; _saPanX = 0; _saPanY = 0;
+
+  // Adapta slider de área conforme limites do sistema
+  const lim = SA_AREA_LIMITS[sysKey] || { min:1, max:500, def:50 };
+  const areaEl = document.getElementById('sa-area');
+  if (areaEl) {
+    areaEl.min  = lim.min;
+    areaEl.max  = lim.max;
+    areaEl.step = lim.max <= 2 ? 0.01 : lim.max <= 20 ? 0.1 : 1;
+    areaEl.value = lim.def;
+  }
+
+  // Auto-preset e visibilidade por sistema
+  if (sysKey === 'sisteminha') {
+    sa_applyPreset('sist-canto', false);
+  } else if (_saState.layout === 'sisteminha') {
+    sa_applyPreset('lo', false);
+  }
+  document.querySelectorAll('.sa-layout-btn').forEach(b => {
+    const bSys = b.dataset.systems || '';
+    b.style.display = (!bSys || bSys.split(',').includes(sysKey)) ? '' : 'none';
+  });
+  const lt = document.getElementById('sa-layout-panel-title');
+  if (lt) lt.textContent = sysKey === 'sisteminha' ? '🐓 Posição do Tanque de Peixe' : '🗺 Direção e Padrão das Linhas';
+  const angRow = document.getElementById('sa-ang-row');
+  if (angRow) angRow.style.display = sysKey === 'sisteminha' ? 'none' : '';
+
   sa_renderSystemTabs();
   sa_renderVariantSelect();
   sa_syncSliders();
@@ -593,7 +624,7 @@ function sa_updateLabels() {
   const srow = +(g('sa-srow')?.value || _saState?.spacingRow || 3);
   const spl  = +(g('sa-spl')?.value  || _saState?.spacingPlant || 1);
   const ang  = +(g('sa-ang')?.value  || 0);
-  if (g('sa-area-val')) g('sa-area-val').textContent = area + ' ha';
+  if (g('sa-area-val')) g('sa-area-val').textContent = area < 1 ? Math.round(area * 10000) + ' m²' : area + ' ha';
   if (g('sa-srow-val')) g('sa-srow-val').textContent = srow + ' m';
   if (g('sa-spl-val'))  g('sa-spl-val').textContent  = spl  + ' m';
   if (g('sa-ang-val'))  g('sa-ang-val').textContent  = ang  + '°';
@@ -641,7 +672,8 @@ function sa_runSimulation() {
     ? genFn.generate(areaM2, _saState.spacingRow, _saState.spacingPlant, angRad, nSp)
     : [];
   // Layouts que não aplicam ângulo internamente: aplica rotação post-geração
-  if (angRad && (_saState.layout || 'linear') !== 'linear') {
+  // Sisteminha: ângulo codifica posição do tanque, não rotação real
+  if (angRad && !['linear', 'sisteminha'].includes(_saState.layout || 'linear')) {
     _saPositions = _saRotatePositions(_saPositions, angRad);
   }
   if (_saPositions.length > 2500) _saPositions = _saPositions.slice(0, 2500);
@@ -858,6 +890,37 @@ let _saSatLayer         = null;   // L.layerGroup com plantas
 let _saSatCenter        = { lat: -4.9, lng: -45.3 };
 let _saSatBoundary      = null;   // polígono de perímetro (arrastável)
 let _saSatCornerMarkers = [];     // alças de canto arrastáveis
+let _saSatBaseTile      = null;   // camada base atual (permutável)
+let _saSatRefTile       = null;   // camada de rótulos atual (permutável)
+let _saSatActiveBase    = 'esri-sat';
+
+// Provedores de tiles disponíveis
+const _SAT_PROVIDERS = {
+  'esri-sat': {
+    label: '🛰️ Sat.',
+    title: 'Esri World Imagery — satélite (recomendado)',
+    url:  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    opts: { attribution: 'Tiles &copy; Esri', maxZoom: 22, maxNativeZoom: 19 },
+    ref:  {
+      url:  'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+      opts: { maxZoom: 22, maxNativeZoom: 19, opacity: 0.65 }
+    }
+  },
+  'esri-topo': {
+    label: '🏔️ Topo',
+    title: 'Esri Topográfico — útil onde o satélite não tem cobertura',
+    url:  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    opts: { attribution: 'Tiles &copy; Esri', maxZoom: 22, maxNativeZoom: 19 },
+    ref: null
+  },
+  'osm': {
+    label: '🗺️ OSM',
+    title: 'OpenStreetMap — cobertura global, sem lacunas',
+    url:  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    opts: { attribution: '&copy; OpenStreetMap contributors', maxZoom: 19 },
+    ref: null
+  }
+};
 
 // ─── Troca de subaba ─────────────────────────────────────────────────────────
 function sa_switchView(view) {
@@ -918,17 +981,40 @@ function sa_satInit() {
   });
   _saSatMap.scrollWheelZoom.enable();
 
-  // Satélite Esri World Imagery (livre, sem chave de API)
-  L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    { attribution: 'Tiles &copy; Esri', maxZoom: 22 }
-  ).addTo(_saSatMap);
+  // Carrega provedor inicial (Esri satélite + rótulos, com maxNativeZoom para evitar "not available")
+  const _p0 = _SAT_PROVIDERS['esri-sat'];
+  _saSatBaseTile = L.tileLayer(_p0.url, _p0.opts).addTo(_saSatMap);
+  _saSatRefTile  = L.tileLayer(_p0.ref.url, _p0.ref.opts).addTo(_saSatMap);
+  _saSatActiveBase = 'esri-sat';
 
-  // Rótulos de estradas/lugares sobre o satélite
-  L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
-    { attribution: '', maxZoom: 22, opacity: 0.65 }
-  ).addTo(_saSatMap);
+  // Controle de troca de provedor — canto inferior esquerdo
+  const ProvCtrl = L.Control.extend({
+    options: { position: 'bottomleft' },
+    onAdd() {
+      const d = L.DomUtil.create('div');
+      d.id = 'sa-sat-prov-ctrl';
+      d.style.cssText = 'background:rgba(10,26,10,0.90);border:1px solid rgba(74,222,128,0.35);border-radius:8px;padding:4px 5px;display:flex;gap:3px;box-shadow:0 2px 8px rgba(0,0,0,0.6);margin-bottom:6px';
+      // stopPropagation sem preventDefault — não bloqueia clique nos botões filhos
+      L.DomEvent.on(d, 'click dblclick mousedown touchstart', L.DomEvent.stopPropagation);
+      L.DomEvent.on(d, 'wheel', L.DomEvent.stopPropagation);
+      Object.entries(_SAT_PROVIDERS).forEach(([key, prov]) => {
+        const btn = L.DomUtil.create('button', '', d);
+        btn.id = `sa-sat-prov-${key}`;
+        btn.textContent = prov.label;
+        btn.title = prov.title;
+        btn.style.borderRadius = '5px';
+        btn.style.padding      = '3px 8px';
+        btn.style.cursor       = 'pointer';
+        btn.style.fontSize     = '10px';
+        btn.style.whiteSpace   = 'nowrap';
+        btn.style.transition   = 'all .15s';
+        _satProvBtnApply(btn, key === 'esri-sat');
+        btn.onclick = () => sa_satSwitchProvider(key);
+      });
+      return d;
+    }
+  });
+  new ProvCtrl().addTo(_saSatMap);
 
   _saSatLayer         = L.layerGroup().addTo(_saSatMap);
   _saSatBoundary      = null;
@@ -1014,6 +1100,36 @@ function sa_satApplyCoords() {
     _saSatMap.setView([lat, lng], 15);
     sa_satDrawPlants(true);
   }
+}
+
+// ─── Aplica visual ativo/inativo no botão de provedor ────────────────────────
+function _satProvBtnApply(btn, active) {
+  btn.style.background  = active ? '#166534'               : 'rgba(255,255,255,0.04)';
+  btn.style.border      = active ? '1px solid #4ade80'     : '1px solid rgba(74,222,128,0.20)';
+  btn.style.color       = active ? '#ffffff'               : '#9ca3af';
+  btn.style.fontWeight  = active ? '600'                   : 'normal';
+}
+
+// ─── Troca provedor de tiles do mapa base ────────────────────────────────────
+function sa_satSwitchProvider(key) {
+  if (!_saSatMap) return;
+  const prov = _SAT_PROVIDERS[key];
+  if (!prov) return;
+
+  if (_saSatBaseTile) { _saSatMap.removeLayer(_saSatBaseTile); _saSatBaseTile = null; }
+  if (_saSatRefTile)  { _saSatMap.removeLayer(_saSatRefTile);  _saSatRefTile  = null; }
+
+  _saSatBaseTile = L.tileLayer(prov.url, prov.opts).addTo(_saSatMap);
+  if (prov.ref) _saSatRefTile = L.tileLayer(prov.ref.url, prov.ref.opts).addTo(_saSatMap);
+  if (_saSatLayer) _saSatLayer.bringToFront();
+
+  _saSatActiveBase = key;
+
+  // Atualiza realce de todos os botões
+  Object.keys(_SAT_PROVIDERS).forEach(k => {
+    const btn = document.getElementById(`sa-sat-prov-${k}`);
+    if (btn) _satProvBtnApply(btn, k === key);
+  });
 }
 
 // ─── Desenha plantas no mapa satélite ────────────────────────────────────────

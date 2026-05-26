@@ -225,6 +225,24 @@ const SA_SYSTEMS = {
         invest_ha: 4500, renda_ha: 7200, carbon_ha: 0.8, agua_ha: 3500,
         empregos: 65, biodiv: 5.5,
         fonte: 'Embrapa Pesca e Aquicultura, 2023; Embrapa Cocais 2022'
+      },
+      {
+        id: 'sist_completo',
+        label: 'Sisteminha Completo (500 m²)',
+        desc: 'Unidade familiar diversificada: horta 50m² + 50 galinhas + 100 codornas + 20 patos + tanque 3.000L + pomar + canto de compostagem. Renda R$ 1.500–3.000/mês.',
+        species: [
+          { name: 'Hortaliças (canteiros)', icon: '🥬', color: '#4ade80', crown: 0.20, height: 0.4 },
+          { name: 'Galinhas (Gallus domesticus)', icon: '🐓', color: '#fbbf24', crown: 0.30, height: 0.4 },
+          { name: 'Codornas (Coturnix coturnix)', icon: '🐦', color: '#fb923c', crown: 0.12, height: 0.2 },
+          { name: 'Patos (Cairina moschata)', icon: '🦆', color: '#60a5fa', crown: 0.25, height: 0.3 },
+          { name: 'Tilápia/Tambaqui (tanque)', icon: '🐟', color: '#22d3ee', crown: 0.20, height: 0.1 },
+          { name: 'Frutíferas (pomar)', icon: '🍎', color: '#f87171', crown: 0.80, height: 2.0 },
+          { name: 'Compostagem', icon: '♻️', color: '#92400e', crown: 0.25, height: 0.3 }
+        ],
+        spacingRow: 0.5, spacingPlant: 0.4,
+        invest_ha: 2500, renda_ha: 5800, carbon_ha: 0.7, agua_ha: 2800,
+        empregos: 55, biodiv: 5.8,
+        fonte: 'Embrapa Pesca e Aquicultura, 2023; Embrapa Cocais 2023'
       }
     ]
   },

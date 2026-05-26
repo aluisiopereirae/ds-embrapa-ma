@@ -122,6 +122,11 @@ function sa_drawPlantacao(canvas, state, positions, options) {
     ctx.beginPath(); ctx.moveTo(cx + sx*cSz, cy); ctx.lineTo(cx, cy); ctx.lineTo(cx, cy + sy*cSz); ctx.stroke();
   });
 
+  // ── Zonas do Sisteminha Embrapa ───────────────────────────────────────────
+  if (state.system === 'sisteminha' && typeof SA_SISTEMINHA_ZONES !== 'undefined' && SA_SISTEMINHA_ZONES) {
+    _saDrawSistZones(ctx, SA_SISTEMINHA_ZONES, scale);
+  }
+
   // ── Plantas ───────────────────────────────────────────────────────────────
   // Raio mínimo visível: 2.5 CSS px convertido para metros
   const minRadiusMetros = 2.5 / scale;
@@ -251,6 +256,43 @@ function sa_drawScaleBar(ctx, scale, W, H) {
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   ctx.fillText(inc >= 1000 ? (inc/1000)+'km' : inc+'m', bX + barPx + 6, bY);
+  ctx.textBaseline = 'alphabetic';
+}
+
+// ── Zonas coloridas do Sisteminha Embrapa ────────────────────────────────────
+const _SIST_ZONE_STYLES = {
+  tank:  { fill:'rgba(34,211,238,0.20)',  stroke:'rgba(34,211,238,0.60)',  label:'🐟 Tanque'     },
+  aves:  { fill:'rgba(251,191,36,0.18)',  stroke:'rgba(251,191,36,0.55)',  label:'🐓 Galinhas'   },
+  cod:   { fill:'rgba(251,146,60,0.18)',  stroke:'rgba(251,146,60,0.55)',  label:'🐦 Codornas'   },
+  patos: { fill:'rgba(96,165,250,0.18)',  stroke:'rgba(96,165,250,0.55)',  label:'🦆 Patos'      },
+  horta: { fill:'rgba(74,222,128,0.12)',  stroke:'rgba(74,222,128,0.40)',  label:'🥬 Horta'      },
+  fruti: { fill:'rgba(248,113,113,0.14)', stroke:'rgba(248,113,113,0.50)', label:'🍎 Fruteiras'  },
+  comp:  { fill:'rgba(146,64,14,0.22)',   stroke:'rgba(180,80,20,0.60)',   label:'♻️ Compost.'  },
+  ervas: { fill:'rgba(134,239,172,0.14)', stroke:'rgba(134,239,172,0.45)', label:'🌿 Ervas'      },
+};
+
+function _saDrawSistZones(ctx, zones, scale) {
+  const lw = 0.35 / scale;
+  for (const z of zones) {
+    const st = _SIST_ZONE_STYLES[z.t] || _SIST_ZONE_STYLES.horta;
+    const zW = z.x1 - z.x0, zH = z.y1 - z.y0;
+    ctx.fillStyle = st.fill;
+    ctx.fillRect(z.x0, z.y0, zW, zH);
+    ctx.strokeStyle = st.stroke;
+    ctx.lineWidth = lw;
+    ctx.setLineDash([lw * 3, lw * 2]);
+    ctx.strokeRect(z.x0 + lw, z.y0 + lw, zW - lw * 2, zH - lw * 2);
+    ctx.setLineDash([]);
+    // Rótulo da zona no canto superior esquerdo
+    if (zW * scale > 30 && zH * scale > 20) {
+      const fs = Math.max(0.8, Math.min(3.5, 14 / scale));
+      ctx.font = `bold ${fs}px sans-serif`;
+      ctx.fillStyle = st.stroke;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText(st.label, z.x0 + lw * 4, z.y0 + lw * 4);
+    }
+  }
   ctx.textBaseline = 'alphabetic';
 }
 
