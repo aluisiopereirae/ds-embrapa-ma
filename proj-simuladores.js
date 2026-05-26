@@ -617,11 +617,50 @@ function _buildSimHTML() {
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
         <div class="chart-card">
           <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>📈 Trajetória de Impacto ao Longo do Tempo</span>${_dlMenu('dl-conv-traj',[{fn:"downloadChartImage('conv-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('conv-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('conv-chart')",lbl:'⬇ CSV'}])}</div>
-          <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="conv-chart"></canvas></div>
+          <div class="chart-wrap" style="height:clamp(260px,48vh,380px)"><canvas id="conv-chart"></canvas></div>
+          <div style="margin-top:10px;padding:10px 12px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--green3);font-size:11px;color:var(--text3);line-height:1.6">
+            <div style="font-weight:600;color:var(--text2);margin-bottom:5px">ℹ️ Como ler este gráfico</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div><span style="color:rgba(248,113,113,0.7);font-weight:600">— — —</span> <strong style="color:var(--text2)">GEE MA sem intervenção</strong> (eixo esquerdo): tendência de emissões do Maranhão sem adoção de sistemas — cresce ~0,8%/ano pelo avanço do desmatamento e pressão agropecuária.</div>
+              <div><span style="color:#f87171;font-weight:600">———</span> <strong style="color:var(--text2)">GEE MA com sistemas</strong> (eixo esquerdo): projeção das emissões considerando a redução combinada de todos os sistemas selecionados. A diferença entre as duas linhas vermelhas é o benefício climático acumulado.</div>
+              <div style="margin-top:2px"><strong style="color:var(--text2)">Linhas coloridas</strong> (eixo direito — escala menor): contribuição individual de redução de cada sistema selecionado em kt CO₂eq/ano. Cada linha segue uma curva de adoção em S + maturação ecológica específica do sistema — sistemas florestais (SAF, ILPF) continuam crescendo por décadas; sistemas anuais (Roça, Sisteminha) estabilizam mais cedo.</div>
+              <div style="margin-top:2px;padding-top:6px;border-top:1px solid var(--border);color:var(--text3)">⚠️ As linhas coloridas podem aparecer <em>acima</em> da linha de GEE sem intervenção visualmente porque utilizam o <strong>eixo direito</strong>, cuja escala é muito menor (centenas a milhares de kt) do que o eixo esquerdo (dezenas de milhares de kt). Isso é normal: as duas escalas coexistem no mesmo gráfico para permitir comparar grandezas diferentes.</div>
+            </div>
+          </div>
         </div>
         <div class="chart-card">
           <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span style="flex:1;min-width:0">⚖️ Comparativo de Sistemas — Redução de GEE por ha em ${convState.years} anos</span>${_dlMenu('dl-conv-cmp',[{fn:"downloadChartImage('conv-cmp-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('conv-cmp-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('conv-cmp-chart')",lbl:'⬇ CSV'}])}</div>
-          <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="conv-cmp-chart"></canvas></div>
+          <div class="chart-wrap" style="height:clamp(260px,48vh,380px)"><canvas id="conv-cmp-chart"></canvas></div>
+          <div style="margin-top:10px;padding:10px 12px;background:var(--bg3);border-radius:8px;border-left:3px solid #60a5fa;font-size:11px;color:var(--text3);line-height:1.6">
+            <div style="font-weight:600;color:var(--text2);margin-bottom:6px">📌 Melhores abordagens por objetivo</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">
+              <div style="background:var(--bg2);border-radius:6px;padding:6px 8px">
+                <div style="color:#4ade80;font-weight:600;margin-bottom:2px">🌿 Máx. sequestro de carbono</div>
+                <div>SAF e ILPF — maior acúmulo de biomassa florestal e matéria orgânica no solo ao longo de décadas.</div>
+              </div>
+              <div style="background:var(--bg2);border-radius:6px;padding:6px 8px">
+                <div style="color:#fbbf24;font-weight:600;margin-bottom:2px">💰 Maior retorno financeiro/ha</div>
+                <div>Piscicultura e Meliponicultura — maior renda bruta por hectare; menor área necessária para viabilidade econômica.</div>
+              </div>
+              <div style="background:var(--bg2);border-radius:6px;padding:6px 8px">
+                <div style="color:#fb923c;font-weight:600;margin-bottom:2px">👷 Geração de empregos</div>
+                <div>Sisteminha Embrapa e SAF — maior número de empregos por hectare; ideais para assentamentos e agricultura familiar.</div>
+              </div>
+              <div style="background:var(--bg2);border-radius:6px;padding:6px 8px">
+                <div style="color:#a78bfa;font-weight:600;margin-bottom:2px">🏦 Menor investimento inicial</div>
+                <div>Extrativismo Sustentável e Roça Sustentável — implantação de baixo custo; indicados para comunidades com poucos recursos.</div>
+              </div>
+              <div style="background:var(--bg2);border-radius:6px;padding:6px 8px">
+                <div style="color:#22d3ee;font-weight:600;margin-bottom:2px">🌍 Maior impacto em GEE/ha</div>
+                <div>SAF &gt; ILPF &gt; Extrativismo — os sistemas com maior cobertura arbórea dominam a redução de emissões no longo prazo.</div>
+              </div>
+              <div style="background:var(--bg2);border-radius:6px;padding:6px 8px">
+                <div style="color:#86efac;font-weight:600;margin-bottom:2px">⚖️ Estratégia combinada</div>
+                <div>Use o modo <strong>Múltiplos</strong> para combinar sistemas complementares: ILPF ou SAF (carbono) + Sisteminha (emprego) + Apicultura (polinização) numa mesma propriedade ou território.</div>
+              </div>
+            </div>
+            <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);color:var(--text3)">⚠️ Ex.: As barras mostram o GEE total evitado (Mt CO₂eq) em <strong>${convState.years} anos </strong> se cada sistema fosse implantado individualmente em <strong>100%</strong> da área definida pelo slider — independentemente do modo de análise selecionado. Serve como referência comparativa entre sistemas.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -947,18 +986,50 @@ function runConversaoSim() {
     _destroyChart('conv');
     const opts = _darkChartDefaults();
     opts.interaction = { mode:'index', intersect:false };
-    const datasets = sysList.map((s, i) => {
+
+    // Aggregate combined reduction at each year (sum of all selected systems)
+    const totRedArr = years_arr.map(y =>
+      sysList.reduce((acc, s) => {
+        return acc + areaPerSys * (DEGRADED_EMISSION + s.seq_co2) / 1000 * _convDynamic(y, s.key);
+      }, 0)
+    );
+    // Baseline MA GEE (no intervention: +0.8%/yr) and with combined systems
+    const mBaseArr = years_arr.map(y => +(MA_GEE_KT * (1 + 0.008 * y)).toFixed(1));
+    const mCombArr = years_arr.map((y, i) => +Math.max(
+      MA_GEE_KT * 0.25,
+      MA_GEE_KT * (1 + 0.008 * y) - totRedArr[i]
+    ).toFixed(1));
+
+    // Per-system reduction lines (right axis, thinner lines)
+    const sysDatasets = sysList.map((s, i) => {
       const geeRedBase = areaPerSys * (DEGRADED_EMISSION + s.seq_co2) / 1000;
       const data = years_arr.map(y => +(geeRedBase * _convDynamic(y, s.key)).toFixed(1));
       const col  = s.color || `hsl(${i * 360 / sysList.length},70%,60%)`;
-      return { label: s.icon + ' ' + s.label, data, borderColor: col, backgroundColor: col + '22', fill: false, tension: 0.4 };
+      return {
+        label: s.icon + ' ' + s.label,
+        data, borderColor: col, backgroundColor: col + '18',
+        fill: false, tension: 0.4, yAxisID: 'y1',
+        borderWidth: 1.5, pointRadius: 0
+      };
     });
+
     _simCharts['conv'] = new Chart(ctx, {
       type: 'line',
-      data: { labels, datasets },
+      data: { labels, datasets: [
+        { label: 'GEE MA sem intervenção (kt/ano)', data: mBaseArr,
+          borderColor: 'rgba(248,113,113,0.40)', borderDash: [6,4],
+          fill: false, tension: 0.3, yAxisID: 'y', pointRadius: 0, borderWidth: 2 },
+        { label: 'GEE MA com sistemas (kt/ano)', data: mCombArr,
+          borderColor: '#f87171', backgroundColor: 'rgba(248,113,113,0.10)',
+          fill: true, tension: 0.4, yAxisID: 'y', borderWidth: 2 },
+        ...sysDatasets
+      ]},
       options: { ...opts, scales: {
-        x: { ticks:{color:'#6b9b6b'}, grid:{color:'rgba(74,222,128,0.08)'} },
-        y: { ticks:{color:'#4ade80'}, grid:{color:'rgba(74,222,128,0.06)'}, title:{display:true,text:'Redução GEE (kt CO₂eq/ano)',color:'#4ade80'} }
+        x:  { ticks:{color:'#6b9b6b'}, grid:{color:'rgba(74,222,128,0.08)'} },
+        y:  { type:'linear', position:'left',  ticks:{color:'#f87171'}, grid:{color:'rgba(248,113,113,0.06)'},
+              title:{display:true,text:'GEE MA (kt CO₂eq/ano)',color:'#f87171'} },
+        y1: { type:'linear', position:'right', ticks:{color:'#4ade80'}, grid:{display:false},
+              title:{display:true,text:'Redução por sistema (kt CO₂eq/ano)',color:'#4ade80'} }
       }}
     });
   }
