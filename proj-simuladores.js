@@ -659,8 +659,7 @@ function _buildSimHTML() {
                 <div>Use o modo <strong>Múltiplos</strong> para combinar sistemas complementares: ILPF ou SAF (carbono) + Sisteminha (emprego) + Apicultura (polinização) numa mesma propriedade ou território.</div>
               </div>
             </div>
-            <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);color:var(--text3)">⚠️ Ex.: As barras mostram o GEE total evitado (Mt CO₂eq) em <strong>${convState.years} anos </strong> se cada sistema fosse implantado individualmente em <strong>100%</strong> da área definida pelo slider — independentemente do modo de análise selecionado. Serve como referência comparativa entre sistemas.</div>
-          </div>
+           </div>
         </div>
       </div>
     </div>
