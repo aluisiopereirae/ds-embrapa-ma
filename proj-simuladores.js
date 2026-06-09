@@ -472,7 +472,7 @@ function _buildScatterChart() {
   const ctx = document.getElementById('comp-scatter-chart'); if (!ctx) return;
   _destroyChart('scatter');
   const ttl = document.getElementById('comp-scatter-title');
-  if (ttl) ttl.textContent = `📊 ${cfgA.icon} ${cfgA.label} × ${cfgB.icon} ${cfgB.label}`;
+  if (ttl) ttl.innerHTML = `📊 ${cfgA.icon} ${cfgA.label} × ${cfgB.icon} ${cfgB.label} <span class="badge-validado" title="Fonte: IBGE 2024 — dados oficiais de indicadores municipais">✔</span>`;
   const opts = _darkChartDefaults();
   opts.scales.x.title = { display:true, text: `${cfgA.icon} ${cfgA.label}`, color:'#a3c9a3' };
   opts.scales.y.title = { display:true, text: `${cfgB.icon} ${cfgB.label}`, color:'#a3c9a3' };
@@ -494,7 +494,7 @@ function _buildRankingChart() {
   const ctx = document.getElementById('comp-rank-chart'); if (!ctx) return;
   _destroyChart('rank');
   const ttl = document.getElementById('comp-rank-title');
-  if (ttl) ttl.textContent = `🏆 Top 12 — ${cfgA.icon} ${cfgA.label}`;
+  if (ttl) ttl.innerHTML = `🏆 Top 12 — ${cfgA.icon} ${cfgA.label} <span class="badge-validado" title="Fonte: IBGE 2024 — dados oficiais municipais">✔</span>`;
   const nVals = _normalize(ranked.map(r=>r.v));
   const colors = nVals.map(t => _indColor(t, cfgA.higher_better));
   const opts = _darkChartDefaults();
@@ -616,7 +616,7 @@ function _buildSimHTML() {
       <div id="conv-results"></div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
         <div class="chart-card">
-          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>📈 Trajetória de Impacto ao Longo do Tempo</span>${_dlMenu('dl-conv-traj',[{fn:"downloadChartImage('conv-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('conv-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('conv-chart')",lbl:'⬇ CSV'}])}</div>
+          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>📈 Trajetória de Impacto ao Longo do Tempo <span class="badge-pendente" title="Projeção modelada — parâmetros Embrapa; confirmar com monitoramento real de campo">⚠</span></span>${_dlMenu('dl-conv-traj',[{fn:"downloadChartImage('conv-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('conv-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('conv-chart')",lbl:'⬇ CSV'}])}</div>
           <div class="chart-wrap" style="height:clamp(260px,48vh,380px)"><canvas id="conv-chart"></canvas></div>
           <div style="margin-top:10px;padding:10px 12px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--green3);font-size:11px;color:var(--text3);line-height:1.6">
             <div style="font-weight:600;color:var(--text2);margin-bottom:5px">ℹ️ Como ler este gráfico</div>
@@ -629,7 +629,7 @@ function _buildSimHTML() {
           </div>
         </div>
         <div class="chart-card">
-          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span style="flex:1;min-width:0">⚖️ Comparativo de Sistemas — Redução de GEE por ha em ${convState.years} anos</span>${_dlMenu('dl-conv-cmp',[{fn:"downloadChartImage('conv-cmp-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('conv-cmp-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('conv-cmp-chart')",lbl:'⬇ CSV'}])}</div>
+          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span style="flex:1;min-width:0">⚖️ Comparativo de Sistemas — Redução de GEE por ha em ${convState.years} anos <span class="badge-pendente" title="Estimativa por fatores Embrapa — confirmar com inventários GEE e dados de campo">⚠</span></span>${_dlMenu('dl-conv-cmp',[{fn:"downloadChartImage('conv-cmp-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('conv-cmp-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('conv-cmp-chart')",lbl:'⬇ CSV'}])}</div>
           <div class="chart-wrap" style="height:clamp(260px,48vh,380px)"><canvas id="conv-cmp-chart"></canvas></div>
           <div style="margin-top:10px;padding:10px 12px;background:var(--bg3);border-radius:8px;border-left:3px solid #60a5fa;font-size:11px;color:var(--text3);line-height:1.6">
             <div style="font-weight:600;color:var(--text2);margin-bottom:6px">📌 Melhores abordagens por objetivo</div>
@@ -700,12 +700,12 @@ function _buildSimHTML() {
 
 <div>
   <div class="chart-card" style="margin-bottom:14px">
-    <div class="chart-title">🌳 Vista Superior do Plantio (simulação topográfica)</div>
+    <div class="chart-title">🌳 Vista Superior do Plantio (simulação topográfica) <span class="badge-pendente" title="Simulação paramétrica Embrapa — confirmar com dados de campo reais">⚠</span></div>
     <canvas id="plantio-canvas" width="540" height="360"></canvas>
     <div id="plantio-legend" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--text3)"></div>
   </div>
   <div class="chart-card">
-    <div class="chart-title">📊 Sequestro de Carbono ao Longo do Tempo</div>
+    <div class="chart-title">📊 Sequestro de Carbono ao Longo do Tempo <span class="badge-pendente" title="Estimativa Embrapa — necessita monitoramento de campo e validação por inventários GEE">⚠</span></div>
     <div class="chart-wrap" style="height:180px"><canvas id="plt-carbon-chart"></canvas></div>
   </div>
 </div>
@@ -725,11 +725,11 @@ function _buildSimHTML() {
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
   <div class="chart-card">
-    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>🌧 Precipitação e Temperatura Mensais</span>${_dlMenu('dl-meteo',[{fn:"downloadChartImage('meteo-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('meteo-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('meteo-chart')",lbl:'⬇ CSV'}])}</div>
+    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>🌧 Precipitação e Temperatura Mensais <span class="badge-pendente" title="Dados climáticos parametrizados por mesorregião — confirmar com estações INMET/CEMADEN">⚠</span></span>${_dlMenu('dl-meteo',[{fn:"downloadChartImage('meteo-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('meteo-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('meteo-chart')",lbl:'⬇ CSV'}])}</div>
     <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="meteo-chart"></canvas></div>
   </div>
   <div class="chart-card">
-    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>☀️ Radiação Solar e Meses Favoráveis ao Sistema</span>${_dlMenu('dl-meteo-solar',[{fn:"downloadChartImage('meteo-solar-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('meteo-solar-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('meteo-solar-chart')",lbl:'⬇ CSV'}])}</div>
+    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>☀️ Radiação Solar e Meses Favoráveis ao Sistema <span class="badge-pendente" title="Dados parametrizados por mesorregião — confirmar com atlas solar INPE/CRESESB">⚠</span></span>${_dlMenu('dl-meteo-solar',[{fn:"downloadChartImage('meteo-solar-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('meteo-solar-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('meteo-solar-chart')",lbl:'⬇ CSV'}])}</div>
     <div class="chart-wrap" style="height:clamp(160px,38vh,220px)"><canvas id="meteo-solar-chart"></canvas></div>
   </div>
 </div>
@@ -758,11 +758,11 @@ function _buildSimHTML() {
 </div>
 <div>
   <div class="chart-card" style="margin-bottom:14px">
-    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>🔍 Radar de Indicadores — Município vs. Média MA</span>${_dlMenu('dl-vuln-radar',[{fn:"downloadChartImage('vuln-radar-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('vuln-radar-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('vuln-radar-chart')",lbl:'⬇ CSV'}])}</div>
+    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>🔍 Radar de Indicadores — Município vs. Média MA <span class="badge-validado" title="Fonte: IBGE 2024 — indicadores municipais oficiais">✔</span></span>${_dlMenu('dl-vuln-radar',[{fn:"downloadChartImage('vuln-radar-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('vuln-radar-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('vuln-radar-chart')",lbl:'⬇ CSV'}])}</div>
     <div class="chart-wrap" style="height:clamp(200px,42vh,280px)"><canvas id="vuln-radar-chart"></canvas></div>
   </div>
   <div class="chart-card">
-    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>🏅 Ranking — Top 20 Municípios mais Vulneráveis</span>${_dlMenu('dl-vuln-rank',[{fn:"downloadChartImage('vuln-rank-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('vuln-rank-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('vuln-rank-chart')",lbl:'⬇ CSV'}])}</div>
+    <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span>🏅 Ranking — Top 20 Municípios mais Vulneráveis <span class="badge-validado" title="Fonte: IBGE 2024 — índice composto de indicadores municipais oficiais">✔</span></span>${_dlMenu('dl-vuln-rank',[{fn:"downloadChartImage('vuln-rank-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('vuln-rank-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('vuln-rank-chart')",lbl:'⬇ CSV'}])}</div>
     <div class="chart-wrap" style="height:clamp(220px,45vh,300px)"><canvas id="vuln-rank-chart"></canvas></div>
   </div>
 </div>

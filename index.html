@@ -1088,6 +1088,47 @@ header {
 }
 #settings-reset:hover { background: rgba(248,113,113,0.12); border-color: var(--red); color: var(--red); }
 
+/* ═══ SELOS DE VALIDAÇÃO DE DADOS ═══ */
+.badge-validado, .badge-pendente {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  white-space: nowrap;
+  vertical-align: middle;
+  flex-shrink: 0;
+  cursor: default;
+  transition: opacity 0.2s, transform 0.15s;
+  line-height: 1;
+}
+.badge-validado:hover, .badge-pendente:hover { transform: scale(1.15); }
+.badge-validado {
+  background: rgba(74,222,128,0.13);
+  border: 1px solid rgba(74,222,128,0.45);
+  color: #4ade80;
+}
+.badge-pendente {
+  background: rgba(251,191,36,0.11);
+  border: 1px solid rgba(251,191,36,0.45);
+  color: #fbbf24;
+}
+.data-legend-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 11px;
+  color: var(--text3);
+  flex-wrap: wrap;
+}
+.data-legend-bar span { display: inline-flex; align-items: center; gap: 4px; }
 </style>
 </head>
 <body>
@@ -1292,7 +1333,14 @@ document.addEventListener('click', function(e) {
     <div id="view-overview" class="panel active">
       <div class="sec-header" style="padding-bottom:0;margin-bottom:0;">
         <div class="sec-title">📊 Visão Geral — Maranhão</div>
-        <button class="btn btn-secondary" onclick="exportData('db')">⬇ Exportar CSV</button>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div class="data-legend-bar" title="Legenda dos selos de confiabilidade dos dados">
+            <span><span class="badge-validado" style="margin-left:0">✔</span> Fonte oficial comprovada (IBGE, SEEG, PRODES, MapBiomas)</span>
+            <span style="color:var(--border2)">|</span>
+            <span><span class="badge-pendente" style="margin-left:0">⚠</span> Levantamento interno — necessita confirmação por fonte externa</span>
+          </div>
+          <button class="btn btn-secondary" onclick="exportData('db')">⬇ Exportar CSV</button>
+        </div>
       </div>
       <!-- Sub-tabs -->
       <div style="display:flex;gap:2px;padding:12px 0 0;border-bottom:1px solid var(--border);margin-bottom:16px;">
@@ -1305,7 +1353,7 @@ document.addEventListener('click', function(e) {
         <div class="stats-grid" id="stats-grid"></div>
         <div class="charts-grid">
           <div class="chart-card">
-            <div class="chart-title">📍 Distribuição por Sistema Produtivo</div>
+            <div class="chart-title">📍 Distribuição por Sistema Produtivo <span class="badge-pendente" title="Dados do banco de dados interno Embrapa — aguarda cruzamento com fontes externas (IBGE Censo Agropecuário, MAPA)">⚠</span></div>
             <div class="chart-wrap">
               <canvas id="chart-sistemas" height="200"></canvas>
               <button class="chart-menu-btn" onclick="toggleChartMenu('menu-sistemas')">⋮</button>
@@ -1317,7 +1365,7 @@ document.addEventListener('click', function(e) {
             </div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">🗺 Sistemas por Mesorregião</div>
+            <div class="chart-title">🗺 Sistemas por Mesorregião <span class="badge-pendente" title="Dados do levantamento interno Embrapa Maranhão — confirmar com dados regionais do IBGE Censo Agropecuário">⚠</span></div>
             <div class="chart-wrap">
               <canvas id="chart-regioes" height="200"></canvas>
               <button class="chart-menu-btn" onclick="toggleChartMenu('menu-regioes')">⋮</button>
@@ -1329,7 +1377,7 @@ document.addEventListener('click', function(e) {
             </div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">📅 Implantações por Ano</div>
+            <div class="chart-title">📅 Implantações por Ano <span class="badge-pendente" title="Registros do sistema interno Embrapa — verificar completude histórica com relatórios anuais Embrapa MA">⚠</span></div>
             <div class="chart-wrap">
               <canvas id="chart-anos" height="200"></canvas>
               <button class="chart-menu-btn" onclick="toggleChartMenu('menu-anos')">⋮</button>
@@ -1341,7 +1389,7 @@ document.addEventListener('click', function(e) {
             </div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">💨 Balanço de Carbono (tCO₂e)</div>
+            <div class="chart-title">💨 Balanço de Carbono (tCO₂e) <span class="badge-pendente" title="Estimativa calculada a partir de parâmetros Embrapa — confirmar com dados SEEG/inventário GEE oficial">⚠</span></div>
             <div class="chart-wrap">
               <canvas id="chart-carbono" height="200"></canvas>
               <button class="chart-menu-btn" onclick="toggleChartMenu('menu-carbono')">⋮</button>
@@ -1353,7 +1401,7 @@ document.addEventListener('click', function(e) {
             </div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">💰 Renda Média por Sistema (R$/mês)</div>
+            <div class="chart-title">💰 Renda Média por Sistema (R$/mês) <span class="badge-pendente" title="Estimativa baseada em parâmetros de referência Embrapa — confirmar com levantamentos IMESC/IBGE PAM/PPM">⚠</span></div>
             <div class="chart-wrap">
               <canvas id="chart-renda" height="200"></canvas>
               <button class="chart-menu-btn" onclick="toggleChartMenu('menu-renda')">⋮</button>
@@ -1365,7 +1413,7 @@ document.addEventListener('click', function(e) {
             </div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">🌿 Área Total (ha) por Sistema</div>
+            <div class="chart-title">🌿 Área Total (ha) por Sistema <span class="badge-pendente" title="Levantamento Embrapa Maranhão — confirmar com dados CAR/SNCR e Censo Agropecuário IBGE">⚠</span></div>
             <div class="chart-wrap">
               <canvas id="chart-area" height="200"></canvas>
               <button class="chart-menu-btn" onclick="toggleChartMenu('menu-area')">⋮</button>
@@ -1380,7 +1428,7 @@ document.addEventListener('click', function(e) {
 
         <!-- Casos de Referência por Sistema -->
       <div class="form-section" style="margin-top:8px;">
-        <div class="form-section-title">⭐ Casos de Referência por Sistema — Embrapa Maranhão</div>
+        <div class="form-section-title">⭐ Casos de Referência por Sistema — Embrapa Maranhão <span class="badge-pendente" title="Dados de campo Embrapa — necessita validação com publicações científicas ou relatórios técnicos oficiais">⚠</span></div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
           <button class="map-btn active" id="refbtn-ilp" onclick="showRefCase('ilp')">🐄 ILP/ILPF</button>
           <button class="map-btn" id="refbtn-saf" onclick="showRefCase('saf')">🌱 SAF</button>
@@ -1427,7 +1475,7 @@ document.addEventListener('click', function(e) {
         <div class="stats-grid" id="stats-estado"></div>
         <div class="charts-grid">
           <div class="chart-card" style="grid-column:1/-1">
-            <div class="chart-title" id="estado-chart-title">📊 Indicador por Município — Maranhão</div>
+            <div class="chart-title" id="estado-chart-title">📊 Indicador por Município — Maranhão <span class="badge-validado" title="Fonte: IBGE 2024 — dados oficiais de indicadores municipais">✔</span></div>
             <div class="chart-wrap">
               <canvas id="chart-estado-munic" height="100"></canvas>
               <button class="chart-menu-btn" onclick="toggleChartMenu('menu-estado-munic')">⋮</button>
@@ -1439,7 +1487,7 @@ document.addEventListener('click', function(e) {
             </div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">🏆 Top 10 Municípios</div>
+            <div class="chart-title">🏆 Top 10 Municípios <span class="badge-validado" title="Fonte: IBGE 2024 — dados oficiais municipais">✔</span></div>
             <div class="chart-wrap">
               <canvas id="chart-estado-top10" height="200"></canvas>
               <button class="chart-menu-btn" onclick="toggleChartMenu('menu-estado-top10')">⋮</button>
@@ -1451,7 +1499,7 @@ document.addEventListener('click', function(e) {
             </div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">📊 Distribuição por Bioma</div>
+            <div class="chart-title">📊 Distribuição por Bioma <span class="badge-validado" title="Fonte: MapBiomas — mapeamento oficial de cobertura e uso do solo">✔</span></div>
             <div class="chart-wrap">
               <canvas id="chart-estado-bioma" height="200"></canvas>
               <button class="chart-menu-btn" onclick="toggleChartMenu('menu-estado-bioma')">⋮</button>
@@ -1463,7 +1511,7 @@ document.addEventListener('click', function(e) {
             </div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">🌍 IDH × PIB per capita</div>
+            <div class="chart-title">🌍 IDH × PIB per capita <span class="badge-validado" title="Fonte: IBGE/PNUD — dados oficiais de IDH e PIB municipal">✔</span></div>
             <div class="chart-wrap">
               <canvas id="chart-estado-scatter" height="200"></canvas>
               <button class="chart-menu-btn" onclick="toggleChartMenu('menu-estado-scatter')">⋮</button>
@@ -1475,7 +1523,7 @@ document.addEventListener('click', function(e) {
             </div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">🌿 Cobertura Vegetal × GEE</div>
+            <div class="chart-title">🌿 Cobertura Vegetal × GEE <span class="badge-validado" title="Fonte: MapBiomas (cobertura vegetal) + SEEG (emissões GEE) — dados oficiais">✔</span></div>
             <div class="chart-wrap">
               <canvas id="chart-estado-veg-gee" height="200"></canvas>
               <button class="chart-menu-btn" onclick="toggleChartMenu('menu-estado-veg-gee')">⋮</button>
@@ -1489,7 +1537,7 @@ document.addEventListener('click', function(e) {
         </div>
         <!-- Tabela municípios -->
         <div class="form-section" style="margin-top:8px;">
-          <div class="form-section-title">📋 Todos os Municípios do Maranhão — IBGE 2024</div>
+          <div class="form-section-title">📋 Todos os Municípios do Maranhão — IBGE 2024 <span class="badge-validado" title="Fonte: IBGE Censo 2022 e estimativas 2024 — dados oficiais">✔</span></div>
           <div style="display:flex;gap:8px;margin-bottom:10px;">
             <input class="form-input" id="busca-munic" placeholder="🔍 Buscar município..." style="width:220px;" oninput="filtrarTabelaMunic()">
             <select class="map-select" id="filtro-bioma-munic" onchange="filtrarTabelaMunic()">
@@ -1711,7 +1759,7 @@ document.addEventListener('click', function(e) {
       <!-- ═══ Cenários ═══ -->
       <div id="proj-cenarios">
       <div class="sec-header">
-        <div class="sec-title">📈 Projeções GEE até 2050 — Cenários Embrapa × SEEG × IPCC AR6</div>
+        <div class="sec-title">📈 Projeções GEE até 2050 — Cenários Embrapa × SEEG × IPCC AR6 <span class="badge-pendente" title="Projeções modeladas — os dados históricos base (SEEG) são validados, mas os cenários futuros são estimativas que necessitam validação metodológica">⚠</span></div>
         <div style="display:flex;gap:8px;align-items:center;">
           <select class="map-select" id="proj-var" onchange="renderProjCharts()">
             <option value="gee">GEE (Mt CO₂eq)</option>
@@ -1728,7 +1776,7 @@ document.addEventListener('click', function(e) {
 
       <div class="charts-grid">
         <div class="chart-card" style="grid-column:1/-1">
-          <div class="chart-title">📊 Comparativo de Cenários até 2050</div>
+          <div class="chart-title">📊 Comparativo de Cenários até 2050 <span class="badge-pendente" title="Cenários modelados Embrapa/IPCC AR6 — projeções futuras requerem validação metodológica e revisão periódica">⚠</span></div>
           <div class="chart-wrap">
             <canvas id="chart-proj-main" height="120"></canvas>
             <button class="chart-menu-btn" onclick="toggleChartMenu('menu-proj-main')">⋮</button>
@@ -1740,7 +1788,7 @@ document.addEventListener('click', function(e) {
           </div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">🌡 Temperatura Projetada por Cenário</div>
+          <div class="chart-title">🌡 Temperatura Projetada por Cenário <span class="badge-pendente" title="Projeção IPCC AR6 — modelo climático com incerteza intrínseca; confirmar com INMET/CEMADEN">⚠</span></div>
           <div class="chart-wrap">
             <canvas id="chart-proj-temp" height="200"></canvas>
             <button class="chart-menu-btn" onclick="toggleChartMenu('menu-proj-temp')">⋮</button>
@@ -1752,7 +1800,7 @@ document.addEventListener('click', function(e) {
           </div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">🔥 Desmatamento Projetado (km²/ano)</div>
+          <div class="chart-title">🔥 Desmatamento Projetado (km²/ano) <span class="badge-pendente" title="Projeção baseada em tendências históricas PRODES — confirmar com dados futuros INPE/PRODES">⚠</span></div>
           <div class="chart-wrap">
             <canvas id="chart-proj-desmat" height="200"></canvas>
             <button class="chart-menu-btn" onclick="toggleChartMenu('menu-proj-desmat')">⋮</button>
@@ -1764,7 +1812,7 @@ document.addEventListener('click', function(e) {
           </div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">🌿 Sequestro Carbono ILPF+SAF</div>
+          <div class="chart-title">🌿 Sequestro Carbono ILPF+SAF <span class="badge-pendente" title="Estimativa Embrapa baseada em fatores de emissão/sequestro por sistema — necessita monitoramento de campo e validação por inventários GEE">⚠</span></div>
           <div class="chart-wrap">
             <canvas id="chart-proj-seq" height="200"></canvas>
             <button class="chart-menu-btn" onclick="toggleChartMenu('menu-proj-seq')">⋮</button>
@@ -1776,7 +1824,7 @@ document.addEventListener('click', function(e) {
           </div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">📉 GEE Histórico MA 2000–2025 (SEEG)</div>
+          <div class="chart-title">📉 GEE Histórico MA 2000–2025 (SEEG) <span class="badge-validado" title="Fonte: SEEG Brasil (Sistema de Estimativas de Emissões e Remoções de Gases de Efeito Estufa) — dados oficiais">✔</span></div>
           <div class="chart-wrap">
             <canvas id="chart-gee-hist" height="200"></canvas>
             <button class="chart-menu-btn" onclick="toggleChartMenu('menu-gee-hist')">⋮</button>
@@ -1793,7 +1841,7 @@ document.addEventListener('click', function(e) {
 
       <!-- Tabela resumo 2050 -->
       <div class="form-section" style="margin-top:8px;">
-        <div class="form-section-title">📋 Resumo em 2050 por Cenário</div>
+        <div class="form-section-title">📋 Resumo em 2050 por Cenário <span class="badge-pendente" title="Valores modelados a partir de cenários Embrapa/IPCC — projeções sujeitas a incerteza; revisar conforme atualização dos modelos">⚠</span></div>
         <div class="table-wrap" style="max-height:280px;">
           <table class="data-table">
             <thead><tr>
@@ -3749,7 +3797,7 @@ function renderEstadoCharts() {
   };
 
   // Main chart - all municipalities
-  document.getElementById('estado-chart-title').textContent = '📊 ' + ind.label + ' por Município';
+  document.getElementById('estado-chart-title').innerHTML = '📊 ' + ind.label + ' por Município <span class="badge-validado" title="Fonte: IBGE 2024 — dados oficiais de indicadores municipais">✔</span>';
   mkChart('chart-estado-munic', 'bar', sorted.map(r=>r[0]), sorted.map(r=>r[ind.idx]));
   // Top 10
   mkChart('chart-estado-top10', 'bar', sorted.slice(0,10).map(r=>r[0]), sorted.slice(0,10).map(r=>r[ind.idx]));
@@ -5644,7 +5692,20 @@ function saveApiKey() {
   }
   localStorage.setItem('claude_api_key', val);
   showChatUI();
-  if (chatHistory.length === 0) showWelcomeMessage();
+  if (chatHistory.length === 0) {
+    showWelcomeMessage();
+    if (location.protocol === 'file:') {
+      setTimeout(() => appendChatMsg('assistant',
+        `⚠️ **Atenção — página aberta via arquivo local (file://)**\n\n` +
+        `O Chat IA não funciona neste modo por restrição de segurança do navegador (CORS).\n\n` +
+        `**Execute o servidor local:**\n` +
+        `1. Abra a pasta do projeto no Explorer\n` +
+        `2. Clique duplo em **iniciar-servidor.bat**\n` +
+        `3. Acesse **http://localhost:8080** no navegador\n\n` +
+        `Sua chave já foi salva — funciona imediatamente após abrir pelo servidor.`
+      ), 400);
+    }
+  }
   setTimeout(() => document.getElementById('chat-input')?.focus(), 100);
 }
 
@@ -5811,7 +5872,23 @@ ${buildDataContext()}`;
 
   } catch (err) {
     if (loadingEl) loadingEl.remove();
-    appendChatMsg('assistant', `❌ **Erro:** ${err.message}`);
+    const isCors = err.message?.toLowerCase().includes('cors') ||
+                   err.message?.toLowerCase().includes('failed to fetch') ||
+                   err.message?.toLowerCase().includes('networkerror') ||
+                   location.protocol === 'file:';
+    if (isCors) {
+      appendChatMsg('assistant',
+        `❌ **Erro de CORS — arquivo aberto diretamente (file://)**\n\n` +
+        `A API do Claude só funciona quando a página é servida via HTTP.\n\n` +
+        `**Como corrigir:**\n` +
+        `1. Execute o arquivo **iniciar-servidor.bat** (está na pasta do projeto)\n` +
+        `2. Abra **http://localhost:8080** no navegador\n` +
+        `3. O Chat IA funcionará normalmente\n\n` +
+        `*Alternativa: use a extensão **Live Server** no VS Code → botão direito no index.html → Open with Live Server*`
+      );
+    } else {
+      appendChatMsg('assistant', `❌ **Erro:** ${err.message}`);
+    }
   }
 }
 

@@ -144,7 +144,7 @@ function _buildSaHTML() {
       <div id="sa-view-canvas">
         <div class="chart-card" style="margin-bottom:12px">
           <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-            <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🌳 Vista Superior do Plantio</span>
+            <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🌳 Vista Superior do Plantio <span class="badge-pendente" title="Simulação de plantio paramétrica Embrapa — confirmar com dados de campo reais">⚠</span></span>
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
               <button onclick="sa_zoomOut()" title="Zoom −"
                 style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:14px;color:var(--text2);line-height:1;display:flex;align-items:center;justify-content:center">−</button>
@@ -172,7 +172,7 @@ function _buildSaHTML() {
         </div>
         <div id="sa-alertas" style="margin-bottom:10px"></div>
         <div class="chart-card" style="margin-bottom:12px">
-          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span style="flex:1;min-width:0">🔀 Comparação de Variantes — Sistema Atual</span>${_dlMenu('dl-sa-comp',[{fn:"downloadChartImage('sa-comp-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('sa-comp-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('sa-comp-chart')",lbl:'⬇ CSV'}])}</div>
+          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px"><span style="flex:1;min-width:0">🔀 Comparação de Variantes — Sistema Atual <span class="badge-pendente" title="Simulação paramétrica — confirmar com experimentos de campo Embrapa MA">⚠</span></span>${_dlMenu('dl-sa-comp',[{fn:"downloadChartImage('sa-comp-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('sa-comp-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('sa-comp-chart')",lbl:'⬇ CSV'}])}</div>
           <div class="chart-wrap" style="height:clamp(160px,35vh,200px)"><canvas id="sa-comp-chart"></canvas></div>
         </div>
         <div id="sa-recomendacoes"></div>
@@ -183,7 +183,7 @@ function _buildSaHTML() {
       <div id="sa-view-sat" style="display:none">
         <div class="chart-card">
           <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
-            <span>🛰️ Projeção em Terreno Real — Satélite</span>
+            <span>🛰️ Projeção em Terreno Real — Satélite <span class="badge-pendente" title="Simulação sobre imagem de satélite — confirmar medidas com levantamento topográfico real">⚠</span></span>
             <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
               <button onclick="sa_satDrawPlants()"
                 style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;color:var(--text2)">
@@ -240,7 +240,7 @@ function _buildSaHTML() {
 
         <div class="chart-card" style="margin-top:12px">
           <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px">
-            <span style="flex:1;min-width:0">🔀 Comparação de Variantes — Sistema Atual</span>
+            <span style="flex:1;min-width:0">🔀 Comparação de Variantes — Sistema Atual <span class="badge-pendente" title="Simulação paramétrica — confirmar com experimentos de campo Embrapa MA">⚠</span></span>
             ${_dlMenu('dl-sat-comp',[{fn:"downloadChartImage('sa-sat-comp-chart','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('sa-sat-comp-chart','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('sa-sat-comp-chart')",lbl:'⬇ CSV'}])}
           </div>
           <div class="chart-wrap" style="height:clamp(160px,35vh,200px)"><canvas id="sa-sat-comp-chart"></canvas></div>
@@ -276,7 +276,7 @@ function _buildSaHTML() {
             <!-- Mapa interativo + Restrições dentro do mesmo card -->
             <div class="chart-card" style="margin-bottom:10px">
               <div class="chart-title" style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:6px">
-                <span>🗺️ Terreno Real — Clique para Classificar</span>
+                <span>🗺️ Terreno Real — Clique para Classificar <span class="badge-validado" title="Classificação baseada em dados IBGE, MapBiomas, FUNAI, FCP — fontes oficiais">✔</span></span>
                 ${_dlMenu('dl-rec-map',[{fn:"downloadDivImage('rec-map','png','terreno-real')",lbl:'⬇ PNG'},{fn:"downloadDivImage('rec-map','jpg','terreno-real')",lbl:'⬇ JPG'}])}
               </div>
               <div style="background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.12);border-radius:6px;padding:5px 9px;margin-bottom:7px;font-size:10px;color:var(--text3)">
@@ -302,7 +302,7 @@ function _buildSaHTML() {
 
             <!-- Características ambientais e socioeconômicas -->
             <div class="chart-card" style="margin-bottom:10px">
-              <div class="chart-title" style="margin-bottom:8px">🌍 Características do Local Detectadas</div>
+              <div class="chart-title" style="margin-bottom:8px">🌍 Características do Local Detectadas <span class="badge-validado" title="Dados detectados de IBGE, MapBiomas, FUNAI, FCP — fontes oficiais">✔</span></div>
               <div id="rec-env-panel">
                 <span style="color:var(--text3);font-size:11px">Clique no mapa para detectar características...</span>
               </div>
@@ -311,7 +311,7 @@ function _buildSaHTML() {
             <!-- Planejamento multi-sistema — abaixo de Características -->
             <div class="chart-card">
               <div class="chart-title" style="margin-bottom:8px">
-                🔗 Planejamento Multi-sistema
+                🔗 Planejamento Multi-sistema <span class="badge-pendente" title="Combinação de sistemas: estimativa Embrapa — confirmar com experimentos integrados de campo">⚠</span>
                 <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:5px">Combine 2–3 sistemas e calcule métricas integradas</span>
               </div>
               <div id="rec-multisys">
@@ -327,7 +327,7 @@ function _buildSaHTML() {
             <!-- Pesos dos critérios (compacto, 2 colunas de sliders) -->
             <div class="chart-card" style="margin-bottom:10px">
               <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                <span>⚖️ Pesos dos Critérios de Avaliação</span>
+                <span>⚖️ Pesos dos Critérios de Avaliação <span class="badge-pendente" title="Pesos configuráveis — resultado do ranking depende dos critérios escolhidos pelo usuário">⚠</span></span>
                 <button onclick="rec_resetWeights()"
                   style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:3px 9px;cursor:pointer;font-size:10px;color:var(--text3)">
                   ↺ Resetar
@@ -341,7 +341,7 @@ function _buildSaHTML() {
             <!-- Ranking completo -->
             <div class="chart-card" style="margin-bottom:10px">
               <div class="chart-title" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:6px">
-                <span style="flex:1;min-width:0">🏆 Sistemas Recomendados <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:5px">Pontuação 0–100 · MCDA ponderado</span></span>
+                <span style="flex:1;min-width:0">🏆 Sistemas Recomendados <span class="badge-pendente" title="Recomendação por algoritmo MCDA — validar com especialistas Embrapa e condições reais do local">⚠</span> <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:5px">Pontuação 0–100 · MCDA ponderado</span></span>
                 ${_dlMenu('dl-rec-rank',[{fn:"downloadDivImage('rec-ranking','png','sistemas-recomendados')",lbl:'⬇ PNG'},{fn:"downloadDivImage('rec-ranking','jpg','sistemas-recomendados')",lbl:'⬇ JPG'},{fn:"downloadRecRankingCSV()",lbl:'⬇ CSV'}])}
               </div>
               <div id="rec-ranking">
@@ -352,11 +352,11 @@ function _buildSaHTML() {
             <!-- Radar + Barras lado a lado -->
             <div id="rec-charts-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div class="chart-card">
-                <div class="chart-title" style="margin-bottom:5px;font-size:11px;display:flex;justify-content:space-between;align-items:center;gap:4px"><span>📡 Top 3 · Multi-Critério</span>${_dlMenu('dl-rec-radar',[{fn:"downloadChartImage('rec-radar','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('rec-radar','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('rec-radar')",lbl:'⬇ CSV'}])}</div>
+                <div class="chart-title" style="margin-bottom:5px;font-size:11px;display:flex;justify-content:space-between;align-items:center;gap:4px"><span>📡 Top 3 · Multi-Critério <span class="badge-pendente" title="Recomendação por algoritmo MCDA — validar com especialistas e dados de campo">⚠</span></span>${_dlMenu('dl-rec-radar',[{fn:"downloadChartImage('rec-radar','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('rec-radar','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('rec-radar')",lbl:'⬇ CSV'}])}</div>
                 <div style="height:clamp(180px,40vh,240px)"><canvas id="rec-radar"></canvas></div>
               </div>
               <div class="chart-card">
-                <div class="chart-title" style="margin-bottom:5px;font-size:11px;display:flex;justify-content:space-between;align-items:center;gap:4px"><span>📊 Pontuação Geral</span>${_dlMenu('dl-rec-bar',[{fn:"downloadChartImage('rec-bar','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('rec-bar','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('rec-bar')",lbl:'⬇ CSV'}])}</div>
+                <div class="chart-title" style="margin-bottom:5px;font-size:11px;display:flex;justify-content:space-between;align-items:center;gap:4px"><span>📊 Pontuação Geral <span class="badge-pendente" title="Pontuação algorítmica MCDA — confirmar com análise técnica Embrapa">⚠</span></span>${_dlMenu('dl-rec-bar',[{fn:"downloadChartImage('rec-bar','png')",lbl:'⬇ PNG'},{fn:"downloadChartImage('rec-bar','jpg')",lbl:'⬇ JPG'},{fn:"downloadChartCSV('rec-bar')",lbl:'⬇ CSV'}])}</div>
                 <div style="height:clamp(180px,40vh,240px)"><canvas id="rec-bar"></canvas></div>
               </div>
             </div>
