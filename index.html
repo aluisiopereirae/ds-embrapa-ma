@@ -5626,10 +5626,7 @@ loadSettings();
     <p>Para usar o assistente de IA, informe sua chave da API Claude (Anthropic). A chave é armazenada <strong>apenas no seu navegador</strong> (localStorage) e nunca enviada a terceiros.</p>
     <p style="margin-top:6px">Obtenha sua chave em <strong>console.anthropic.com</strong></p>
     <input id="chat-api-key-input" type="password" placeholder="sk-ant-api03-..." autocomplete="off"/>
-    <hr class="chat-setup-divider"/>
-    <p><strong>Proxy CORS</strong> — necessário apenas para GitHub Pages / sites externos</p>
-    <p style="margin-top:2px">Cole a URL do seu Cloudflare Worker. <a href="https://workers.cloudflare.com" target="_blank" style="color:var(--green3)">Como criar →</a></p>
-    <input id="chat-proxy-url-input" type="url" placeholder="https://seu-worker.workers.dev" autocomplete="off"/>
+    <input id="chat-proxy-url-input" type="url" style="display:none" autocomplete="off"/>
     <button id="chat-api-save" onclick="saveApiKey()">✓ Salvar e iniciar</button>
   </div>
 
@@ -5649,6 +5646,9 @@ loadSettings();
 // ═══════════════════════════════════════════════════════
 // CHAT RAG — Assistente de Dados Embrapa MA
 // ═══════════════════════════════════════════════════════
+// Para funcionar no GitHub Pages, cole aqui a URL do seu Cloudflare Worker:
+// (veja o arquivo cloudflare-worker.js para instruções de criação gratuita)
+const CLOUDFLARE_PROXY = 'https://shy-feather-3fc8.aluisio-pereira-ti.workers.dev/';
 let chatHistory = [];
 let chatOpen = false;
 
@@ -5857,17 +5857,17 @@ Regras:
 ${buildDataContext()}`;
 
   const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  const proxyUrl = localStorage.getItem('chat_proxy_url');
+  const activeProxy = localStorage.getItem('chat_proxy_url') || CLOUDFLARE_PROXY;
   const API_URL = isLocal
     ? '/proxy/messages'
-    : (proxyUrl || 'https://api.anthropic.com/v1/messages');
+    : (activeProxy || 'https://api.anthropic.com/v1/messages');
 
   const reqHeaders = {
     'content-type': 'application/json',
     'x-api-key': apiKey,
     'anthropic-version': '2023-06-01',
   };
-  if (!isLocal && !proxyUrl) reqHeaders['anthropic-dangerous-client-side-request-allow'] = 'true';
+  if (!isLocal && !activeProxy) reqHeaders['anthropic-dangerous-client-side-request-allow'] = 'true';
 
   try {
     const response = await fetch(API_URL, {
@@ -5928,16 +5928,17 @@ ${buildDataContext()}`;
         `3. Certifique-se que Python está instalado`
       );
     } else if (msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('cors')) {
-      const isGithubPages = location.hostname.endsWith('.github.io');
-      const hasProxy = !!localStorage.getItem('chat_proxy_url');
-      if (isGithubPages && !hasProxy) {
+      const hasProxy = !!(localStorage.getItem('chat_proxy_url') || CLOUDFLARE_PROXY);
+      if (!isLocal && !hasProxy) {
         appendChatMsg('assistant',
-          `❌ **Erro de CORS — GitHub Pages bloqueia chamadas diretas à API Anthropic**\n\n` +
-          `A API da Anthropic não permite requisições de origens externas sem um proxy intermediário.\n\n` +
-          `**Como resolver:**\n` +
-          `1. Crie um **Cloudflare Worker** gratuito (veja o arquivo \`cloudflare-worker.js\` no projeto)\n` +
-          `2. Cole a URL do Worker no campo **Proxy CORS** em ⚙ Configurações\n` +
-          `3. Envie a mensagem novamente`
+          `❌ **Erro de CORS — a API Anthropic bloqueia chamadas diretas do navegador**\n\n` +
+          `**Solução (gratuita, 5 minutos):**\n` +
+          `1. Acesse **workers.cloudflare.com** e crie uma conta\n` +
+          `2. Crie um Worker e cole o código do arquivo \`cloudflare-worker.js\` do projeto\n` +
+          `3. Copie a URL gerada (ex: \`https://xxx.workers.dev\`)\n` +
+          `4. Abra o arquivo \`index.html\` e edite a linha:\n` +
+          `   \`const CLOUDFLARE_PROXY = 'https://xxx.workers.dev';\`\n` +
+          `5. Salve e faça push para o GitHub`
         );
       } else {
         appendChatMsg('assistant',
