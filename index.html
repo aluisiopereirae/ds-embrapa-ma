@@ -5865,6 +5865,7 @@ ${buildDataContext()}`;
       const code = response.status;
       if (code === 401) throw new Error('Chave de API inválida. Clique em ⚙ para reconfigurar.');
       if (code === 429) throw new Error('Limite de requisições atingido. Aguarde alguns segundos.');
+      if (code === 501) throw new Error('__proxy_501__');
       throw new Error(err.error?.message || `Erro HTTP ${code}`);
     }
 
@@ -5885,6 +5886,16 @@ ${buildDataContext()}`;
         `**Como corrigir:**\n` +
         `1. Clique duplo em **iniciar-servidor.bat** na pasta do projeto\n` +
         `2. Abra **http://localhost:8080** no navegador`
+      );
+    } else if (msg.includes('__proxy_501__')) {
+      appendChatMsg('assistant',
+        `❌ **Servidor antigo sem suporte a proxy**\n\n` +
+        `O servidor que está rodando é o antigo (\`python -m http.server\`), que não aceita requisições POST.\n\n` +
+        `**Como corrigir:**\n` +
+        `1. Feche a janela preta do servidor atual (Ctrl+C ou feche a janela)\n` +
+        `2. Clique duplo em **iniciar-servidor.bat** novamente\n` +
+        `3. Aguarde a mensagem "EmbrapAI — Servidor local"\n` +
+        `4. Acesse **http://localhost:8080**`
       );
     } else if (isLocal && (msg.includes('failed to fetch') || msg.includes('networkerror'))) {
       appendChatMsg('assistant',
