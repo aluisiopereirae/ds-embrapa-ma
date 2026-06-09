@@ -3,61 +3,59 @@ title EmbrapAI - Servidor Local
 echo.
 echo  ====================================================
 echo   EmbrapAI ^| Dados - Maranh^ao
-echo   Servidor local para habilitar o Chat IA
+echo   Servidor local com proxy para o Chat IA
 echo  ====================================================
 echo.
 
-REM Tenta Python 3
+REM Tenta Python 3 (prefere o proxy completo)
 python --version >nul 2>&1
 if %errorlevel% == 0 (
-    echo  [OK] Python encontrado. Iniciando servidor na porta 8080...
+    echo  [OK] Python encontrado. Iniciando servidor proxy na porta 8080...
     echo.
     echo  Acesse no navegador:
     echo     http://localhost:8080
     echo.
     echo  Pressione Ctrl+C para encerrar.
     echo.
-    python -m http.server 8080
+    python proxy-server.py
     goto :fim
 )
 
-REM Tenta python3
 python3 --version >nul 2>&1
 if %errorlevel% == 0 (
-    echo  [OK] Python3 encontrado. Iniciando servidor na porta 8080...
+    echo  [OK] Python3 encontrado. Iniciando servidor proxy na porta 8080...
     echo.
     echo  Acesse no navegador:
     echo     http://localhost:8080
     echo.
     echo  Pressione Ctrl+C para encerrar.
     echo.
-    python3 -m http.server 8080
+    python3 proxy-server.py
     goto :fim
 )
 
-REM Tenta Node.js (npx serve)
+REM Fallback: Node.js (sem proxy — Chat IA nao funcionara em localhost)
 node --version >nul 2>&1
 if %errorlevel% == 0 (
-    echo  [OK] Node.js encontrado. Iniciando servidor na porta 8080...
+    echo  [AVISO] Node.js encontrado, mas sem Python o proxy nao estara ativo.
+    echo          O Chat IA pode nao funcionar em localhost com Node.js.
+    echo          Instale Python para habilitar o proxy:
+    echo          https://www.python.org/downloads/
     echo.
-    echo  Acesse no navegador:
-    echo     http://localhost:8080
-    echo.
-    echo  Pressione Ctrl+C para encerrar.
+    echo  Iniciando servidor simples na porta 8080...
+    echo  Acesse: http://localhost:8080
     echo.
     npx serve -l 8080 .
     goto :fim
 )
 
-REM Nenhum interpretador encontrado
-echo  [ERRO] Python e Node.js nao encontrados.
+echo  [ERRO] Python nao encontrado.
 echo.
-echo  Instale uma das opcoes:
-echo    - Python: https://www.python.org/downloads/
-echo    - Node.js: https://nodejs.org/
+echo  Instale Python (recomendado):
+echo    https://www.python.org/downloads/
 echo.
-echo  Ou abra o arquivo index.html via VS Code com a extensao
-echo  "Live Server" (botao direito - Open with Live Server).
+echo  Ou use o VS Code com a extensao "Live Server":
+echo    Botao direito no index.html ^> Open with Live Server
 echo.
 pause
 

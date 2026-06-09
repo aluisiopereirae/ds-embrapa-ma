@@ -5696,13 +5696,9 @@ function saveApiKey() {
     showWelcomeMessage();
     if (location.protocol === 'file:') {
       setTimeout(() => appendChatMsg('assistant',
-        `⚠️ **Atenção — página aberta via arquivo local (file://)**\n\n` +
-        `O Chat IA não funciona neste modo por restrição de segurança do navegador (CORS).\n\n` +
-        `**Execute o servidor local:**\n` +
-        `1. Abra a pasta do projeto no Explorer\n` +
-        `2. Clique duplo em **iniciar-servidor.bat**\n` +
-        `3. Acesse **http://localhost:8080** no navegador\n\n` +
-        `Sua chave já foi salva — funciona imediatamente após abrir pelo servidor.`
+        `⚠️ **Página aberta como arquivo local — Chat IA desabilitado**\n\n` +
+        `Clique duplo em **iniciar-servidor.bat** e acesse **http://localhost:8080**.\n` +
+        `Sua chave já foi salva.`
       ), 400);
     }
   }
@@ -5838,15 +5834,24 @@ Regras:
 
 ${buildDataContext()}`;
 
+  // Localhost usa proxy local (evita CORS com HTTP); demais origens chamam a API diretamente
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const API_URL = isLocal
+    ? '/proxy/messages'
+    : 'https://api.anthropic.com/v1/messages';
+
+  const reqHeaders = {
+    'content-type': 'application/json',
+    'x-api-key': apiKey,
+    'anthropic-version': '2023-06-01',
+  };
+  // O header abaixo é necessário apenas em chamadas diretas ao navegador (HTTPS externo)
+  if (!isLocal) reqHeaders['anthropic-dangerous-client-side-request-allow'] = 'true';
+
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(API_URL, {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-client-side-request-allow': 'true'
-      },
+      headers: reqHeaders,
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1500,
@@ -5872,19 +5877,32 @@ ${buildDataContext()}`;
 
   } catch (err) {
     if (loadingEl) loadingEl.remove();
-    const isCors = err.message?.toLowerCase().includes('cors') ||
-                   err.message?.toLowerCase().includes('failed to fetch') ||
-                   err.message?.toLowerCase().includes('networkerror') ||
-                   location.protocol === 'file:';
-    if (isCors) {
+    const msg = err.message?.toLowerCase() || '';
+    if (location.protocol === 'file:') {
       appendChatMsg('assistant',
-        `❌ **Erro de CORS — arquivo aberto diretamente (file://)**\n\n` +
-        `A API do Claude só funciona quando a página é servida via HTTP.\n\n` +
+        `❌ **Página aberta como arquivo local (file://)**\n\n` +
+        `O Chat IA não funciona neste modo.\n\n` +
         `**Como corrigir:**\n` +
-        `1. Execute o arquivo **iniciar-servidor.bat** (está na pasta do projeto)\n` +
-        `2. Abra **http://localhost:8080** no navegador\n` +
-        `3. O Chat IA funcionará normalmente\n\n` +
-        `*Alternativa: use a extensão **Live Server** no VS Code → botão direito no index.html → Open with Live Server*`
+        `1. Clique duplo em **iniciar-servidor.bat** na pasta do projeto\n` +
+        `2. Abra **http://localhost:8080** no navegador`
+      );
+    } else if (isLocal && (msg.includes('failed to fetch') || msg.includes('networkerror'))) {
+      appendChatMsg('assistant',
+        `❌ **Proxy local não está respondendo**\n\n` +
+        `O servidor proxy não foi iniciado ou foi encerrado.\n\n` +
+        `**Como corrigir:**\n` +
+        `1. Feche esta janela do servidor\n` +
+        `2. Clique duplo em **iniciar-servidor.bat** novamente\n` +
+        `3. Certifique-se que Python está instalado`
+      );
+    } else if (msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('cors')) {
+      appendChatMsg('assistant',
+        `❌ **Erro de rede ao chamar a API**\n\n` +
+        `Possíveis causas:\n` +
+        `• Sem conexão à internet\n` +
+        `• Extensão de navegador bloqueando a requisição\n` +
+        `• A API da Anthropic pode estar temporariamente indisponível\n\n` +
+        `Tente novamente em alguns instantes.`
       );
     } else {
       appendChatMsg('assistant', `❌ **Erro:** ${err.message}`);
