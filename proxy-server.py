@@ -59,6 +59,8 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
                 result = resp.read()
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
+                self.send_header('Content-Length', str(len(result)))
+                self.send_header('Connection', 'close')
                 self._cors_headers()
                 self.end_headers()
                 self.wfile.write(result)
@@ -67,18 +69,21 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
             result = e.read()
             self.send_response(e.code)
             self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(result)))
+            self.send_header('Connection', 'close')
             self._cors_headers()
             self.end_headers()
             self.wfile.write(result)
 
         except Exception as e:
+            result = json.dumps({'error': {'message': str(e)}}).encode()
             self.send_response(500)
             self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(result)))
+            self.send_header('Connection', 'close')
             self._cors_headers()
             self.end_headers()
-            self.wfile.write(
-                json.dumps({'error': {'message': str(e)}}).encode()
-            )
+            self.wfile.write(result)
 
     # ── Silencia logs de arquivos estáticos; mostra só chamadas da API ────────
     def log_message(self, fmt, *args):
