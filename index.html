@@ -770,6 +770,13 @@ header {
   animation: chatSlideIn 0.25s ease;
 }
 #chat-panel.open { display: flex; }
+#chat-panel.maximized {
+  width: min(740px, calc(100vw - 20px));
+  max-height: calc(100vh - 80px);
+  bottom: 10px;
+  right: 10px;
+  transition: width 0.22s ease, max-height 0.22s ease;
+}
 @keyframes chatSlideIn {
   from { opacity: 0; transform: translateY(16px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -5619,6 +5626,7 @@ loadSettings();
     <button class="chat-hbtn" onclick="clearChat()" title="Limpar conversa">🗑</button>
     <button class="chat-hbtn" onclick="openApiSetup()" title="Configurar chave de API">⚙</button>
     <button class="chat-hbtn" onclick="openChatHelp()" title="Ajuda e instruções">❓</button>
+    <button class="chat-hbtn" id="chat-maximize-btn" onclick="toggleChatMaximize()" title="Maximizar">⤢</button>
     <button class="chat-hbtn" onclick="toggleChat()" title="Fechar">✕</button>
   </div>
 
@@ -5651,6 +5659,16 @@ loadSettings();
 const CLOUDFLARE_PROXY = 'https://shy-feather-3fc8.aluisio-pereira-ti.workers.dev/';
 let chatHistory = [];
 let chatOpen = false;
+let chatMaximized = false;
+
+function toggleChatMaximize() {
+  chatMaximized = !chatMaximized;
+  const panel = document.getElementById('chat-panel');
+  const btn = document.getElementById('chat-maximize-btn');
+  panel.classList.toggle('maximized', chatMaximized);
+  btn.textContent = chatMaximized ? '⤡' : '⤢';
+  btn.title = chatMaximized ? 'Restaurar tamanho' : 'Maximizar';
+}
 
 function toggleChat() {
   chatOpen = !chatOpen;
