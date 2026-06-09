@@ -857,15 +857,19 @@ header {
 .help-step strong { color: var(--text); }
 #chat-api-setup {
   padding: 20px; flex-direction: column; gap: 12px;
+  overflow-y: auto; flex: 1;
 }
 #chat-api-setup p { font-size: 12px; color: var(--text3); margin: 0; line-height: 1.6; }
-#chat-api-key-input {
+#chat-api-key-input, #chat-proxy-url-input {
   background: var(--card); border: 1px solid var(--border);
   border-radius: 8px; padding: 10px 12px; color: var(--text);
   font-size: 13px; font-family: 'DM Sans',sans-serif; outline: none; width: 100%;
   box-sizing: border-box;
 }
-#chat-api-key-input:focus { border-color: var(--green3); }
+#chat-api-key-input:focus, #chat-proxy-url-input:focus { border-color: var(--green3); }
+.chat-setup-divider {
+  border: none; border-top: 1px solid var(--border); margin: 4px 0;
+}
 #chat-api-save {
   background: var(--green3); border: none; border-radius: 8px;
   padding: 10px; color: #fff; font-size: 13px; font-weight: 600;
@@ -5622,6 +5626,10 @@ loadSettings();
     <p>Para usar o assistente de IA, informe sua chave da API Claude (Anthropic). A chave é armazenada <strong>apenas no seu navegador</strong> (localStorage) e nunca enviada a terceiros.</p>
     <p style="margin-top:6px">Obtenha sua chave em <strong>console.anthropic.com</strong></p>
     <input id="chat-api-key-input" type="password" placeholder="sk-ant-api03-..." autocomplete="off"/>
+    <hr class="chat-setup-divider"/>
+    <p><strong>Proxy CORS</strong> — necessário apenas para GitHub Pages / sites externos</p>
+    <p style="margin-top:2px">Cole a URL do seu Cloudflare Worker. <a href="https://workers.cloudflare.com" target="_blank" style="color:var(--green3)">Como criar →</a></p>
+    <input id="chat-proxy-url-input" type="url" placeholder="https://seu-worker.workers.dev" autocomplete="off"/>
     <button id="chat-api-save" onclick="saveApiKey()">✓ Salvar e iniciar</button>
   </div>
 
@@ -5675,12 +5683,26 @@ function showChatUI() {
 
 function openApiSetup() {
   const existingKey = localStorage.getItem('claude_api_key') || '';
+  const existingProxy = localStorage.getItem('chat_proxy_url') || '';
   document.getElementById('chat-api-key-input').value = existingKey ? '••••••••' + existingKey.slice(-6) : '';
+  document.getElementById('chat-proxy-url-input').value = existingProxy;
   showApiSetup();
 }
 
 function saveApiKey() {
   const val = document.getElementById('chat-api-key-input').value.trim();
+  const proxyVal = document.getElementById('chat-proxy-url-input').value.trim();
+
+  if (proxyVal) {
+    try { new URL(proxyVal); } catch {
+      showToast('⚠ URL do proxy inválida', true);
+      return;
+    }
+    localStorage.setItem('chat_proxy_url', proxyVal);
+  } else {
+    localStorage.removeItem('chat_proxy_url');
+  }
+
   if (!val || val.startsWith('•')) {
     showChatUI();
     if (chatHistory.length === 0) showWelcomeMessage();
@@ -5834,19 +5856,18 @@ Regras:
 
 ${buildDataContext()}`;
 
-  // Localhost usa proxy local (evita CORS com HTTP); demais origens chamam a API diretamente
   const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const proxyUrl = localStorage.getItem('chat_proxy_url');
   const API_URL = isLocal
     ? '/proxy/messages'
-    : 'https://api.anthropic.com/v1/messages';
+    : (proxyUrl || 'https://api.anthropic.com/v1/messages');
 
   const reqHeaders = {
     'content-type': 'application/json',
     'x-api-key': apiKey,
     'anthropic-version': '2023-06-01',
   };
-  // O header abaixo é necessário apenas em chamadas diretas ao navegador (HTTPS externo)
-  if (!isLocal) reqHeaders['anthropic-dangerous-client-side-request-allow'] = 'true';
+  if (!isLocal && !proxyUrl) reqHeaders['anthropic-dangerous-client-side-request-allow'] = 'true';
 
   try {
     const response = await fetch(API_URL, {
@@ -5907,14 +5928,27 @@ ${buildDataContext()}`;
         `3. Certifique-se que Python está instalado`
       );
     } else if (msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('cors')) {
-      appendChatMsg('assistant',
-        `❌ **Erro de rede ao chamar a API**\n\n` +
-        `Possíveis causas:\n` +
-        `• Sem conexão à internet\n` +
-        `• Extensão de navegador bloqueando a requisição\n` +
-        `• A API da Anthropic pode estar temporariamente indisponível\n\n` +
-        `Tente novamente em alguns instantes.`
-      );
+      const isGithubPages = location.hostname.endsWith('.github.io');
+      const hasProxy = !!localStorage.getItem('chat_proxy_url');
+      if (isGithubPages && !hasProxy) {
+        appendChatMsg('assistant',
+          `❌ **Erro de CORS — GitHub Pages bloqueia chamadas diretas à API Anthropic**\n\n` +
+          `A API da Anthropic não permite requisições de origens externas sem um proxy intermediário.\n\n` +
+          `**Como resolver:**\n` +
+          `1. Crie um **Cloudflare Worker** gratuito (veja o arquivo \`cloudflare-worker.js\` no projeto)\n` +
+          `2. Cole a URL do Worker no campo **Proxy CORS** em ⚙ Configurações\n` +
+          `3. Envie a mensagem novamente`
+        );
+      } else {
+        appendChatMsg('assistant',
+          `❌ **Erro de rede ao chamar a API**\n\n` +
+          `Possíveis causas:\n` +
+          `• Sem conexão à internet\n` +
+          `• Extensão de navegador bloqueando a requisição\n` +
+          `• A API da Anthropic pode estar temporariamente indisponível\n\n` +
+          `Tente novamente em alguns instantes.`
+        );
+      }
     } else {
       appendChatMsg('assistant', `❌ **Erro:** ${err.message}`);
     }
