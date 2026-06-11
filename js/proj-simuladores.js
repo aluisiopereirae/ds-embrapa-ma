@@ -566,10 +566,11 @@ function _buildSimHTML() {
 </div>
 
 <div class="sim-tabs-inner">
-  <button class="sim-itab active" data-simtab="conversao" onclick="showSimTab('conversao')">🔄 Conversão de Áreas</button>
-  <button class="sim-itab" data-simtab="plantio"   onclick="showSimTab('plantio')">🌱 Simulador de Plantio</button>
-  <button class="sim-itab" data-simtab="meteo"     onclick="showSimTab('meteo')">🌦 Sazonalidade Municipal</button>
-  <button class="sim-itab" data-simtab="vuln"      onclick="showSimTab('vuln')">⚠️ Vulnerabilidade Municipal</button>
+  <button class="sim-itab active" data-simtab="conversao"    onclick="showSimTab('conversao')">🔄 Conversão de Áreas</button>
+  <button class="sim-itab" data-simtab="plantio"             onclick="showSimTab('plantio')">🌱 Simulador de Plantio</button>
+  <button class="sim-itab" data-simtab="meteo"               onclick="showSimTab('meteo')">🌦 Sazonalidade Municipal</button>
+  <button class="sim-itab" data-simtab="vuln"                onclick="showSimTab('vuln')">⚠️ Vulnerabilidade Municipal</button>
+  <button class="sim-itab" data-simtab="crescimento"         onclick="showSimTab('crescimento')">🌿 Crescimento de Plantas</button>
 </div>
 
 <!-- SIM 1: Conversão de Áreas Degradadas -->
@@ -744,6 +745,7 @@ function _buildSimHTML() {
 
 <!-- SIM 4: Vulnerabilidade -->
 <div id="simtab-vuln" style="display:none">
+
 <div id="vuln-grid" style="display:grid;grid-template-columns:minmax(240px,340px) 1fr;gap:16px;align-items:start">
 <div class="sim-card">
   <div class="sim-card-title">⚠️ Índice de Vulnerabilidade Municipal</div>
@@ -768,6 +770,9 @@ function _buildSimHTML() {
 </div>
 </div>
 </div>
+
+<!-- SIM 5: Crescimento de Plantas (lazy init via crescimento.js) -->
+<div id="simtab-crescimento" style="display:none"></div>
 `;
 }
 
@@ -790,10 +795,11 @@ function showSimTab(tab) {
   document.querySelectorAll('.sim-itab').forEach(b => b.classList.remove('active'));
   const btn = document.querySelector(`.sim-itab[data-simtab="${tab}"]`);
   if (btn) btn.classList.add('active');
-  ['conversao','plantio','meteo','vuln'].forEach(t => {
+  ['conversao','plantio','meteo','vuln','crescimento'].forEach(t => {
     const el = document.getElementById('simtab-'+t);
     if (el) el.style.display = (t === tab) ? 'block' : 'none';
   });
+  if (tab === 'crescimento' && typeof _initCrescimento === 'function') _initCrescimento();
 }
 
 /* ─────────── SIMULADOR 1: CONVERSÃO DE ÁREAS ─────────── */
