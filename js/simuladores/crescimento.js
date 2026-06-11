@@ -150,6 +150,132 @@ const CRESC_CROPS = {
     recs:['Semeadura direta ou mudas; canteiro bem drenado','Desbaste para 1 planta/cova; proteção de mudas','Adubação N parcelada; controle de pulgões e trips','Polinização por abelhas (manter colmeias próximas)','Desbaste para 2-3 frutos/planta; adubação K','Irrigação intensa; K+Ca para parede firme','Controle de antracnose e míldio; monitorar maturação','Colheita quando gavinha seca; "toque" no fruto'],
     refs:'Embrapa Semi-Árido; Bhella (2003); FAO Cucurbit Crops; Dias et al. (2010); Marouelli (2011)',
     defaultN:100, defaultP:80, defaultK:130, defaultS:15, defaultEsp:3.0,
+    recN:100, recP:80, recK:130, recS:15, mesIdeal:3, tblStep:1,
+  },
+  acai: {
+    nome:'Açaí', icon:'🟣', cor:'#6a1b9a',
+    nomeCientifico:'Euterpe oleracea Mart.',
+    cicloBase:36, tempOpt:27, tempMin:18, tempMax:38,
+    aguaOpt:250, pHOtimo:[5.5,6.5], espOpt:4.0,
+    NOptimo:100, POptimo:30, KOptimo:180, SOptimo:20,
+    prodMin:10, prodMax:25, alturaMax:1200,
+    unidade:'t/ha (cachos frescos)',
+    bmPotencial:10.0, convFreshFactor:6.0, isFruitCrop:true,
+    variedades:[
+      {nome:'BRS-Pará (Embrapa)', ciclo:36, prodFator:1.0, tempOpt:27},
+      {nome:'BRS-Tajá', ciclo:36, prodFator:0.95, tempOpt:27},
+      {nome:'PAR-01 (nativo)', ciclo:40, prodFator:0.85, tempOpt:26},
+    ],
+    extraLabel:['Antocianinas (mg/g)','Teor lipídico (%)'],
+    extraCalc:(p,fGlobal)=>[
+      +(15+22*fGlobal).toFixed(1),
+      +(8+7*fGlobal).toFixed(1),
+    ],
+    fases:['Plantio/enraizamento','Crescimento inicial','Formação de perfilhos','Crescimento vegetativo','Crescimento vegetativo','Diferenciação floral','Florescimento','Florescimento','Frutificação','Frutificação','Maturação','Colheita plena'],
+    recs:['Plantio em áreas úmidas; espaçamento 4×4m; calagem prévia','Irrigação frequente; sombreamento parcial','Manter 3-4 perfilhos/touceira; adubação N leve','Adubação NPK completa; cobertura morta','Adubação K pesada; controle de curculionídeos','Observar emissão da espata floral; adubação foliar micronutrientes','Polinização entomófila; manter umidade','Adubação foliar K+B; controle antracnose','Monitorar coloração (verde→roxo); adubação K','Amostrar Brix e teor lipídico','Colheita manual dos cachos maduros','Produção contínua 2-3×/ano; poda de manutenção'],
+    refs:'Embrapa Amazônia Oriental (2020); Shanley & Medina (2005); Cavalcante (1996); FAO; CIFOR Açaí',
+    defaultN:80, defaultP:25, defaultK:150, defaultS:20, defaultEsp:16.0,
+    recN:100, recP:30, recK:180, recS:20, mesIdeal:3, tblStep:4,
+  },
+  cupuacu: {
+    nome:'Cupuaçu', icon:'🟤', cor:'#6d4c41',
+    nomeCientifico:'Theobroma grandiflorum (Willd. ex Spreng.) K.Schum.',
+    cicloBase:48, tempOpt:25, tempMin:16, tempMax:35,
+    aguaOpt:180, pHOtimo:[5.5,6.5], espOpt:9.0,
+    NOptimo:80, POptimo:40, KOptimo:120, SOptimo:15,
+    prodMin:8, prodMax:20, alturaMax:800,
+    unidade:'t/ha (frutos frescos)',
+    bmPotencial:8.5, convFreshFactor:4.5, isFruitCrop:true,
+    variedades:[
+      {nome:'Coari (Embrapa)', ciclo:48, prodFator:1.0, tempOpt:25},
+      {nome:'BRS-Carimbó', ciclo:42, prodFator:1.05, tempOpt:25},
+      {nome:'Mamau (nativo)', ciclo:54, prodFator:0.85, tempOpt:24},
+    ],
+    extraLabel:['Brix da polpa (°Bx)','Peso do fruto (kg)'],
+    extraCalc:(p,fGlobal)=>[
+      +(8+6*fGlobal).toFixed(1),
+      +(0.8+1.2*fGlobal).toFixed(2),
+    ],
+    fases:['Estabelecimento','Crescimento inicial','Crescimento vegetativo','Crescimento vegetativo','Formação da copa','Formação da copa','Crescimento produtivo','Florescimento inicial','Frutificação','Frutificação','Maturação','Colheita plena'],
+    recs:['Plantio sombreado; espaçamento 3×3m; calagem','Adubação N leve; cobertura morta; capinas','Podas de formação; controle vassoura-de-bruxa','Adubação NPK completa; poda sanitária','Manutenção da copa; controle de Phytophthora','Adubação K+Ca; proteção das flores','Monitorar Crinipellis perniciosa','Raleio de frutos; controle de fungos','Adubação foliar micronutrientes; colheita quando casca amarelando','Processamento da polpa (congelamento rápido)','Seleção e classificação dos frutos','Produção plena 2ª safra; manejo do sombreamento'],
+    refs:'Embrapa Amazônia Oriental (2019); Calzavara et al. (1984); Müller & Calzavara; FAO Non-Wood Forest Products',
+    defaultN:60, defaultP:30, defaultK:100, defaultS:15, defaultEsp:9.0,
+    recN:80, recP:40, recK:120, recS:15, mesIdeal:2, tblStep:4,
+  },
+  buriti: {
+    nome:'Buriti', icon:'🌴', cor:'#e65100',
+    nomeCientifico:'Mauritia flexuosa L.f.',
+    cicloBase:60, tempOpt:27, tempMin:18, tempMax:38,
+    aguaOpt:200, pHOtimo:[5.0,6.5], espOpt:16.0,
+    NOptimo:60, POptimo:20, KOptimo:100, SOptimo:15,
+    prodMin:5, prodMax:15, alturaMax:2000,
+    unidade:'t/ha (frutos frescos)',
+    bmPotencial:7.0, convFreshFactor:5.0, isFruitCrop:true,
+    variedades:[
+      {nome:'Ecótipo de várzea (MA)', ciclo:60, prodFator:1.0, tempOpt:27},
+      {nome:'Ecótipo de cerrado', ciclo:72, prodFator:0.85, tempOpt:26},
+    ],
+    extraLabel:['Carotenoides (mg/g)','Peso do fruto (g)'],
+    extraCalc:(p,fGlobal)=>[
+      +(30+40*fGlobal).toFixed(1),
+      +(18+12*fGlobal).toFixed(1),
+    ],
+    fases:['Plantio/estabelecimento','Crescimento lento do palmito','Crescimento vegetativo','Crescimento vegetativo','Formação do estipe','Formação do estipe','Crescimento produtivo','Emissão floral','Florescimento','Frutificação','Maturação','Colheita plena'],
+    recs:['Plantio em veredas/áreas úmidas; espaçamento 4×4m','Manutenção de umidade; sem adubação N excessiva','Adubação NPK leve anual; controle de pragas','Monitorar desenvolvimento do estipe','Adubação K; manutenção do habitat','Início do período produtivo; adubação de manutenção','Proteger polinizadores (coleópteros)','Emissão da espata; adubação foliar B+Mn','Coleta de pólen; polinização auxiliar','Monitorar amadurecimento (casca escamosa)','Colheita dos cachos (frutos vermelho-alaranjados)','Produção sustentada; poda de folhas secas'],
+    refs:'Lorenzi et al. (2010); Shanley & Medina (2005); Balick (1988); Embrapa Cocais; CIFOR Bioeconomia MA',
+    defaultN:40, defaultP:15, defaultK:80, defaultS:15, defaultEsp:25.0,
+    recN:60, recP:20, recK:100, recS:15, mesIdeal:2, tblStep:6,
+  },
+  caju: {
+    nome:'Cajueiro', icon:'🟡', cor:'#f57f17',
+    nomeCientifico:'Anacardium occidentale L.',
+    cicloBase:30, tempOpt:27, tempMin:18, tempMax:40,
+    aguaOpt:80, pHOtimo:[5.5,7.0], espOpt:16.0,
+    NOptimo:60, POptimo:30, KOptimo:60, SOptimo:10,
+    prodMin:5, prodMax:20, alturaMax:1200,
+    unidade:'t/ha (castanhas + pedúnculos)',
+    bmPotencial:6.5, convFreshFactor:6.0, isFruitCrop:true,
+    variedades:[
+      {nome:'CCP-76 (anão precoce)', ciclo:24, prodFator:1.0, tempOpt:28},
+      {nome:'BRS-189 (Embrapa)', ciclo:28, prodFator:1.05, tempOpt:27},
+      {nome:'Cajueiro comum (tardio)', ciclo:36, prodFator:0.85, tempOpt:27},
+    ],
+    extraLabel:['Peso da castanha (g)','Brix do pedúnculo (°Bx)'],
+    extraCalc:(p,fGlobal)=>[
+      +(8+6*fGlobal).toFixed(1),
+      +(10+6*fGlobal).toFixed(1),
+    ],
+    fases:['Plantio/brotação','Crescimento vegetativo','Formação da copa','Formação da copa','Crescimento produtivo','Florescimento (seca)','Florescimento (seca)','Frutificação','Maturação/colheita','Produção plena'],
+    recs:['Plantio início das chuvas; espaçamento 8×8m; calagem','Podas de formação; adubação N moderada; capinas','Controle de antracnose (Colletotrichum); adubação NPK','Manutenção da copa; adubação K; controle helopeltis','Adubação pré-floração; estresse hídrico leve','Evitar irrigação excessiva na floração (seca induz floração)','Proteger flores de chuvas; monitorar broca','Colheita dos pedúnculos; proteção das castanhas','Beneficiamento das castanhas; CNPCO Embrapa','Colheita anual; poda de limpeza pós-safra'],
+    refs:'Embrapa Agroindústria Tropical (2019); Barros (2002); Mitchell & Mori (1987); FAO Cashew; IBGE-PAM',
+    defaultN:50, defaultP:25, defaultK:50, defaultS:10, defaultEsp:16.0,
+    recN:60, recP:30, recK:60, recS:10, mesIdeal:7, tblStep:3,
+  },
+  manga: {
+    nome:'Manga', icon:'🥭', cor:'#ff6f00',
+    nomeCientifico:'Mangifera indica L.',
+    cicloBase:36, tempOpt:26, tempMin:15, tempMax:40,
+    aguaOpt:100, pHOtimo:[5.5,7.5], espOpt:25.0,
+    NOptimo:100, POptimo:40, KOptimo:120, SOptimo:15,
+    prodMin:10, prodMax:30, alturaMax:1500,
+    unidade:'t/ha (frutos frescos)',
+    bmPotencial:9.5, convFreshFactor:7.0, isFruitCrop:true,
+    variedades:[
+      {nome:'Tommy Atkins', ciclo:36, prodFator:1.0, tempOpt:26},
+      {nome:'Palmer', ciclo:36, prodFator:1.05, tempOpt:25},
+      {nome:'BRS-Espada', ciclo:34, prodFator:0.95, tempOpt:27},
+      {nome:'Haden', ciclo:38, prodFator:0.90, tempOpt:25},
+    ],
+    extraLabel:['Brix (°Bx)','Peso do fruto (g)'],
+    extraCalc:(p,fGlobal)=>[
+      +(14+7*fGlobal).toFixed(1),
+      +(250+250*fGlobal).toFixed(0),
+    ],
+    fases:['Estabelecimento','Crescimento vegetativo','Crescimento vegetativo','Formação da copa','Formação da copa','Crescimento produtivo','Crescimento produtivo','Indução floral (seca)','Florescimento','Florescimento','Frutificação/enchimento','Maturação/colheita'],
+    recs:['Plantio em área aberta; espaçamento 5×5m; calagem','Podas de formação; adubação NPK; controle antracnose','Manutenção da copa; adubação K','Poda de limpeza anual; adubação pré-floração','Estresse hídrico controlado para induzir floração','Período seco favorece diferenciação floral','Adubação K+Ca+B; controle de broca Cryptorhynchus','Evitar irrigação no florescimento; monitorar Oidium','Polinização; controle de mosca-das-frutas','Raleio de frutos; adubação foliar K+Ca','Irrigação plena; enchimento do fruto','Colheita no ponto de maturação fisiológica; pós-colheita cuidadoso'],
+    refs:'Embrapa Semi-Árido (2018); Subramanyam (1997); FAOSTAT Mango; Singh (2001); Avilan et al.',
+    defaultN:80, defaultP:35, defaultK:100, defaultS:15, defaultEsp:25.0,
+    recN:100, recP:40, recK:120, recS:15, mesIdeal:7, tblStep:3,
   },
 };
 
@@ -179,7 +305,7 @@ function _buildCrescimentoHTML() {
   return `
 <div style="margin-bottom:12px">
   <div class="sec-title" style="margin-bottom:4px">🌿 Simuladores de Crescimento de Plantas</div>
-  <div style="font-size:12px;color:var(--text3)">Modelos baseados em DSSAT · Embrapa · FAO · CIAT · Mandioca · Tomate · Banana · Abacaxi · Melancia</div>
+  <div style="font-size:12px;color:var(--text3)">Modelos baseados em DSSAT · Embrapa · FAO · CIAT · 10 culturas do Maranhão</div>
 </div>
 
 <div class="sim-tabs-inner" style="margin-bottom:14px">${cropTabs}</div>
@@ -189,6 +315,7 @@ function _buildCrescimentoHTML() {
   <!-- ═══ CONTROLES ═══ -->
   <div class="sim-card" style="margin:0">
     <div class="sim-card-title" id="cresc-panel-title">🌿 Mandioca</div>
+    <button onclick="crescAutoAjustar()" style="width:100%;margin-bottom:10px;padding:7px 10px;border-radius:7px;border:none;background:var(--accent,#2563eb);color:white;font-size:11px;font-weight:600;cursor:pointer;opacity:1;transition:opacity .2s" onmouseover="this.style.opacity='.82'" onmouseout="this.style.opacity='1'">⚡ Ajuste automático para esta cultura e local</button>
 
     <div class="sim-param">
       <label style="font-size:11px;color:var(--text3)">Município do Maranhão</label>
@@ -352,6 +479,11 @@ function _buildCrescimentoHTML() {
       <div id="cresc-alert" style="display:none;margin-top:10px;padding:8px 12px;border-radius:6px;font-size:11px;font-weight:500"></div>
     </div>
 
+    <!-- Diagnóstico -->
+    <div class="chart-card" style="padding:10px 14px" id="cresc-diagnostico">
+      <div style="font-size:11px;color:var(--text3);text-align:center;padding:8px">Aguardando simulação...</div>
+    </div>
+
     <!-- 4 Gráficos -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="chart-card">
@@ -447,6 +579,149 @@ function onCrescMunicipioChange() {
   setV('cresc-ph', m.ph);
   updateCrescLabels();
   updateCrescent();
+}
+
+/* ─────────── AUTO-AJUSTE ─────────── */
+function crescAutoAjustar() {
+  const cropKey = _crescCurrentCrop;
+  const crop = CRESC_CROPS[cropKey];
+  const munKey = document.getElementById('cresc-mun').value;
+  const mun = CRESC_MUN[munKey];
+  const setV = (id,v) => { const el=document.getElementById(id); if(el) el.value=v; };
+
+  setV('cresc-temp', mun.temp);
+  setV('cresc-chuva', mun.chuva);
+  setV('cresc-rad', mun.rad);
+  setV('cresc-ur', mun.ur);
+  setV('cresc-ph', ((crop.pHOtimo[0]+crop.pHOtimo[1])/2).toFixed(1));
+  setV('cresc-N', crop.recN || crop.NOptimo);
+  setV('cresc-P', crop.recP || crop.POptimo);
+  setV('cresc-K', crop.recK || crop.KOptimo);
+  setV('cresc-S', crop.recS || crop.SOptimo);
+  setV('cresc-esp', crop.espOpt);
+  setV('cresc-mes', crop.mesIdeal || 1);
+  setV('cresc-praga', '0');
+  const irrigEl = document.getElementById('cresc-irrig');
+  if (irrigEl) irrigEl.value = mun.chuva < crop.aguaOpt*0.4 ? '2' : mun.chuva < crop.aguaOpt*0.8 ? '1' : '0';
+
+  updateCrescLabels();
+  updateCrescent();
+}
+
+/* ─────────── DIAGNÓSTICO EM TEMPO REAL ─────────── */
+function _updateCrescDiagnostico() {
+  const el = document.getElementById('cresc-diagnostico');
+  if (!el) return;
+  const cropKey = _crescCurrentCrop;
+  const crop = CRESC_CROPS[cropKey];
+  const p = _getCrescParams();
+  const f = _calcCrescFactors(p, crop);
+  const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+  const recN = crop.recN || crop.NOptimo;
+  const recP = crop.recP || crop.POptimo;
+  const recK = crop.recK || crop.KOptimo;
+  const recS = crop.recS || crop.SOptimo;
+
+  const checks = [
+    {
+      label:'Temperatura', value:p.temp+'°C', fv:f.fTemp, ideal:crop.tempOpt+'°C',
+      ok: p.temp >= crop.tempMin+2 && p.temp <= crop.tempMax-3 && f.fTemp >= 0.75,
+      critical: f.fTemp < 0.50,
+      why: p.temp < crop.tempMin+2
+        ? `Muito fria (mín ${crop.tempMin}°C). Crescimento severamente limitado.`
+        : p.temp > crop.tempMax-3
+          ? `Muito quente (máx ${crop.tempMax}°C). Estresse térmico e queda de flores/frutos.`
+          : f.fTemp < 0.75 ? `Subótima. Melhor: ${crop.tempOpt}°C.` : `Temperatura adequada para ${crop.nome}.`,
+    },
+    {
+      label:'Chuva/Água', value:p.chuva+'mm/mês', fv:f.fWater, ideal:crop.aguaOpt+'mm/mês',
+      ok: f.fWater >= 0.75,
+      critical: f.fWater < 0.45,
+      why: f.fWater < 0.45
+        ? `Déficit hídrico severo. Necessita ${crop.aguaOpt}mm/mês.${p.irrig===0?' Ative a irrigação!':''}`
+        : f.fWater < 0.75
+          ? `Abaixo do ideal (${crop.aguaOpt}mm). Produção reduzida.`
+          : `Suprimento hídrico adequado.`,
+    },
+    {
+      label:'pH do Solo', value:p.ph.toFixed(1), fv:f.fPH, ideal:crop.pHOtimo[0]+'-'+crop.pHOtimo[1],
+      ok: p.ph >= crop.pHOtimo[0] && p.ph <= crop.pHOtimo[1],
+      critical: f.fPH < 0.50,
+      why: p.ph < crop.pHOtimo[0]
+        ? `Muito ácido. Aplicar calcário dolomítico para elevar a ${crop.pHOtimo[0]}.`
+        : p.ph > crop.pHOtimo[1]
+          ? `Muito alcalino. Adicionar enxofre elementar ou fertilizante ácido.`
+          : `pH dentro da faixa ótima para ${crop.nome}.`,
+    },
+    {
+      label:'Nitrogênio (N)', value:p.N+'kg/ha', fv:f.fN, ideal:recN+'kg/ha',
+      ok: p.N >= recN*0.70,
+      critical: p.N < recN*0.30,
+      why: p.N < recN*0.30
+        ? `N gravemente insuficiente. Causa clorose foliar e baixíssima produção.`
+        : p.N < recN*0.70
+          ? `N abaixo do recomendado (${recN}kg/ha). Parcelar adubação nitrogenada.`
+          : p.N > recN*1.6
+            ? `Excesso de N. Pode causar crescimento excessivo e reduzir frutificação.`
+            : `N adequado para ${crop.nome}.`,
+    },
+    {
+      label:'Fósforo (P₂O₅)', value:p.P+'kg/ha', fv:f.fP, ideal:recP+'kg/ha',
+      ok: p.P >= recP*0.70,
+      critical: p.P < recP*0.25,
+      why: p.P < recP*0.25
+        ? `P gravemente insuficiente. Prejudica enraizamento e florescimento.`
+        : p.P < recP*0.70
+          ? `P abaixo do recomendado (${recP}kg/ha). Aplicar na adubação de base.`
+          : `Fósforo adequado para o cultivo.`,
+    },
+    {
+      label:'Potássio (K₂O)', value:p.K+'kg/ha', fv:f.fK, ideal:recK+'kg/ha',
+      ok: p.K >= recK*0.70,
+      critical: p.K < recK*0.25,
+      why: p.K < recK*0.25
+        ? `K gravemente insuficiente. Afeta qualidade dos frutos e resistência a doenças.`
+        : p.K < recK*0.70
+          ? `K abaixo do recomendado (${recK}kg/ha). Parcelar em cobertura.`
+          : `Potássio adequado para o cultivo.`,
+    },
+    {
+      label:'Mês de Plantio', value:MONTHS[p.mes-1], fv:null,
+      ideal: crop.mesIdeal ? MONTHS[crop.mesIdeal-1]+'±1' : 'qualquer',
+      ok: !crop.mesIdeal || [0,1,11].map(d => ((p.mes-1+d)%12===crop.mesIdeal-1)).some(Boolean)
+        || Math.abs(p.mes-crop.mesIdeal)<=1,
+      critical: false,
+      why: crop.mesIdeal && !(Math.abs(p.mes-crop.mesIdeal)<=1 || Math.abs(p.mes-crop.mesIdeal)>=11)
+        ? `Mês não ideal no MA. Melhor: ${MONTHS[crop.mesIdeal-1]}±1. Pode impactar florescimento e chuvas.`
+        : `Mês de plantio adequado para ${crop.nome} no Maranhão.`,
+    },
+    {
+      label:'Pragas/Doenças', value:['Nenhuma','Leve','Moderada','Severa'][p.praga], fv:f.fPraga,
+      ideal:'Nenhuma/Leve',
+      ok: p.praga <= 1,
+      critical: p.praga === 3,
+      why: p.praga===3
+        ? `Pressão severa! Aplique MIP urgente. Perdas de 45-55% na produção.`
+        : p.praga===2
+          ? `Pressão moderada. Implante MIP (Manejo Integrado de Pragas).`
+          : `Situação fitossanitária adequada.`,
+    },
+  ];
+
+  const icon = c => c.critical?'err':(!c.ok||(c.fv!==null&&c.fv<0.75))?'warn':'ok';
+  const bg   = c => ({err:'#fef2f2',warn:'#fffbeb',ok:'#f0fdf4'}[icon(c)]);
+  const col  = c => ({err:'#dc2626',warn:'#d97706',ok:'#15803d'}[icon(c)]);
+  const ico  = c => ({err:'❌',warn:'⚠️',ok:'✅'}[icon(c)]);
+
+  el.innerHTML = `<div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px">🩺 Diagnóstico em tempo real<span style="font-size:10px;font-weight:400;color:var(--text3)">— ${crop.icon} ${crop.nome}</span></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px">
+${checks.map(c=>`<div style="background:${bg(c)};border:1px solid ${col(c)}33;border-radius:6px;padding:6px 8px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px"><span style="font-size:10px;font-weight:600;color:var(--text2)">${c.label}</span><span style="font-size:13px">${ico(c)}</span></div>
+<div style="font-size:11px;font-weight:700;color:${col(c)}">${c.value}</div>
+<div style="font-size:9px;color:var(--text3)">ideal: ${c.ideal}</div>
+${icon(c)!=='ok'?`<div style="font-size:9px;color:${col(c)};margin-top:3px;line-height:1.3">${c.why}</div>`:''}</div>`).join('')}
+</div>`;
 }
 
 /* ─────────── LABELS DOS SLIDERS ─────────── */
@@ -567,6 +842,31 @@ function _crescGrowthFrac(cropKey, m, ciclo) {
       if (t<0.22) return t/0.22*0.28;
       if (t<0.62) return 0.28+(t-0.22)/0.40*0.68;
       return 0.96+(t-0.62)/0.38*0.04;
+    case 'acai':
+      if (t<=0.15) return 0.01+0.11*(t/0.15);
+      if (t<=0.45) return 0.12+0.33*((t-0.15)/0.30);
+      if (t<=0.78) return 0.45+0.43*((t-0.45)/0.33);
+      return 0.88+0.12*((t-0.78)/0.22);
+    case 'cupuacu':
+      if (t<=0.12) return 0.01+0.09*(t/0.12);
+      if (t<=0.40) return 0.10+0.28*((t-0.12)/0.28);
+      if (t<=0.72) return 0.38+0.45*((t-0.40)/0.32);
+      return 0.83+0.17*((t-0.72)/0.28);
+    case 'buriti':
+      if (t<=0.10) return 0.005+0.05*(t/0.10);
+      if (t<=0.40) return 0.055+0.22*((t-0.10)/0.30);
+      if (t<=0.75) return 0.275+0.52*((t-0.40)/0.35);
+      return 0.795+0.205*((t-0.75)/0.25);
+    case 'caju':
+      if (t<=0.12) return 0.02+0.15*(t/0.12);
+      if (t<=0.38) return 0.17+0.33*((t-0.12)/0.26);
+      if (t<=0.68) return 0.50+0.38*((t-0.38)/0.30);
+      return 0.88+0.12*((t-0.68)/0.32);
+    case 'manga':
+      if (t<=0.14) return 0.02+0.18*(t/0.14);
+      if (t<=0.42) return 0.20+0.38*((t-0.14)/0.28);
+      if (t<=0.70) return 0.58+0.32*((t-0.42)/0.28);
+      return 0.90+0.10*((t-0.70)/0.30);
     default:
       return t;
   }
@@ -598,6 +898,31 @@ function _crescPartition(cropKey, t) {
       const lfM=Math.max(0.10,0.40-frM*0.22);
       return {root:0.04, leaf:lfM, stem:Math.max(0.04,1-frM-lfM-0.04), fruit:frM};
     }
+    case 'acai': {
+      const fr=Math.min(0.45,Math.max(0,(t-0.60)/0.40)*0.50);
+      const lf=Math.max(0.12,0.38-fr*0.25);
+      return {root:0.08,leaf:lf,stem:Math.max(0.08,1-fr-lf-0.08),fruit:fr};
+    }
+    case 'cupuacu': {
+      const fr=Math.min(0.52,Math.max(0,(t-0.58)/0.42)*0.58);
+      const lf=Math.max(0.15,0.40-fr*0.25);
+      return {root:0.10,leaf:lf,stem:Math.max(0.08,1-fr-lf-0.10),fruit:fr};
+    }
+    case 'buriti': {
+      const fr=Math.min(0.40,Math.max(0,(t-0.68)/0.32)*0.45);
+      const lf=Math.max(0.15,0.35-fr*0.18);
+      return {root:0.12,leaf:lf,stem:Math.max(0.12,1-fr-lf-0.12),fruit:fr};
+    }
+    case 'caju': {
+      const fr=Math.min(0.48,Math.max(0,(t-0.50)/0.50)*0.55);
+      const lf=Math.max(0.12,0.38-fr*0.22);
+      return {root:0.08,leaf:lf,stem:Math.max(0.08,1-fr-lf-0.08),fruit:fr};
+    }
+    case 'manga': {
+      const fr=Math.min(0.55,Math.max(0,(t-0.55)/0.45)*0.60);
+      const lf=Math.max(0.12,0.38-fr*0.22);
+      return {root:0.08,leaf:lf,stem:Math.max(0.08,1-fr-lf-0.08),fruit:fr};
+    }
     default:
       return {root:0.25, leaf:0.25, stem:0.25, fruit:0.25};
   }
@@ -618,6 +943,16 @@ function _crescHeight(cropKey, m, ciclo, maxH) {
       return Math.min(maxH, 8+maxH*0.88*t);
     case 'melancia':
       return Math.min(maxH, 4+maxH*t);
+    case 'acai':
+      return Math.min(maxH, 20+maxH*(1-Math.exp(-3.5*t)));
+    case 'cupuacu':
+      return Math.min(maxH, 15+maxH*(1-Math.exp(-2.5*t)));
+    case 'buriti':
+      return Math.min(maxH, 10+maxH*(1-Math.exp(-2.0*t)));
+    case 'caju':
+      return Math.min(maxH, 20+maxH*0.85*Math.min(1,t*1.8));
+    case 'manga':
+      return Math.min(maxH, 25+maxH*0.88*Math.min(1,t*1.6));
     default:
       return Math.min(maxH, maxH*t);
   }
@@ -646,6 +981,26 @@ function _crescLAI(cropKey, m, ciclo) {
       if (t<0.32) return t/0.32*2.8;
       if (t<0.68) return 2.8+(t-0.32)/0.36*0.8;
       return Math.max(0.5,3.6-(t-0.68)/0.32*2.2);
+    case 'acai':
+      if (t<0.30) return t/0.30*3.5;
+      if (t<0.70) return 3.5+(t-0.30)/0.40*1.5;
+      return Math.max(2.5,5.0-(t-0.70)/0.30*0.5);
+    case 'cupuacu':
+      if (t<0.35) return t/0.35*3.0;
+      if (t<0.70) return 3.0+(t-0.35)/0.35*1.5;
+      return Math.max(2.0,4.5-(t-0.70)/0.30*0.8);
+    case 'buriti':
+      if (t<0.35) return t/0.35*4.0;
+      if (t<0.75) return 4.0+(t-0.35)/0.40*2.0;
+      return Math.max(3.0,6.0-(t-0.75)/0.25*0.5);
+    case 'caju':
+      if (t<0.30) return t/0.30*2.5;
+      if (t<0.65) return 2.5+(t-0.30)/0.35*1.0;
+      return Math.max(1.0,3.5-(t-0.65)/0.35*1.0);
+    case 'manga':
+      if (t<0.30) return t/0.30*3.0;
+      if (t<0.65) return 3.0+(t-0.30)/0.35*1.5;
+      return Math.max(2.0,4.5-(t-0.65)/0.35*0.8);
     default:
       return Math.sin(t*Math.PI)*3.5;
   }
@@ -772,6 +1127,7 @@ function updateCrescent() {
   _drawCrescPlant(cropKey, result.fGlobal, last.height, last.freshYield, result.ciclo);
   _updateCrescCharts(result, crop, cropKey);
   _updateCrescTable(result, crop, cropKey);
+  _updateCrescDiagnostico();
 }
 
 /* ─────────── DESENHO SVG DA PLANTA ─────────── */
@@ -811,6 +1167,11 @@ function _drawCrescPlant(cropKey, health, height, freshYield, ciclo) {
     case 'banana':   _drawBanana(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
     case 'abacaxi':  _drawAbacaxi(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
     case 'melancia': _drawMelancia(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
+    case 'acai':     _drawAcai(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
+    case 'cupuacu':  _drawCupuacu(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
+    case 'buriti':   _drawBuriti(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
+    case 'caju':     _drawCaju(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
+    case 'manga':    _drawManga(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
   }
 }
 
@@ -1205,6 +1566,220 @@ function _updateCrescCharts(result, crop, cropKey) {
 }
 
 /* ─────────── TABELA CRONOGRAMA ─────────── */
+/* ─────────── SVG — NOVAS CULTURAS ─────────── */
+function _drawAcai(ns,gS,gL,gF,h,height,yld) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const sH=Math.min(170,20+height*0.12);
+  const sw=3+2*Math.min(1,height/800);
+  // Estipe fino
+  const st=document.createElementNS(ns,'path');
+  st.setAttribute('d',`M${cx-sw},${cy} Q${cx-sw*0.8},${_svgN(cy-sH*0.5)} ${cx-sw*0.5},${_svgN(cy-sH)}`);
+  st.setAttribute('stroke','#5a3518'); st.setAttribute('stroke-width',sw*2+'');
+  st.setAttribute('fill','none'); st.setAttribute('opacity',Math.min(1,h+0.2)+''); gS.appendChild(st);
+  // Cicatrizes foliares
+  for(let k=0;k<4;k++){
+    const lly=_svgN(cy-sH*(0.25+k*0.18));
+    const ci=document.createElementNS(ns,'path');
+    ci.setAttribute('d',`M${_svgN(cx-sw*1.5)},${lly} Q${cx},${_svgN(lly-2)} ${_svgN(cx+sw*1.5)},${lly}`);
+    ci.setAttribute('stroke','#3a2010'); ci.setAttribute('stroke-width','0.8');
+    ci.setAttribute('fill','none'); ci.setAttribute('opacity','0.5'); gS.appendChild(ci);
+  }
+  // Folhas pinadas
+  if (h>0.08) {
+    const lc=h>0.6?'#2d7a1a':'#4a9a2e';
+    const nL=h>0.4?5:3;
+    [[-1,-0.95],[-0.5,-1.05],[0,-1.10],[0.5,-1.02],[1.1,-0.92]].slice(0,nL).forEach(([ax,ay]) => {
+      const llx=_svgN(cx+ax*50*Math.min(1,h+0.2));
+      const lly=_svgN(cy-sH+ay*22*Math.min(1,h+0.2));
+      const mx=_svgN(cx+(llx-cx)*0.5), my=_svgN(cy-sH+(lly-cy+sH)*0.5+6);
+      const lf=document.createElementNS(ns,'path');
+      lf.setAttribute('d',`M${cx},${_svgN(cy-sH)} Q${mx},${_svgN(my-8)} ${llx},${lly} Q${_svgN(mx+4)},${_svgN(my+4)} ${cx},${_svgN(cy-sH)} Z`);
+      lf.setAttribute('fill',lc); lf.setAttribute('stroke','#1a5a08');
+      lf.setAttribute('stroke-width','0.5'); lf.setAttribute('opacity',Math.min(1,h+0.2)+''); gL.appendChild(lf);
+    });
+  }
+  // Cachos (bolinhas roxas)
+  if (yld>0.5 && h>0.35) {
+    const bOp=Math.min(1,yld/12);
+    const bSc=Math.min(1,yld/18);
+    [[-12,-18],[8,-22]].slice(0,Math.round(1+bSc)).forEach(([bx,by]) => {
+      for(let k=0;k<Math.round(5+8*bSc);k++){
+        const fx=_svgN(cx+bx+Math.sin(k*2.1)*9*bSc);
+        const fy=_svgN(cy-sH+by+Math.cos(k*2.1)*7*bSc);
+        const fr=document.createElementNS(ns,'circle');
+        fr.setAttribute('cx',fx+''); fr.setAttribute('cy',fy+'');
+        fr.setAttribute('r','2.5'); fr.setAttribute('fill','#4a148c');
+        fr.setAttribute('stroke','#1a0044'); fr.setAttribute('stroke-width','0.4');
+        fr.setAttribute('opacity',bOp.toFixed(2)); gF.appendChild(fr);
+      }
+    });
+  }
+}
+
+function _drawCupuacu(ns,gS,gL,gF,h,height,yld) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const sH=Math.min(150,15+height*0.18);
+  const sw=5+4*Math.min(1,height/600);
+  // Tronco
+  const tr=document.createElementNS(ns,'path');
+  tr.setAttribute('d',`M${cx-sw},${cy} L${_svgN(cx-sw*0.6)},${_svgN(cy-sH)} L${_svgN(cx+sw*0.6)},${_svgN(cy-sH)} L${cx+sw},${cy} Z`);
+  tr.setAttribute('fill','#4a2c10'); tr.setAttribute('stroke','#2a1408');
+  tr.setAttribute('stroke-width','0.7'); tr.setAttribute('opacity',Math.min(1,h+0.15)+''); gS.appendChild(tr);
+  // Copa densa
+  if (h>0.08) {
+    const cr=Math.min(68,22+55*Math.min(1,h));
+    const ch=Math.min(72,18+60*Math.min(1,h));
+    const lc=h>0.6?'#2d6a14':'#4a8a22';
+    const c1=document.createElementNS(ns,'ellipse');
+    c1.setAttribute('cx',cx+''); c1.setAttribute('cy',_svgN(cy-sH-ch*0.38)+'');
+    c1.setAttribute('rx',cr+''); c1.setAttribute('ry',_svgN(ch*0.65)+'');
+    c1.setAttribute('fill',lc); c1.setAttribute('opacity','0.88'); gL.appendChild(c1);
+    if (h>0.3) {
+      const c2=document.createElementNS(ns,'ellipse');
+      c2.setAttribute('cx',_svgN(cx-cr*0.2)+''); c2.setAttribute('cy',_svgN(cy-sH-ch*0.58)+'');
+      c2.setAttribute('rx',_svgN(cr*0.55)+''); c2.setAttribute('ry',_svgN(ch*0.48)+'');
+      c2.setAttribute('fill',h>0.6?'#3d7a1a':'#5a9a28');
+      c2.setAttribute('opacity','0.65'); gL.appendChild(c2);
+    }
+  }
+  // Frutos grandes ovais
+  if (yld>0.5 && h>0.3) {
+    const frOp=Math.min(1,yld/10);
+    const frSc=Math.min(1,yld/14);
+    [[-22,12],[8,5],[28,18]].slice(0,Math.round(1+2*frSc)).forEach(([dx,dy]) => {
+      const fb=document.createElementNS(ns,'ellipse');
+      fb.setAttribute('cx',_svgN(cx+dx)+''); fb.setAttribute('cy',_svgN(cy-sH*0.55+dy)+'');
+      fb.setAttribute('rx',_svgN(8+6*frSc)+''); fb.setAttribute('ry',_svgN(12+9*frSc)+'');
+      fb.setAttribute('fill','#6d4c41'); fb.setAttribute('stroke','#3e2723');
+      fb.setAttribute('stroke-width','0.8'); fb.setAttribute('opacity',frOp.toFixed(2)); gF.appendChild(fb);
+    });
+  }
+}
+
+function _drawBuriti(ns,gS,gL,gF,h,height,yld) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const sH=Math.min(175,10+height*0.088);
+  const sw=6+5*Math.min(1,height/1500);
+  // Estipe cilíndrico
+  const st=document.createElementNS(ns,'path');
+  st.setAttribute('d',`M${cx-sw},${cy} Q${_svgN(cx-sw*0.8)},${_svgN(cy-sH*0.6)} ${_svgN(cx-sw*0.65)},${_svgN(cy-sH)} L${_svgN(cx+sw*0.65)},${_svgN(cy-sH)} Q${_svgN(cx+sw*0.8)},${_svgN(cy-sH*0.6)} ${cx+sw},${cy} Z`);
+  st.setAttribute('fill','#6d4c20'); st.setAttribute('stroke','#3a2010');
+  st.setAttribute('stroke-width','0.8'); st.setAttribute('opacity',Math.min(1,h+0.2)+''); gS.appendChild(st);
+  // Folhas em leque (fan palm)
+  if (h>0.08) {
+    const lc=h>0.6?'#1a5e0a':'#3a7a1e';
+    const nL=h>0.5?7:h>0.25?5:3;
+    const lLen=32+40*Math.min(1,h+0.1);
+    for(let i=0;i<nL;i++){
+      const ang=(-0.58+(i/(nL-1))*1.16)*Math.PI;
+      const tipX=_svgN(cx+Math.cos(ang)*lLen);
+      const tipY=_svgN(cy-sH+Math.sin(ang)*lLen*0.5+4);
+      const perp=ang+Math.PI/2;
+      const w=10+8*Math.min(1,h);
+      const bx=cx, by=_svgN(cy-sH+2);
+      const fan=document.createElementNS(ns,'path');
+      fan.setAttribute('d',
+        `M${bx},${by} Q${_svgN(cx+Math.cos(ang)*lLen*0.4+Math.cos(perp)*w)},${_svgN(cy-sH+Math.sin(ang)*lLen*0.4*0.5+Math.sin(perp)*w*0.5)} ${tipX},${tipY} Q${_svgN(cx+Math.cos(ang)*lLen*0.4-Math.cos(perp)*w)},${_svgN(cy-sH+Math.sin(ang)*lLen*0.4*0.5-Math.sin(perp)*w*0.5)} ${bx},${by} Z`);
+      fan.setAttribute('fill',lc); fan.setAttribute('stroke','#0f3008');
+      fan.setAttribute('stroke-width','0.5'); fan.setAttribute('opacity',Math.min(1,h+0.15)+''); gL.appendChild(fan);
+    }
+  }
+  // Cacho (frutos escamosos alaranjados)
+  if (yld>0.3 && h>0.4) {
+    const bOp=Math.min(1,yld/8);
+    const bSc=Math.min(1,yld/12);
+    const nc=Math.round(4+7*bSc);
+    for(let k=0;k<nc;k++){
+      const fx=_svgN(cx+8+Math.sin(k*1.9)*14*bSc);
+      const fy=_svgN(cy-sH-14+Math.cos(k*1.9)*10*bSc);
+      const fr=document.createElementNS(ns,'circle');
+      fr.setAttribute('cx',fx+''); fr.setAttribute('cy',fy+'');
+      fr.setAttribute('r',_svgN(3+2.5*bSc)+''); fr.setAttribute('fill','#e64a00');
+      fr.setAttribute('stroke','#bf360c'); fr.setAttribute('stroke-width','0.5');
+      fr.setAttribute('opacity',bOp.toFixed(2)); gF.appendChild(fr);
+    }
+  }
+}
+
+function _drawCaju(ns,gS,gL,gF,h,height,yld) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const sH=Math.min(135,18+height*0.11);
+  const sw=5+4*Math.min(1,height/900);
+  // Tronco tortuoso
+  const tr=document.createElementNS(ns,'path');
+  tr.setAttribute('d',`M${cx-sw},${cy} Q${_svgN(cx+4)},${_svgN(cy-sH*0.45)} ${_svgN(cx-3)},${_svgN(cy-sH)} L${_svgN(cx+sw*0.7)},${_svgN(cy-sH)} Q${cx+sw},${_svgN(cy-sH*0.45)} ${cx+sw},${cy} Z`);
+  tr.setAttribute('fill','#5a3515'); tr.setAttribute('stroke','#3a2010');
+  tr.setAttribute('stroke-width','0.7'); tr.setAttribute('opacity',Math.min(1,h+0.15)+''); gS.appendChild(tr);
+  // Copa larga e baixa
+  if (h>0.08) {
+    const cr=Math.min(72,18+65*Math.min(1,h));
+    const ch=Math.min(55,12+48*Math.min(1,h));
+    const lc=h>0.6?'#2a6010':'#3a8018';
+    [[0,0,1.0],[cx*0.2,ch*0.18,0.75],[-cx*0.15,ch*0.22,0.72]].forEach(([dx,dy,sc]) => {
+      const c=document.createElementNS(ns,'ellipse');
+      c.setAttribute('cx',_svgN(cx+dx)+''); c.setAttribute('cy',_svgN(cy-sH-ch*0.38+dy)+'');
+      c.setAttribute('rx',_svgN(cr*sc)+''); c.setAttribute('ry',_svgN(ch*0.62*sc)+'');
+      c.setAttribute('fill',lc); c.setAttribute('opacity',Math.min(0.9,h+0.08)+''); gL.appendChild(c);
+    });
+  }
+  // Pedúnculo (pera) + castanha
+  if (yld>0.5 && h>0.3) {
+    const frOp=Math.min(1,yld/10);
+    const frSc=Math.min(1,yld/14);
+    [[-18,8],[12,2],[0,-10]].slice(0,Math.round(1+2*frSc)).forEach(([dx,dy]) => {
+      const fx=_svgN(cx+dx), fy=_svgN(cy-sH*0.55+dy);
+      const fh=_svgN(8+7*frSc);
+      const pe=document.createElementNS(ns,'path');
+      pe.setAttribute('d',`M${_svgN(fx-5*frSc)},${_svgN(fy+fh*0.4)} Q${_svgN(fx-7*frSc)},${fy} ${fx},${_svgN(fy-fh*0.7)} Q${_svgN(fx+7*frSc)},${fy} ${_svgN(fx+5*frSc)},${_svgN(fy+fh*0.4)} Z`);
+      pe.setAttribute('fill',yld>7?'#f44336':'#ff8f00'); pe.setAttribute('stroke','#c62828');
+      pe.setAttribute('stroke-width','0.5'); pe.setAttribute('opacity',frOp.toFixed(2)); gF.appendChild(pe);
+      const ca=document.createElementNS(ns,'path');
+      ca.setAttribute('d',`M${fx},${_svgN(fy-fh*0.7)} Q${_svgN(fx+8)},${_svgN(fy-fh*1.1)} ${_svgN(fx+3)},${_svgN(fy-fh*1.5)} Q${_svgN(fx-4)},${_svgN(fy-fh*1.1)} ${fx},${_svgN(fy-fh*0.7)} Z`);
+      ca.setAttribute('fill','#795548'); ca.setAttribute('opacity',(frOp*0.9).toFixed(2)); gF.appendChild(ca);
+    });
+  }
+}
+
+function _drawManga(ns,gS,gL,gF,h,height,yld) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const sH=Math.min(155,22+height*0.09);
+  const sw=6+5*Math.min(1,height/1200);
+  // Tronco reto
+  const tr=document.createElementNS(ns,'path');
+  tr.setAttribute('d',`M${cx-sw},${cy} L${_svgN(cx-sw*0.75)},${_svgN(cy-sH)} L${_svgN(cx+sw*0.75)},${_svgN(cy-sH)} L${cx+sw},${cy} Z`);
+  tr.setAttribute('fill','#4a2c10'); tr.setAttribute('stroke','#2a1408');
+  tr.setAttribute('stroke-width','0.7'); tr.setAttribute('opacity',Math.min(1,h+0.2)+''); gS.appendChild(tr);
+  // Copa densa arredondada (mangueira)
+  if (h>0.08) {
+    const cr=Math.min(78,20+68*Math.min(1,h));
+    const ch=Math.min(85,16+75*Math.min(1,h));
+    const lc=h>0.6?'#1a5e08':'#2a7a12';
+    const c1=document.createElementNS(ns,'ellipse');
+    c1.setAttribute('cx',cx+''); c1.setAttribute('cy',_svgN(cy-sH-ch*0.40)+'');
+    c1.setAttribute('rx',cr+''); c1.setAttribute('ry',_svgN(ch*0.60)+'');
+    c1.setAttribute('fill',lc); c1.setAttribute('opacity','0.92'); gL.appendChild(c1);
+    const c2=document.createElementNS(ns,'ellipse');
+    c2.setAttribute('cx',_svgN(cx-cr*0.1)+''); c2.setAttribute('cy',_svgN(cy-sH-ch*0.62)+'');
+    c2.setAttribute('rx',_svgN(cr*0.62)+''); c2.setAttribute('ry',_svgN(ch*0.40)+'');
+    c2.setAttribute('fill',h>0.6?'#2d7a14':'#3d9020');
+    c2.setAttribute('opacity','0.70'); gL.appendChild(c2);
+  }
+  // Mangas (formato gota/rim)
+  if (yld>1 && h>0.3) {
+    const frOp=Math.min(1,yld/15);
+    const frSc=Math.min(1,yld/22);
+    [[-24,-8],[14,-18],[36,0],[-8,-22],[26,-6]].slice(0,Math.round(1+4*frSc)).forEach(([dx,dy]) => {
+      const fx=_svgN(cx+dx), fy=_svgN(cy-sH*0.45+dy);
+      const fw=_svgN(5+6*frSc), fh2=_svgN(8+9*frSc);
+      const mg=document.createElementNS(ns,'path');
+      mg.setAttribute('d',`M${fx},${_svgN(fy-fh2-3)} Q${_svgN(fx+fw+3)},${fy} ${fx},${_svgN(fy+fh2)} Q${_svgN(fx-fw-3)},${fy} ${fx},${_svgN(fy-fh2-3)} Z`);
+      mg.setAttribute('fill',yld>15?'#ff8f00':'#ffa000'); mg.setAttribute('stroke','#e65100');
+      mg.setAttribute('stroke-width','0.5'); mg.setAttribute('opacity',frOp.toFixed(2)); gF.appendChild(mg);
+    });
+  }
+}
+
+/* ─────────── TABELA CRONOGRAMA ─────────── */
 function _updateCrescTable(result, crop, cropKey) {
   const thead = document.getElementById('cresc-tbl-head');
   const tbody = document.getElementById('cresc-tbl-body');
@@ -1226,7 +1801,9 @@ function _updateCrescTable(result, crop, cropKey) {
   </tr>`;
 
   tbody.innerHTML = '';
+  const tblStep = crop.tblStep || 1;
   result.months.forEach((m, i) => {
+    if (tblStep > 1 && m.m % tblStep !== 0 && m.m !== result.ciclo) return;
     const isHarvest = (m.m === result.ciclo);
     const hColor = m.health>70?'#15803d':m.health>40?'#d97706':'#dc2626';
     const phase = crop.fases[Math.min(i, crop.fases.length-1)];
