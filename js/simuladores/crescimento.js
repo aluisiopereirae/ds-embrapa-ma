@@ -24,7 +24,7 @@ const CRESC_MUN = {
 /* ─────────── BANCO DE DADOS DAS CULTURAS ─────────── */
 const CRESC_CROPS = {
   mandioca: {
-    nome:'Mandioca', icon:'🌿', cor:'#639922',
+    nome:'Mandioca', icon:'🌿', cor:'#639922', cropType:'root',
     nomeCientifico:'Manihot esculenta Crantz',
     cicloBase:12, tempOpt:27, tempMin:15, tempMax:40,
     aguaOpt:150, pHOtimo:[5.5,6.5], espOpt:1.0,
@@ -48,9 +48,10 @@ const CRESC_CROPS = {
     recs:['Garantir boa umidade para brotação das estacas','Monitorar emergência; replantio se necessário','Adubação nitrogenada (1/3 da dose)','Controle preventivo de pragas foliares','Aplicar K₂O restante; capina se necessário','Avaliar estresses hídricos; irrigar se seco','Suspender nitrogênio; maximizar K para amido','Monitorar bacteriose e mosaico-comum','Preparar colheita; avaliar teor de amido','Colheita ótima para teor de amido máximo','Colheita recomendada antes de 14 meses','Colher! Raízes perdem qualidade após colheita','Risco de deterioração; colher imediatamente','Deterioração das raízes — colheita urgente'],
     refs:'Howeler & Cadavid (1983); Cock (1985 CIAT); LINTUL-Cassava-NPK (2022); Embrapa ZARC-MA; Oliveira Jr. et al.',
     defaultN:80, defaultP:60, defaultK:80, defaultS:20, defaultEsp:1.0,
+    recN:100, recP:60, recK:150, recS:20, mesIdeal:3, tblStep:1,
   },
   tomate: {
-    nome:'Tomate', icon:'🍅', cor:'#e53935',
+    nome:'Tomate', icon:'🍅', cor:'#e53935', cropType:'shrub',
     nomeCientifico:'Solanum lycopersicum L.',
     cicloBase:4, tempOpt:23, tempMin:10, tempMax:35,
     aguaOpt:120, pHOtimo:[6.0,6.8], espOpt:0.6,
@@ -73,9 +74,10 @@ const CRESC_CROPS = {
     recs:['Adubação de base P+K; solo bem preparado e drenado','Irrigação diária; monitorar tombamento (Pythium)','Adubação N parcelada; tutoramento e desbrota','Polinização; controle de Tuta absoluta','Adubação potássica para enchimento; controle de fungos','Colheita escalonada a cada 3-5 dias; refrigeração pós-colheita'],
     refs:'Embrapa Hortaliças (2019); DSSAT-CERES-Tomato v4.7; Marouelli et al. (2012); FAO CROPWAT Tomato',
     defaultN:150, defaultP:100, defaultK:200, defaultS:25, defaultEsp:0.5,
+    recN:160, recP:100, recK:210, recS:25, mesIdeal:7, tblStep:1,
   },
   banana: {
-    nome:'Banana', icon:'🍌', cor:'#f9a825',
+    nome:'Banana', icon:'🍌', cor:'#f9a825', cropType:'shrub',
     nomeCientifico:'Musa spp.',
     cicloBase:13, tempOpt:27, tempMin:15, tempMax:38,
     aguaOpt:180, pHOtimo:[5.5,7.0], espOpt:2.5,
@@ -99,9 +101,10 @@ const CRESC_CROPS = {
     recs:['Plantio das mudas (rizomas ou mudas-chifre); calagem','Manter umidade; controlar broca-do-rizoma','Adubação N parcelada mensalmente','Monitorar Sigatoka amarela; limpar folhas secas','Escore de número de folhas; irrigação regular','Adubação K pesada (maior demanda vegetativa)','Aparecimento da penca floral; proteger com saco','Desbaste para 7-9 pencas; remoção de pencas extras','Irrigação intensa; adubação foliar de K','Proteger o cacho de pássaros e sol direto','Avaliação do grau de maturação (calibre ≥ 32mm)','Colheita no ponto firme (maturação fisiológica)','Transporte refrigerado; embalagem para exportação','Brotação das filhotes para segunda safra (ratoon)'],
     refs:'Embrapa Mandioca e Fruticultura (2020); Robinson & Galán Saúco (2010); FAO Musa; IBGE-PAM 2023',
     defaultN:200, defaultP:40, defaultK:400, defaultS:20, defaultEsp:6.0,
+    recN:220, recP:45, recK:450, recS:20, mesIdeal:3, tblStep:1,
   },
   abacaxi: {
-    nome:'Abacaxi', icon:'🍍', cor:'#ff8f00',
+    nome:'Abacaxi', icon:'🍍', cor:'#ff8f00', cropType:'shrub',
     nomeCientifico:'Ananas comosus (L.) Merr.',
     cicloBase:16, tempOpt:26, tempMin:15, tempMax:35,
     aguaOpt:100, pHOtimo:[4.5,5.5], espOpt:0.3,
@@ -124,9 +127,10 @@ const CRESC_CROPS = {
     recs:['Plantio das mudas; orientação da bainha solar','Rega leve; solo solto; sem encharcamento','Adubação foliar (N+K); controle de plantas daninhas','Fertilização foliar mensal; inspeção nematoides','Controle de cochonilhas; monitoramento','Fertilização K pesada (maior volume de planta)','Fertilização foliar K+Mg; inspeção broca','Adubação N suspensa; maximizar amido','Aplicação de Ethephon para induzir floração uniforme','Proteger inflorescência; umbigo do fruto','Raleio de frutinhos extras; proteção solar','Adubação Ca-B para qualidade','Irrigação regular; evitar déficit hídrico','Adubação foliar + controle de Phytophthora','Avaliar Brix ≥ 12°; casca amarelando','Colheita manual; pedúnculo de 3cm','Seleção, classificação e embalagem dos frutos','Rebrota dos filhotes para 2º ciclo (ratoon)'],
     refs:'Embrapa Mandioca e Fruticultura (CNPMF); Py et al. (1987); Oliveira & Souza (2018); FAO',
     defaultN:30, defaultP:18, defaultK:50, defaultS:8, defaultEsp:0.3,
+    recN:30, recP:18, recK:50, recS:8, mesIdeal:5, tblStep:1,
   },
   melancia: {
-    nome:'Melancia', icon:'🍉', cor:'#2e7d32',
+    nome:'Melancia', icon:'🍉', cor:'#2e7d32', cropType:'vine',
     nomeCientifico:'Citrullus lanatus (Thunb.)',
     cicloBase:4, tempOpt:28, tempMin:18, tempMax:38,
     aguaOpt:130, pHOtimo:[6.0,7.0], espOpt:2.0,
@@ -152,8 +156,195 @@ const CRESC_CROPS = {
     defaultN:100, defaultP:80, defaultK:130, defaultS:15, defaultEsp:3.0,
     recN:100, recP:80, recK:130, recS:15, mesIdeal:3, tblStep:1,
   },
+  feijao: {
+    nome:'Feijão-Caupi', icon:'🫘', cor:'#795548', cropType:'legume',
+    nomeCientifico:'Vigna unguiculata (L.) Walp.',
+    cicloBase:3, tempOpt:27, tempMin:18, tempMax:38,
+    aguaOpt:80, pHOtimo:[5.5,7.0], espOpt:0.15,
+    NOptimo:40, POptimo:40, KOptimo:40, SOptimo:10,
+    prodMin:0.8, prodMax:3.5, alturaMax:60, unidade:'t/ha (grãos)',
+    bmPotencial:5.5, convFreshFactor:1.0, isFruitCrop:true,
+    variedades:[
+      {nome:'BRS Guariba (Embrapa)', ciclo:3, prodFator:1.0, tempOpt:27},
+      {nome:'BRS Tumucumaque', ciclo:3, prodFator:1.05, tempOpt:27},
+      {nome:'BRS Pujante', ciclo:3, prodFator:0.95, tempOpt:28},
+    ],
+    extraLabel:['Proteína (%)', 'Peso de 100 grãos (g)'],
+    extraCalc:(p,fG)=>[+(22+3*fG).toFixed(1), +(16+4*fG).toFixed(1)],
+    fases:['Semeadura/emergência','Crescimento vegetativo','Florescimento','Frutificação/enchimento','Maturação','Colheita'],
+    recs:['Semeadura direta; calagem se pH<5.5; adubação P+K base','Manter umidade; capinas; controle de trips','Monitorar mosca-branca; adubação K leve','Irrigação regular; controle de fungos e pragas','Reduzir irrigação; avaliar maturidade (vagens secas)','Colheita manual ou mecânica; armazenamento seco'],
+    refs:'Embrapa Meio-Norte; Freire Filho et al. (2011); ZARC Feijão-Caupi MA; FAO Legume Crops',
+    defaultN:20, defaultP:40, defaultK:40, defaultS:10, defaultEsp:0.15,
+    recN:40, recP:40, recK:40, recS:10, mesIdeal:3, tblStep:1,
+  },
+  milho: {
+    nome:'Milho', icon:'🌽', cor:'#f9a825', cropType:'cereal',
+    nomeCientifico:'Zea mays L.',
+    cicloBase:4, tempOpt:25, tempMin:15, tempMax:38,
+    aguaOpt:120, pHOtimo:[5.5,7.0], espOpt:0.15,
+    NOptimo:150, POptimo:80, KOptimo:80, SOptimo:20,
+    prodMin:3, prodMax:15, alturaMax:250, unidade:'t/ha (grãos)',
+    bmPotencial:12.0, convFreshFactor:1.0, isFruitCrop:true,
+    variedades:[
+      {nome:'BRS 3046 (Embrapa)', ciclo:4, prodFator:1.0, tempOpt:25},
+      {nome:'AG 1051 (Agroceres)', ciclo:4, prodFator:1.05, tempOpt:25},
+      {nome:'Milho Crioulo (MA)', ciclo:4, prodFator:0.75, tempOpt:26},
+      {nome:'BRS Caatingueiro (semiárido)', ciclo:3, prodFator:0.85, tempOpt:27},
+    ],
+    extraLabel:['Proteína (%)', 'Umidade na colheita (%)'],
+    extraCalc:(p,fG)=>[+(8+4*fG).toFixed(1), +(14+2*(1-fG)).toFixed(1)],
+    fases:['Semeadura/emergência','Crescimento vegetativo','Crescimento vegetativo','Florescimento/espigamento','Enchimento de grãos','Maturação fisiológica','Colheita'],
+    recs:['Semeadura; calagem prévia; adubação N+P+K base','Controle de plantas daninhas; adubação N (1ª cobertura)','Irrigação regular; monitorar lagarta-do-cartucho','Polinização; estresse hídrico crítico nesta fase','Adubação K; monitorar grãos','Reduzir irrigação; teor de umidade ≈ 18-22%','Colheita quando umidade ≈ 14%; secagem se necessário'],
+    refs:'Embrapa Milho e Sorgo; Parentoni et al.; DSSAT-CERES-Maize v4.7; FAO; IBGE-PAM MA',
+    defaultN:120, defaultP:70, defaultK:70, defaultS:20, defaultEsp:0.15,
+    recN:150, recP:80, recK:80, recS:20, mesIdeal:3, tblStep:1,
+  },
+  sorgo: {
+    nome:'Sorgo', icon:'🌾', cor:'#a1887f', cropType:'cereal',
+    nomeCientifico:'Sorghum bicolor (L.) Moench',
+    cicloBase:4, tempOpt:27, tempMin:15, tempMax:40,
+    aguaOpt:90, pHOtimo:[5.5,7.5], espOpt:0.12,
+    NOptimo:100, POptimo:60, KOptimo:60, SOptimo:15,
+    prodMin:2, prodMax:8, alturaMax:180, unidade:'t/ha (grãos)',
+    bmPotencial:9.0, convFreshFactor:1.0, isFruitCrop:true,
+    variedades:[
+      {nome:'BRS 310 (Embrapa)', ciclo:4, prodFator:1.0, tempOpt:27},
+      {nome:'BR 304', ciclo:4, prodFator:0.95, tempOpt:27},
+      {nome:'ADV 0135 (híbrido)', ciclo:4, prodFator:1.05, tempOpt:27},
+    ],
+    extraLabel:['Tanino (%)', 'Peso de mil grãos (g)'],
+    extraCalc:(p,fG)=>[+(0.5+0.5*(1-fG)).toFixed(2), +(22+8*fG).toFixed(1)],
+    fases:['Germinação/emergência','Crescimento vegetativo','Crescimento vegetativo','Emborrachamento','Florescimento','Enchimento de grãos','Maturação/colheita'],
+    recs:['Semeadura em solo úmido; calagem se pH<5.5','Capina; adubação N 1ª cobertura','Irrigação moderada; resistente à seca','Adubação N 2ª cobertura','Monitorar pulgão-verde; período crítico de água','Avaliar umidade dos grãos; reduzir irrigação','Colheita mecânica; umidade ≤ 14%'],
+    refs:'Embrapa Milho e Sorgo; May et al. (2012); DSSAT-CERES-Sorghum; FAO',
+    defaultN:80, defaultP:50, defaultK:50, defaultS:15, defaultEsp:0.12,
+    recN:100, recP:60, recK:60, recS:15, mesIdeal:3, tblStep:1,
+  },
+  arroz: {
+    nome:'Arroz', icon:'🌾', cor:'#8d6e63', cropType:'cereal',
+    nomeCientifico:'Oryza sativa L.',
+    cicloBase:4, tempOpt:28, tempMin:18, tempMax:38,
+    aguaOpt:180, pHOtimo:[5.0,6.5], espOpt:0.10,
+    NOptimo:100, POptimo:60, KOptimo:60, SOptimo:15,
+    prodMin:2, prodMax:7, alturaMax:100, unidade:'t/ha (grãos)',
+    bmPotencial:8.0, convFreshFactor:1.0, isFruitCrop:true,
+    variedades:[
+      {nome:'BRS Sertaneja (Embrapa)', ciclo:4, prodFator:1.0, tempOpt:28},
+      {nome:'BRS Primavera', ciclo:4, prodFator:0.95, tempOpt:27},
+      {nome:'Metica-1', ciclo:4, prodFator:1.05, tempOpt:28},
+    ],
+    extraLabel:['Teor de amilose (%)', 'Renda de engenho (%)'],
+    extraCalc:(p,fG)=>[+(20+4*fG).toFixed(1), +(68+6*fG).toFixed(1)],
+    fases:['Semeadura/germinação','Perfilhamento','Perfilhamento','Emborrachamento','Florescimento','Enchimento de grãos','Maturação/colheita'],
+    recs:['Semeadura em solos de baixada ou irrigado; pH 5-6.5','Adubação N (1/3); manutenção da lâmina de água','Adubação N (1/3); controle de plantas daninhas aquáticas','Adubação N (1/3 final); monitorar brusone','Manter lâmina de água; período crítico','Reduzir água; avaliar maturidade dos grãos','Colheita mecânica a 20% de umidade; secagem'],
+    refs:'Embrapa Arroz e Feijão; Steinmetz et al.; DSSAT-CERES-Rice v4.7; FAO Rice; ZARC Arroz MA',
+    defaultN:80, defaultP:50, defaultK:50, defaultS:15, defaultEsp:0.10,
+    recN:100, recP:60, recK:60, recS:15, mesIdeal:2, tblStep:1,
+  },
+  soja: {
+    nome:'Soja', icon:'🟢', cor:'#558b2f', cropType:'legume',
+    nomeCientifico:'Glycine max (L.) Merr.',
+    cicloBase:4, tempOpt:25, tempMin:15, tempMax:35,
+    aguaOpt:100, pHOtimo:[6.0,7.0], espOpt:0.10,
+    NOptimo:20, POptimo:80, KOptimo:80, SOptimo:20,
+    prodMin:2, prodMax:4.5, alturaMax:80, unidade:'t/ha (grãos)',
+    bmPotencial:8.5, convFreshFactor:1.0, isFruitCrop:true,
+    variedades:[
+      {nome:'M 8349 IPRO (Monsoy)', ciclo:4, prodFator:1.0, tempOpt:25},
+      {nome:'BRS 8990 IPRO (Embrapa)', ciclo:4, prodFator:1.05, tempOpt:25},
+      {nome:'P98R31 (Pioneer)', ciclo:4, prodFator:1.0, tempOpt:25},
+    ],
+    extraLabel:['Proteína (%)', 'Óleo (%)'],
+    extraCalc:(p,fG)=>[+(36+5*fG).toFixed(1), +(20+2*fG).toFixed(1)],
+    fases:['Semeadura/emergência','Crescimento vegetativo','Crescimento vegetativo','Florescimento/enchimento','Enchimento de vagens','Maturação','Colheita'],
+    recs:['Inoculação com Bradyrhizobium; calagem pH>6; adubação P+K','Controle de plantas daninhas; monitorar mosca-branca','Adubação K leve; controle de percevejos','Período crítico para água; monitorar ferrugem asiática','Monitorar desfolha por lagartas','Reduzir irrigação; avaliar ponto de colheita','Colheita mecânica; umidade 13-14%'],
+    refs:'Embrapa Soja; Farias et al. (2009); DSSAT-CROPGRO-Soybean; CONAB; IBGE-PAM MA (MATOPIBA)',
+    defaultN:20, defaultP:80, defaultK:80, defaultS:20, defaultEsp:0.10,
+    recN:20, recP:80, recK:80, recS:20, mesIdeal:11, tblStep:1,
+  },
+  fava: {
+    nome:'Fava', icon:'🫛', cor:'#6d9e3f', cropType:'legume',
+    nomeCientifico:'Phaseolus lunatus L.',
+    cicloBase:4, tempOpt:24, tempMin:15, tempMax:34,
+    aguaOpt:80, pHOtimo:[5.5,7.0], espOpt:0.20,
+    NOptimo:30, POptimo:40, KOptimo:40, SOptimo:10,
+    prodMin:0.8, prodMax:2.5, alturaMax:80, unidade:'t/ha (grãos secos)',
+    bmPotencial:4.5, convFreshFactor:1.0, isFruitCrop:true,
+    variedades:[
+      {nome:'Fava Larga (MA)', ciclo:4, prodFator:1.0, tempOpt:24},
+      {nome:'BRS Juriti (Embrapa)', ciclo:4, prodFator:1.05, tempOpt:24},
+    ],
+    extraLabel:['Proteína (%)', 'Peso de 100 sementes (g)'],
+    extraCalc:(p,fG)=>[+(21+4*fG).toFixed(1), +(80+40*fG).toFixed(1)],
+    fases:['Semeadura/emergência','Crescimento vegetativo','Crescimento vegetativo','Florescimento','Enchimento de vagens','Maturação','Colheita'],
+    recs:['Semeadura no início das chuvas; calagem; adubação P+K','Capinas; inoculação com Rhizobium','Monitorar pulgões e mosca-branca; adubação foliar','Irrigação moderada; controle de antracnose','Adubação K; monitorar ácaros','Reduzir irrigação; avaliar secagem natural','Colheita manual; trilha; armazenamento seco'],
+    refs:'Embrapa Meio-Norte; Vieira et al. (2015); FAO Phaseolus; IBGE-MA',
+    defaultN:20, defaultP:40, defaultK:40, defaultS:10, defaultEsp:0.20,
+    recN:30, recP:40, recK:40, recS:10, mesIdeal:3, tblStep:1,
+  },
+  cana: {
+    nome:'Cana-de-açúcar', icon:'🎋', cor:'#388e3c', cropType:'cane',
+    nomeCientifico:'Saccharum officinarum L.',
+    cicloBase:18, tempOpt:28, tempMin:18, tempMax:40,
+    aguaOpt:140, pHOtimo:[5.5,7.0], espOpt:0.6,
+    NOptimo:120, POptimo:60, KOptimo:150, SOptimo:25,
+    prodMin:50, prodMax:130, alturaMax:400, unidade:'t/ha (colmos frescos)',
+    bmPotencial:25.0, convFreshFactor:5.5, isFruitCrop:false,
+    variedades:[
+      {nome:'RB92579 (Ridesa)', ciclo:18, prodFator:1.0, tempOpt:28},
+      {nome:'RB867515', ciclo:18, prodFator:1.05, tempOpt:28},
+      {nome:'SP80-3280', ciclo:18, prodFator:0.9, tempOpt:27},
+    ],
+    extraLabel:['Pol (% açúcar)', 'Fibra (%)'],
+    extraCalc:(p,fG)=>[+(12+3*fG).toFixed(1), +(12+1.5*(1-fG)).toFixed(1)],
+    fases:['Plantio das mudas (toletes)','Brotação/perfilhamento','Perfilhamento','Crescimento vegetativo','Crescimento rápido','Crescimento rápido','Crescimento rápido','Grand period de crescimento','Grand period de crescimento','Crescimento acelerado','Crescimento acelerado','Maturação','Maturação','Maturação','Pré-colheita','Pré-colheita','Colheita','Ratoon (soqueira)'],
+    recs:['Plantio dos toletes em sulcos; adubação P+K base','Manutenção da umidade; capinas','Adubação N+K em cobertura (1ª dose)','Monitorar brocas (Diatraea); controle herbicida','Adubação N (2ª dose); irrigação regular','Controle de pulgão-do-colmo','Monitorar podridão-vermelha','Irrigação plena; máxima demanda hídrica','Adubação foliar micronutrientes','Monitorar maturação antecipada','Iniciar estresse hídrico para concentrar sacarose','Período de maturação; reduzir nitrogênio','Queima ou corte verde; colheita mecânica','Adubação da soqueira (ratoon)','Controle de plantas daninhas no ratoon','Monitorar saúde do ratoon','Colheita mecânica no ponto de máx açúcar','Rebrota da soqueira; nova safra'],
+    refs:'Embrapa Agroenergia; Consecana; DSSAT-CANEGRO; Doorenbos & Kassam (FAO); UNICA (2022)',
+    defaultN:100, defaultP:50, defaultK:120, defaultS:25, defaultEsp:0.6,
+    recN:120, recP:60, recK:150, recS:25, mesIdeal:5, tblStep:2,
+  },
+  bacuri: {
+    nome:'Bacuri', icon:'🟡', cor:'#f9a825', cropType:'tree',
+    nomeCientifico:'Platonia insignis Mart.',
+    cicloBase:60, tempOpt:27, tempMin:18, tempMax:35,
+    aguaOpt:200, pHOtimo:[5.0,6.5], espOpt:25.0,
+    NOptimo:60, POptimo:20, KOptimo:80, SOptimo:15,
+    prodMin:5, prodMax:15, alturaMax:2500, unidade:'t/ha (frutos frescos)',
+    bmPotencial:7.0, convFreshFactor:5.5, isFruitCrop:true,
+    variedades:[
+      {nome:'Ecótipo Caatinga (MA)', ciclo:60, prodFator:1.0, tempOpt:27},
+      {nome:'Ecótipo Cocais', ciclo:72, prodFator:0.88, tempOpt:26},
+    ],
+    extraLabel:['Teor de polpa (%)', 'Brix da polpa (°Bx)'],
+    extraCalc:(p,fG)=>[+(30+15*fG).toFixed(1), +(14+6*fG).toFixed(1)],
+    fases:['Plantio/estabelecimento','Crescimento inicial','Crescimento vegetativo','Crescimento vegetativo','Formação da copa','Formação da copa','Maturação reprodutiva','Florescimento','Frutificação','Maturação/colheita','Produção plena','Colheita'],
+    recs:['Plantio em área florestada; espaçamento 5×5m; calagem leve','Cobertura morta; irrigação nos secos','Adubação NPK leve; controle de formigas','Poda de formação; controle de pragas','Manejo sustentável; coleta de frutos nativos','Proteção da regeneração natural','Adubação de manutenção; monitorar floração','Período chuvoso favorece floração','Monitorar desenvolvimento dos frutos','Colheita manual (frutos caem quando maduros)','Comercialização da polpa e sementes (garcinol)','Produção sustentada; manejo agroflorestal'],
+    refs:'Embrapa Amazônia Oriental; Mota et al. (2002); Lorenzi (2009); CIFOR Bacuri; Bioeconomia MA',
+    defaultN:40, defaultP:15, defaultK:60, defaultS:15, defaultEsp:25.0,
+    recN:60, recP:20, recK:80, recS:15, mesIdeal:2, tblStep:6,
+  },
+  pequi: {
+    nome:'Pequi', icon:'🟤', cor:'#e65100', cropType:'tree',
+    nomeCientifico:'Caryocar brasiliense Camb.',
+    cicloBase:48, tempOpt:26, tempMin:16, tempMax:38,
+    aguaOpt:100, pHOtimo:[4.5,6.0], espOpt:25.0,
+    NOptimo:40, POptimo:15, KOptimo:60, SOptimo:10,
+    prodMin:3, prodMax:10, alturaMax:1000, unidade:'t/ha (frutos com caroço)',
+    bmPotencial:5.5, convFreshFactor:4.0, isFruitCrop:true,
+    variedades:[
+      {nome:'Ecótipo Cerrado MA', ciclo:48, prodFator:1.0, tempOpt:26},
+      {nome:'Ecótipo sul do MA', ciclo:60, prodFator:0.85, tempOpt:25},
+    ],
+    extraLabel:['Teor de gordura (%)','Carotenoides (µg/g)'],
+    extraCalc:(p,fG)=>[+(36+10*fG).toFixed(1), +(850+350*fG).toFixed(0)],
+    fases:['Plantio/brotação','Crescimento inicial','Crescimento vegetativo','Crescimento vegetativo','Formação da copa','Crescimento produtivo','Emissão das flores','Florescimento (estação seca)','Frutificação','Maturação','Colheita dos frutos','Produção plena'],
+    recs:['Plantio em solos de cerrado; espaçamento 5×5m; sem calagem excessiva','Manutenção do cerrado nativo ao redor','Sem adubação pesada; espécie adaptada a solos pobres','Poda leve de formação; controle de formigas','Adubação orgânica (esterco); manejo sustentável','Início das chuvas: adubação leve N+K','Período de seca induz floração','Proteger polinizadores nativos (abelhas, borboletas)','Acompanhar desenvolvimento; evitar irrigação excessiva','Frutos maduros em nov-jan; aroma característico','Colheita dos frutos caídos; cozinhar ou extrair polpa/óleo','Produção sustentada; importância cultural e nutricional'],
+    refs:'Embrapa Cerrados; Vera et al. (2009); EMBRAPA CPAC; Lorenzi (2008); Souza & Vieira (2022)',
+    defaultN:20, defaultP:10, defaultK:40, defaultS:10, defaultEsp:25.0,
+    recN:40, recP:15, recK:60, recS:10, mesIdeal:11, tblStep:6,
+  },
   acai: {
-    nome:'Açaí', icon:'🟣', cor:'#6a1b9a',
+    nome:'Açaí', icon:'🟣', cor:'#6a1b9a', cropType:'palm',
     nomeCientifico:'Euterpe oleracea Mart.',
     cicloBase:36, tempOpt:27, tempMin:18, tempMax:38,
     aguaOpt:250, pHOtimo:[5.5,6.5], espOpt:4.0,
@@ -178,7 +369,7 @@ const CRESC_CROPS = {
     recN:100, recP:30, recK:180, recS:20, mesIdeal:3, tblStep:4,
   },
   cupuacu: {
-    nome:'Cupuaçu', icon:'🟤', cor:'#6d4c41',
+    nome:'Cupuaçu', icon:'🟤', cor:'#6d4c41', cropType:'tree',
     nomeCientifico:'Theobroma grandiflorum (Willd. ex Spreng.) K.Schum.',
     cicloBase:48, tempOpt:25, tempMin:16, tempMax:35,
     aguaOpt:180, pHOtimo:[5.5,6.5], espOpt:9.0,
@@ -203,7 +394,7 @@ const CRESC_CROPS = {
     recN:80, recP:40, recK:120, recS:15, mesIdeal:2, tblStep:4,
   },
   buriti: {
-    nome:'Buriti', icon:'🌴', cor:'#e65100',
+    nome:'Buriti', icon:'🌴', cor:'#e65100', cropType:'palm',
     nomeCientifico:'Mauritia flexuosa L.f.',
     cicloBase:60, tempOpt:27, tempMin:18, tempMax:38,
     aguaOpt:200, pHOtimo:[5.0,6.5], espOpt:16.0,
@@ -227,7 +418,7 @@ const CRESC_CROPS = {
     recN:60, recP:20, recK:100, recS:15, mesIdeal:2, tblStep:6,
   },
   caju: {
-    nome:'Cajueiro', icon:'🟡', cor:'#f57f17',
+    nome:'Cajueiro', icon:'🟡', cor:'#f57f17', cropType:'tree',
     nomeCientifico:'Anacardium occidentale L.',
     cicloBase:30, tempOpt:27, tempMin:18, tempMax:40,
     aguaOpt:80, pHOtimo:[5.5,7.0], espOpt:16.0,
@@ -252,7 +443,7 @@ const CRESC_CROPS = {
     recN:60, recP:30, recK:60, recS:10, mesIdeal:7, tblStep:3,
   },
   manga: {
-    nome:'Manga', icon:'🥭', cor:'#ff6f00',
+    nome:'Manga', icon:'🥭', cor:'#ff6f00', cropType:'tree',
     nomeCientifico:'Mangifera indica L.',
     cicloBase:36, tempOpt:26, tempMin:15, tempMax:40,
     aguaOpt:100, pHOtimo:[5.5,7.5], espOpt:25.0,
@@ -277,10 +468,394 @@ const CRESC_CROPS = {
     defaultN:80, defaultP:35, defaultK:100, defaultS:15, defaultEsp:25.0,
     recN:100, recP:40, recK:120, recS:15, mesIdeal:7, tblStep:3,
   },
+
+  /* ══ POMARES — culturas de cultivo comercial ══ */
+  laranja: {
+    nome:'Laranja', icon:'🍊', cor:'#ef6c00', cropType:'tree',
+    nomeCientifico:'Citrus sinensis (L.) Osbeck',
+    cicloBase:36, tempOpt:24, tempMin:12, tempMax:38,
+    aguaOpt:100, pHOtimo:[6.0,7.5], espOpt:16.0,
+    NOptimo:120, POptimo:60, KOptimo:150, SOptimo:20,
+    prodMin:20, prodMax:55, alturaMax:500, unidade:'t/ha (frutos frescos)',
+    bmPotencial:10.0, convFreshFactor:8.5, isFruitCrop:true,
+    variedades:[
+      {nome:'Pêra Rio', ciclo:36, prodFator:1.0, tempOpt:24},
+      {nome:'Valência', ciclo:36, prodFator:1.05, tempOpt:23},
+      {nome:'Hamlin', ciclo:34, prodFator:0.95, tempOpt:24},
+    ],
+    extraLabel:['Brix (°Bx)','Ratio (Brix/Acidez)'],
+    extraCalc:(p,fG)=>[+(10+4*fG).toFixed(1), +(10+5*fG).toFixed(1)],
+    fases:['Plantio/pegamento','Crescimento vegetativo','Crescimento vegetativo','Formação da copa','Formação da copa','Indução floral','Florescimento','Frutificação','Enchimento','Maturação I','Maturação II','Colheita'],
+    recs:['Plantio em solos bem drenados; pH 6-7.5; calagem','Podas de formação; adubação NPK completa','Controle de Phytophthora e gomose; adubação K','Adubação Ca+Mg; controle de ácaros','Poda de produção; adubação pré-floração','Estresse hídrico leve induz floração','Monitorar mosca-das-frutas; controle de pulgões','Adubação K+Ca+B; monitorar queda de frutos','Irrigação regular; adubação foliar Ca+Boro','Avaliar maturação (Brix≥10); pré-colheita','Estresse hídrico aumenta sólidos solúveis','Colheita; armazenamento refrigerado'],
+    refs:'Embrapa Mandioca e Fruticultura; Koller (2006); FAO Citrus; IBGE-PAM',
+    defaultN:100, defaultP:50, defaultK:120, defaultS:20, defaultEsp:16.0,
+    recN:120, recP:60, recK:150, recS:20, mesIdeal:5, tblStep:3,
+  },
+  mamao: {
+    nome:'Mamão', icon:'🍈', cor:'#ff7043', cropType:'shrub',
+    nomeCientifico:'Carica papaya L.',
+    cicloBase:12, tempOpt:27, tempMin:18, tempMax:38,
+    aguaOpt:150, pHOtimo:[5.5,7.0], espOpt:2.25,
+    NOptimo:200, POptimo:100, KOptimo:280, SOptimo:25,
+    prodMin:40, prodMax:100, alturaMax:300, unidade:'t/ha (frutos frescos)',
+    bmPotencial:15.0, convFreshFactor:10.0, isFruitCrop:true,
+    variedades:[
+      {nome:'Sunrise Solo (Havaí)', ciclo:12, prodFator:1.0, tempOpt:27},
+      {nome:'Golden (Formosa)', ciclo:12, prodFator:1.1, tempOpt:27},
+      {nome:'BRS Rubi do Cerrado', ciclo:11, prodFator:1.05, tempOpt:28},
+    ],
+    extraLabel:['Brix (°Bx)','Firmeza da polpa (N)'],
+    extraCalc:(p,fG)=>[+(11+4*fG).toFixed(1), +(40+20*fG).toFixed(0)],
+    fases:['Transplante/pegamento','Crescimento vegetativo','Crescimento vegetativo','Diferenciação floral','Florescimento','Frutificação','Enchimento','Maturação I','Maturação II','Colheita I','Colheita II','Produção plena'],
+    recs:['Transplante de mudas; espaçamento 3×2.5m; calagem','Adubação N parcelada; irrigação frequente','Identificar e eliminar plantas masculinas (3:1 ratio)','Adubação K+Ca; monitorar sexualidade','Polinização; controle de ácaros e trips','Adubação K+Ca+Boro; controle de antracnose','Irrigação plena; adubação foliar micronutrientes','Monitorar maturação (casca amarelando na base)','Colheita com ¼ da casca amarela','Colheita escalonada a cada 2-3 dias','Armazenamento a 8-12°C; transporte cuidadoso','Produção contínua; replantio após 2 anos'],
+    refs:'Embrapa Mandioca e Fruticultura; Marin et al. (2006); FAO Papaya; IBGE-PAM MA',
+    defaultN:160, defaultP:80, defaultK:220, defaultS:25, defaultEsp:2.25,
+    recN:200, recP:100, recK:280, recS:25, mesIdeal:3, tblStep:1,
+  },
+  limao: {
+    nome:'Limão', icon:'🍋', cor:'#c6a700', cropType:'tree',
+    nomeCientifico:'Citrus limon (L.) Osbeck / C. latifolia Tanaka',
+    cicloBase:36, tempOpt:24, tempMin:12, tempMax:38,
+    aguaOpt:100, pHOtimo:[6.0,7.5], espOpt:12.25,
+    NOptimo:100, POptimo:50, KOptimo:120, SOptimo:20,
+    prodMin:15, prodMax:40, alturaMax:400, unidade:'t/ha (frutos frescos)',
+    bmPotencial:8.5, convFreshFactor:8.0, isFruitCrop:true,
+    variedades:[
+      {nome:'Tahiti (Lima Ácida)', ciclo:36, prodFator:1.05, tempOpt:24},
+      {nome:'Eureka', ciclo:36, prodFator:0.95, tempOpt:22},
+      {nome:'Siciliano', ciclo:36, prodFator:1.0, tempOpt:22},
+    ],
+    extraLabel:['Acidez (%)', 'Rendimento de suco (%)'],
+    extraCalc:(p,fG)=>[+(5+2*fG).toFixed(1), +(45+10*fG).toFixed(0)],
+    fases:['Plantio/pegamento','Crescimento vegetativo','Crescimento vegetativo','Formação da copa','Florescimento','Frutificação','Enchimento','Maturação I','Maturação II','Colheita I','Colheita II','Produção plena'],
+    recs:['Plantio em solos drenados; espaçamento 7×5m; calagem','Podas de formação; controle de gomose','Adubação NPK completa; controle de ácaros','Adubação pré-floração K+Ca; poda de produção','Monitorar mosca-das-frutas; monitorar floração','Monitorar queda fisiológica de frutos jovens','Irrigação regular; adubação foliar','Avaliar ponto de colheita (verde-brilhante=ok para Tahiti)','Colheita escalonada','Armazenamento refrigerado','Comercialização in natura ou para suco','Produção contínua (3-5 safras/ano para Tahiti)'],
+    refs:'Embrapa Mandioca e Fruticultura; Koller (2006); FAO Citrus; IBGE-PAM',
+    defaultN:80, defaultP:40, defaultK:100, defaultS:20, defaultEsp:12.25,
+    recN:100, recP:50, recK:120, recS:20, mesIdeal:5, tblStep:3,
+  },
+  maracuja: {
+    nome:'Maracujá', icon:'🟡', cor:'#fbc02d', cropType:'vine',
+    nomeCientifico:'Passiflora edulis f. flavicarpa Deg.',
+    cicloBase:12, tempOpt:25, tempMin:18, tempMax:36,
+    aguaOpt:140, pHOtimo:[5.5,7.0], espOpt:3.0,
+    NOptimo:80, POptimo:60, KOptimo:120, SOptimo:20,
+    prodMin:15, prodMax:40, alturaMax:300, unidade:'t/ha (frutos frescos)',
+    bmPotencial:9.0, convFreshFactor:9.0, isFruitCrop:true,
+    variedades:[
+      {nome:'BRS Gigante Amarelo (Embrapa)', ciclo:12, prodFator:1.05, tempOpt:25},
+      {nome:'BRS Sol do Cerrado', ciclo:12, prodFator:1.0, tempOpt:25},
+      {nome:'Marília (FB-200)', ciclo:12, prodFator:0.95, tempOpt:24},
+    ],
+    extraLabel:['Brix (°Bx)','Rendimento de polpa (%)'],
+    extraCalc:(p,fG)=>[+(12+4*fG).toFixed(1), +(30+10*fG).toFixed(0)],
+    fases:['Transplante/pegamento','Crescimento das ramas','Crescimento das ramas','Florescimento','Florescimento','Frutificação','Enchimento','Maturação I','Colheita I','Colheita II','Colheita III','Pico de produção'],
+    recs:['Transplante de mudas; espaldeira; calagem; espaçamento 3×3m','Formação das ramas; condução em "Y" ou latada','Adubação N+K; controle de antracnose','Polinização manual (15-18h); controle de mosca','Adubação foliar B; proteger das chuvas','Adubação K+Ca; controle de Phytophthora','Irrigação regular; colheita de frutos caídos','Colheita diária dos frutos caídos','Armazenamento seco; polpa para suco','Pico de produção no verão chuvoso MA','Manutenção das ramas produtivas','Podas de renovação; adubação de manutenção'],
+    refs:'Embrapa Mandioca e Fruticultura; Meletti (2011); FAO Passiflora; IBGE-PAM MA',
+    defaultN:60, defaultP:50, defaultK:100, defaultS:20, defaultEsp:3.0,
+    recN:80, recP:60, recK:120, recS:20, mesIdeal:3, tblStep:1,
+  },
+  acerola: {
+    nome:'Acerola', icon:'🔴', cor:'#c62828', cropType:'shrub',
+    nomeCientifico:'Malpighia emarginata DC.',
+    cicloBase:24, tempOpt:26, tempMin:18, tempMax:38,
+    aguaOpt:100, pHOtimo:[5.5,7.0], espOpt:6.25,
+    NOptimo:80, POptimo:50, KOptimo:100, SOptimo:15,
+    prodMin:15, prodMax:50, alturaMax:300, unidade:'t/ha (frutos frescos)',
+    bmPotencial:8.0, convFreshFactor:9.5, isFruitCrop:true,
+    variedades:[
+      {nome:'BRS 366 Jaburu (Embrapa)', ciclo:24, prodFator:1.05, tempOpt:26},
+      {nome:'Okinawa', ciclo:24, prodFator:1.0, tempOpt:26},
+      {nome:'Sertaneja', ciclo:24, prodFator:0.95, tempOpt:27},
+    ],
+    extraLabel:['Vitamina C (mg/100g)','Brix (°Bx)'],
+    extraCalc:(p,fG)=>[+(800+600*fG).toFixed(0), +(6+3*fG).toFixed(1)],
+    fases:['Plantio/enraizamento','Crescimento vegetativo','Crescimento vegetativo','Formação da copa','Formação da copa','Florescimento I','Frutificação I','Colheita I','Florescimento II','Frutificação II','Colheita II','Produção plena'],
+    recs:['Plantio em solos bem drenados; espaçamento 5×5m; calagem','Podas de formação; adubação NPK completa','Controle de antracnose (Colletotrichum)','Poda de limpeza; adubação pré-floração','Adubação K+Ca+Boro','Monitorar polinizadores; proteger de chuvas','Colheita rápida (2-3 dias no ponto)','Processamento imediato ou congelamento','Poda pós-colheita; adubação N','Controle de Phyllosticta; adubação foliar','Colheita escalonada; 3-5 colheitas/ano','Produção contínua; mercado fresco e processado'],
+    refs:'Embrapa Mandioca e Fruticultura; Ritzinger & Ritzinger (2011); FAO; IBGE-PAM MA',
+    defaultN:60, defaultP:40, defaultK:80, defaultS:15, defaultEsp:6.25,
+    recN:80, recP:50, recK:100, recS:15, mesIdeal:3, tblStep:2,
+  },
+  goiaba: {
+    nome:'Goiaba', icon:'🟢', cor:'#2e7d32', cropType:'shrub',
+    nomeCientifico:'Psidium guajava L.',
+    cicloBase:24, tempOpt:26, tempMin:18, tempMax:40,
+    aguaOpt:100, pHOtimo:[5.0,7.0], espOpt:6.25,
+    NOptimo:80, POptimo:50, KOptimo:100, SOptimo:15,
+    prodMin:15, prodMax:50, alturaMax:600, unidade:'t/ha (frutos frescos)',
+    bmPotencial:8.5, convFreshFactor:9.5, isFruitCrop:true,
+    variedades:[
+      {nome:'Paluma', ciclo:24, prodFator:1.0, tempOpt:26},
+      {nome:'Pedro Sato', ciclo:24, prodFator:1.05, tempOpt:25},
+      {nome:'BRS Crystal', ciclo:24, prodFator:1.0, tempOpt:26},
+    ],
+    extraLabel:['Vitamina C (mg/100g)','Brix (°Bx)'],
+    extraCalc:(p,fG)=>[+(150+100*fG).toFixed(0), +(8+4*fG).toFixed(1)],
+    fases:['Plantio/enraizamento','Crescimento vegetativo','Crescimento vegetativo','Formação da copa','Florescimento I','Frutificação I','Colheita I','Poda de produção','Florescimento II','Frutificação II','Maturação','Colheita plena'],
+    recs:['Plantio; espaçamento 6×5m; calagem; adubação base','Podas de formação; adubação NPK completa','Controle de moscas-das-frutas e pulgões','Poda de produção; adubação pré-floração','Monitorar floração; proteção de insetos benéficos','Desbaste de frutos; adubação K+Ca','Colheita escalonada; refrigeração','Poda pós-colheita; adubação N','Reinício do ciclo produtivo','Controle de antracnose; adubação foliar','Avaliar ponto de colheita (cor e firmeza)','3-4 colheitas/ano; mercado fresco e polpa'],
+    refs:'Embrapa Mandioca e Fruticultura; Natale et al. (2009); FAO Guava; IBGE-PAM MA',
+    defaultN:60, defaultP:40, defaultK:80, defaultS:15, defaultEsp:6.25,
+    recN:80, recP:50, recK:100, recS:15, mesIdeal:3, tblStep:2,
+  },
+  tamarindo: {
+    nome:'Tamarindo', icon:'🟫', cor:'#5d4037', cropType:'tree',
+    nomeCientifico:'Tamarindus indica L.',
+    cicloBase:60, tempOpt:28, tempMin:18, tempMax:42,
+    aguaOpt:80, pHOtimo:[5.5,7.5], espOpt:25.0,
+    NOptimo:60, POptimo:30, KOptimo:80, SOptimo:10,
+    prodMin:8, prodMax:25, alturaMax:2500, unidade:'t/ha (frutos com casca)',
+    bmPotencial:7.5, convFreshFactor:5.0, isFruitCrop:true,
+    variedades:[
+      {nome:'Doce (low-acid)', ciclo:60, prodFator:1.0, tempOpt:28},
+      {nome:'Ácido (tradicional)', ciclo:60, prodFator:0.9, tempOpt:28},
+    ],
+    extraLabel:['Açúcar (%)', 'Acidez (% ácido tartárico)'],
+    extraCalc:(p,fG)=>[+(35+15*fG).toFixed(1), +(12+3*(1-fG)).toFixed(1)],
+    fases:['Plantio/estabelecimento','Crescimento inicial','Crescimento vegetativo','Crescimento vegetativo','Formação da copa','Formação da copa','Maturação reprodutiva','Florescimento','Frutificação','Maturação','Colheita/beneficiamento','Produção plena'],
+    recs:['Plantio em solos drenados; espaçamento 5×5m; tolerante à seca','Irrigação nos primeiros anos; sem adubação pesada','Adubação NPK moderada anual; controle de formigas','Poda leve de formação; tolerante a ventos','Manutenção da copa; coleta de sementes para propagação','Adubação K+P pré-floração','Floração na transição seca-chuva','Monitorar pragas; controle preventivo','Frutos em cachos; desenvolvimento lento (4-6 meses)','Casca acinzentada quando maduro; polpa firme e aromática','Colheita manual; descasque; embalagem das vagens','Produção plena a partir dos 5-6 anos; exportação'],
+    refs:'Embrapa Semiárido; El-Siddig et al. (FAO, 1999); Lorenzi et al. (2006); IBGE-PAM',
+    defaultN:40, defaultP:20, defaultK:60, defaultS:10, defaultEsp:25.0,
+    recN:60, recP:30, recK:80, recS:10, mesIdeal:5, tblStep:6,
+  },
+  coco: {
+    nome:'Coco-da-baía', icon:'🥥', cor:'#4e342e', cropType:'palm',
+    nomeCientifico:'Cocos nucifera L.',
+    cicloBase:60, tempOpt:27, tempMin:18, tempMax:38,
+    aguaOpt:180, pHOtimo:[5.5,8.0], espOpt:30.0,
+    NOptimo:150, POptimo:80, KOptimo:300, SOptimo:30,
+    prodMin:80, prodMax:200, alturaMax:2500, unidade:'frutos/palma/ano',
+    bmPotencial:15.0, convFreshFactor:1.0, isFruitCrop:true,
+    variedades:[
+      {nome:'Anão Verde do Pará (AVeP)', ciclo:48, prodFator:1.05, tempOpt:27},
+      {nome:'Anão Amarelo da Malásia (AAM)', ciclo:48, prodFator:1.0, tempOpt:27},
+      {nome:'Gigante do Oeste Africano (GOA)', ciclo:60, prodFator:0.9, tempOpt:27},
+    ],
+    extraLabel:['Água de coco (L/fruto)','Gordura saturada da copra (%)'],
+    extraCalc:(p,fG)=>[+(0.2+0.3*fG).toFixed(2), +(85+5*fG).toFixed(1)],
+    fases:['Plantio de mudas','Enraizamento','Crescimento vegetativo','Crescimento vegetativo','Crescimento vegetativo','Emissão das primeiras flores','Florescimento','Frutificação','Frutificação','Enchimento','Maturação','Colheita (produção plena)'],
+    recs:['Plantio de mudas; espaçamento 6×6m; adubação base K','Irrigação frequente; cobertura morta','Adubação N+K+Mg parcelada','Controle de broca-do-coqueiro (Rhynchophorus)','Controle de ácaros; monitorar anel vermelho','Adubação de produção K+B; irrigação regular','Monitorar polinização; adubação foliar Boro','Proteção dos cachos jovens','Irrigação plena; adubação K+Mg','Colheita de coco verde (5-7 meses) ou seco (11-12)','Colheita escalonada mensal; 12-15 frutos/palma','Produção plena a partir do 5º ano; adubação contínua'],
+    refs:'Embrapa Tabuleiros Costeiros; Ferreira (2005); FAO Coconut; IBGE-PAM MA',
+    defaultN:120, defaultP:60, defaultK:240, defaultS:30, defaultEsp:36.0,
+    recN:150, recP:80, recK:300, recS:30, mesIdeal:3, tblStep:6,
+  },
+
+  /* ══ HORTALIÇAS E TEMPEROS ══ */
+  alface: {
+    nome:'Alface', icon:'🥬', cor:'#66bb6a', cropType:'herb',
+    nomeCientifico:'Lactuca sativa L.',
+    cicloBase:2, tempOpt:20, tempMin:10, tempMax:30,
+    aguaOpt:80, pHOtimo:[5.8,7.0], espOpt:0.07,
+    NOptimo:60, POptimo:40, KOptimo:80, SOptimo:10,
+    prodMin:15, prodMax:35, alturaMax:30, unidade:'t/ha (cabeças frescas)',
+    bmPotencial:4.5, convFreshFactor:10.0, isFruitCrop:false,
+    variedades:[
+      {nome:'Verônica (crespa)', ciclo:2, prodFator:1.0, tempOpt:22},
+      {nome:'Regina (lisa)', ciclo:2, prodFator:0.95, tempOpt:20},
+      {nome:'Elisa (americana)', ciclo:2, prodFator:1.0, tempOpt:18},
+    ],
+    extraLabel:['Massa fresca por cabeça (g)','Valor SPAD (índice de clorofila)'],
+    extraCalc:(p,fG)=>[+(150+200*fG).toFixed(0), +(35+15*fG).toFixed(0)],
+    fases:['Semeadura/emergência','Crescimento foliar inicial','Crescimento foliar','Formação da cabeça','Colheita'],
+    recs:['Semeadura em bandejas; substrato; sombreamento 30-50%','Adubação N+K (1ª dose); irrigação por gotejamento','Controle de pulgões e lesmas; capina','Adubação N final; irrigação regular; sem calor excessivo','Colheita pela manhã; resfriamento imediato'],
+    refs:'Embrapa Hortaliças; Filgueira (2008); FAO Vegetable Crops; CEASA-MA',
+    defaultN:50, defaultP:35, defaultK:65, defaultS:10, defaultEsp:0.07,
+    recN:60, recP:40, recK:80, recS:10, mesIdeal:7, tblStep:1,
+  },
+  couve: {
+    nome:'Couve', icon:'🥦', cor:'#388e3c', cropType:'herb',
+    nomeCientifico:'Brassica oleracea var. acephala DC.',
+    cicloBase:3, tempOpt:20, tempMin:10, tempMax:32,
+    aguaOpt:90, pHOtimo:[5.5,7.0], espOpt:0.30,
+    NOptimo:80, POptimo:40, KOptimo:80, SOptimo:15,
+    prodMin:10, prodMax:30, alturaMax:80, unidade:'t/ha (folhas frescas)',
+    bmPotencial:5.0, convFreshFactor:11.0, isFruitCrop:false,
+    variedades:[
+      {nome:'Manteiga (comum)', ciclo:3, prodFator:1.0, tempOpt:20},
+      {nome:'Portuguesa', ciclo:3, prodFator:0.9, tempOpt:18},
+    ],
+    extraLabel:['Cálcio (mg/100g)','Vitamina C (mg/100g)'],
+    extraCalc:(p,fG)=>[+(120+80*fG).toFixed(0), +(60+40*fG).toFixed(0)],
+    fases:['Transplante/pegamento','Crescimento vegetativo','Emissão de folhas','Colheita escalonada','Produção contínua'],
+    recs:['Transplante de mudas; espaçamento 0.5×0.6m; calagem','Adubação N parcelada; irrigação frequente','Controle de lagartas (MLPV); adubação foliar','Colheita de folhas baixeiras; manter planta produtiva','Adubação N a cada 20 dias; produção por 2-3 anos'],
+    refs:'Embrapa Hortaliças; Filgueira (2008); FAO; CEASA-MA',
+    defaultN:65, defaultP:35, defaultK:65, defaultS:15, defaultEsp:0.30,
+    recN:80, recP:40, recK:80, recS:15, mesIdeal:7, tblStep:1,
+  },
+  coentro: {
+    nome:'Coentro', icon:'🌿', cor:'#558b2f', cropType:'herb',
+    nomeCientifico:'Coriandrum sativum L.',
+    cicloBase:2, tempOpt:22, tempMin:10, tempMax:30,
+    aguaOpt:60, pHOtimo:[5.5,7.0], espOpt:0.05,
+    NOptimo:40, POptimo:20, KOptimo:40, SOptimo:8,
+    prodMin:5, prodMax:15, alturaMax:40, unidade:'t/ha (folhas frescas)',
+    bmPotencial:2.5, convFreshFactor:11.0, isFruitCrop:false,
+    variedades:[
+      {nome:'Verdão (MA)', ciclo:2, prodFator:1.0, tempOpt:22},
+      {nome:'Tabocas', ciclo:2, prodFator:0.95, tempOpt:22},
+    ],
+    extraLabel:['Teor de óleo essencial (ml/100g)','Linalol (%)'],
+    extraCalc:(p,fG)=>[+(0.3+0.3*fG).toFixed(2), +(60+15*fG).toFixed(0)],
+    fases:['Semeadura','Emergência/crescimento','Colheita de folhas','Florescimento/sementes'],
+    recs:['Semeadura direta em canteiros; 3-5 g/m²; pH 5.5-7','Adubação N+K leve; irrigação moderada; sombreamento 30%','Colheita das folhas antes do pendoamento','Colheita das sementes quando marrons; secagem'],
+    refs:'Embrapa Hortaliças; Filgueira (2008); FAO; mercado tradicional MA',
+    defaultN:30, defaultP:18, defaultK:35, defaultS:8, defaultEsp:0.05,
+    recN:40, recP:20, recK:40, recS:8, mesIdeal:7, tblStep:1,
+  },
+  cebolinha: {
+    nome:'Cebolinha', icon:'🌱', cor:'#43a047', cropType:'herb',
+    nomeCientifico:'Allium fistulosum L.',
+    cicloBase:2, tempOpt:20, tempMin:10, tempMax:30,
+    aguaOpt:70, pHOtimo:[5.5,7.0], espOpt:0.04,
+    NOptimo:60, POptimo:30, KOptimo:60, SOptimo:10,
+    prodMin:8, prodMax:25, alturaMax:40, unidade:'t/ha (folhas frescas)',
+    bmPotencial:3.5, convFreshFactor:11.0, isFruitCrop:false,
+    variedades:[
+      {nome:'Comprida (MA)', ciclo:2, prodFator:1.0, tempOpt:20},
+      {nome:'Todo-Ano', ciclo:2, prodFator:1.05, tempOpt:22},
+    ],
+    extraLabel:['Massa por maço (g)','Flavonoides (mg/100g)'],
+    extraCalc:(p,fG)=>[+(80+70*fG).toFixed(0), +(50+30*fG).toFixed(0)],
+    fases:['Semeadura/divisão de touceiras','Crescimento','Perfilhamento','Colheita escalonada'],
+    recs:['Propagação por divisão de touceiras ou sementes','Adubação N+K; irrigação frequente','Manutenção do canteiro; controle de fungos','Colheita quando 30-40cm; amarrar em maços'],
+    refs:'Embrapa Hortaliças; Filgueira (2008); FAO; CEASA-MA',
+    defaultN:50, defaultP:25, defaultK:50, defaultS:10, defaultEsp:0.04,
+    recN:60, recP:30, recK:60, recS:10, mesIdeal:7, tblStep:1,
+  },
+  pimentao: {
+    nome:'Pimentão', icon:'🫑', cor:'#1b5e20', cropType:'shrub',
+    nomeCientifico:'Capsicum annuum L. (grupo grossum)',
+    cicloBase:4, tempOpt:24, tempMin:16, tempMax:35,
+    aguaOpt:120, pHOtimo:[5.5,7.0], espOpt:0.40,
+    NOptimo:120, POptimo:80, KOptimo:150, SOptimo:20,
+    prodMin:20, prodMax:60, alturaMax:80, unidade:'t/ha (frutos frescos)',
+    bmPotencial:9.0, convFreshFactor:9.5, isFruitCrop:true,
+    variedades:[
+      {nome:'Yolo Wonder', ciclo:4, prodFator:1.0, tempOpt:24},
+      {nome:'Magali', ciclo:4, prodFator:1.05, tempOpt:24},
+      {nome:'Margarita F1 (híbrido)', ciclo:4, prodFator:1.1, tempOpt:23},
+    ],
+    extraLabel:['Vitamina C (mg/100g)','Capsaicina (mg/kg)'],
+    extraCalc:(p,fG)=>[+(100+60*fG).toFixed(0), +(5+10*(1-fG)).toFixed(0)],
+    fases:['Transplante/pegamento','Crescimento vegetativo','Florescimento','Frutificação','Colheita verde/maturação','Colheita colorida/plena'],
+    recs:['Transplante de mudas; espaçamento 0.5×0.8m; calagem','Adubação N+K parcelada; irrigação gotejamento','Polinização; controle de Tuta absoluta e ácaros','Adubação K+Ca+Boro; controle de Phytophthora','Colheita no verde (mais produção) ou colorido (mais valor)','Colheita a cada 5-7 dias; refrigeração'],
+    refs:'Embrapa Hortaliças; Loures et al.; FAO Capsicum; CEASA-MA',
+    defaultN:100, defaultP:65, defaultK:120, defaultS:20, defaultEsp:0.40,
+    recN:120, recP:80, recK:150, recS:20, mesIdeal:7, tblStep:1,
+  },
+  quiabo: {
+    nome:'Quiabo', icon:'🟢', cor:'#2e7d32', cropType:'shrub',
+    nomeCientifico:'Abelmoschus esculentus (L.) Moench',
+    cicloBase:3, tempOpt:27, tempMin:18, tempMax:38,
+    aguaOpt:100, pHOtimo:[5.5,7.0], espOpt:0.25,
+    NOptimo:80, POptimo:60, KOptimo:80, SOptimo:15,
+    prodMin:8, prodMax:25, alturaMax:150, unidade:'t/ha (frutos frescos)',
+    bmPotencial:6.0, convFreshFactor:10.0, isFruitCrop:true,
+    variedades:[
+      {nome:'Santa Cruz 47', ciclo:3, prodFator:1.0, tempOpt:27},
+      {nome:'Clemson Spineless', ciclo:3, prodFator:0.95, tempOpt:27},
+    ],
+    extraLabel:['Mucilagem (%)','Fibra bruta (%)'],
+    extraCalc:(p,fG)=>[+(2+1.5*fG).toFixed(1), +(3+1*fG).toFixed(1)],
+    fases:['Semeadura/emergência','Crescimento vegetativo','Florescimento','Frutificação/colheita','Produção plena'],
+    recs:['Semeadura direta; espaçamento 0.4×0.6m; calagem','Adubação N+K em cobertura; capinas','Monitorar trips e pulgões; controle de nematoides','Colheita a cada 2-3 dias (frutos jovens, 7-10cm)','Adubação foliar; poda de estimulação'],
+    refs:'Embrapa Hortaliças; Filgueira (2008); FAO; CEASA-MA',
+    defaultN:65, defaultP:50, defaultK:65, defaultS:15, defaultEsp:0.25,
+    recN:80, recP:60, recK:80, recS:15, mesIdeal:3, tblStep:1,
+  },
+  batata_doce: {
+    nome:'Batata-doce', icon:'🍠', cor:'#7b5ea7', cropType:'root',
+    nomeCientifico:'Ipomoea batatas (L.) Lam.',
+    cicloBase:4, tempOpt:24, tempMin:15, tempMax:35,
+    aguaOpt:100, pHOtimo:[5.5,6.5], espOpt:0.20,
+    NOptimo:60, POptimo:60, KOptimo:100, SOptimo:15,
+    prodMin:12, prodMax:45, alturaMax:40, unidade:'t/ha (raízes frescas)',
+    bmPotencial:8.0, convFreshFactor:5.5, isFruitCrop:false,
+    variedades:[
+      {nome:'BRS Cuia (Embrapa)', ciclo:4, prodFator:1.0, tempOpt:24},
+      {nome:'Beauregard', ciclo:4, prodFator:1.05, tempOpt:24},
+      {nome:'CNPH 80 (roxa)', ciclo:4, prodFator:0.95, tempOpt:24},
+    ],
+    extraLabel:['Amido (%)', 'Beta-caroteno (µg/100g)'],
+    extraCalc:(p,fG)=>[+(18+8*fG).toFixed(1), +(500+1500*fG).toFixed(0)],
+    fases:['Plantio das ramas','Enraizamento/brotação','Crescimento vegetativo','Engrossamento das raízes','Maturação','Colheita'],
+    recs:['Plantio de ramas de 30cm; camalhões; calagem leve','Irrigação moderada; capinas; evitar encharcamento','Adubação K+P; monitorar besouros','Reduzir N; aumentar K para formação das raízes','Reduzir irrigação; testar com amostragem','Colheita 90-120 dias; cura pré-armazenamento'],
+    refs:'Embrapa Hortaliças; Oliveira et al. (2013); FAO IBS; IBGE-PAM MA',
+    defaultN:50, defaultP:50, defaultK:80, defaultS:15, defaultEsp:0.20,
+    recN:60, recP:60, recK:100, recS:15, mesIdeal:3, tblStep:1,
+  },
+  cara: {
+    nome:'Cará', icon:'🟤', cor:'#795548', cropType:'root',
+    nomeCientifico:'Dioscorea alata L.',
+    cicloBase:9, tempOpt:26, tempMin:18, tempMax:35,
+    aguaOpt:130, pHOtimo:[5.5,7.0], espOpt:0.60,
+    NOptimo:80, POptimo:40, KOptimo:100, SOptimo:15,
+    prodMin:12, prodMax:40, alturaMax:200, unidade:'t/ha (tubérculos frescos)',
+    bmPotencial:9.0, convFreshFactor:5.0, isFruitCrop:false,
+    variedades:[
+      {nome:'Da Costa (roxo)', ciclo:9, prodFator:1.0, tempOpt:26},
+      {nome:'Cará-do-ar', ciclo:7, prodFator:0.85, tempOpt:26},
+    ],
+    extraLabel:['Amido (%)','Proteína (%)'],
+    extraCalc:(p,fG)=>[+(22+8*fG).toFixed(1), +(7+3*fG).toFixed(1)],
+    fases:['Plantio das sementes-tubérculo','Brotação/emergência','Crescimento vegetativo','Crescimento vegetativo','Crescimento vegetativo','Engrossamento dos tubérculos','Engrossamento dos tubérculos','Maturação','Colheita'],
+    recs:['Plantio de pedaços de tubérculos (300-400g); espaçamento 0.5×1.2m','Irrigação moderada; controle de formigas cortadeiras','Espaldeira ou tutoramento das ramas','Adubação N+K parcelada; capinas','Monitorar antracnose e podridão radicular','Reduzir N; aumentar K; irrigação regular','Avaliar engrossamento por amostragem','Reduzir irrigação; amarelamento das ramas indica maturação','Colheita manual; cura por 7-10 dias'],
+    refs:'Embrapa Hortaliças; Pedralli (2002); FAO Yams; IBGE-PAM MA',
+    defaultN:65, defaultP:35, defaultK:80, defaultS:15, defaultEsp:0.60,
+    recN:80, recP:40, recK:100, recS:15, mesIdeal:3, tblStep:1,
+  },
+  inhame: {
+    nome:'Inhame', icon:'🟤', cor:'#6d4c41', cropType:'root',
+    nomeCientifico:'Colocasia esculenta (L.) Schott',
+    cicloBase:9, tempOpt:25, tempMin:18, tempMax:35,
+    aguaOpt:140, pHOtimo:[5.5,7.0], espOpt:0.50,
+    NOptimo:80, POptimo:50, KOptimo:120, SOptimo:20,
+    prodMin:12, prodMax:35, alturaMax:150, unidade:'t/ha (rizomas frescos)',
+    bmPotencial:9.0, convFreshFactor:5.0, isFruitCrop:false,
+    variedades:[
+      {nome:'Sete-Ervas (MA)', ciclo:9, prodFator:1.0, tempOpt:25},
+      {nome:'Chinês', ciclo:8, prodFator:1.05, tempOpt:25},
+    ],
+    extraLabel:['Amido (%)','Proteína (%)'],
+    extraCalc:(p,fG)=>[+(18+7*fG).toFixed(1), +(6+3*fG).toFixed(1)],
+    fases:['Plantio dos rizomas','Brotação/emergência','Crescimento foliar','Crescimento vegetativo','Crescimento vegetativo','Engrossamento dos cormos','Engrossamento dos cormos','Maturação','Colheita'],
+    recs:['Plantio de cormos-filhos; solos argilosos úmidos; calagem','Irrigação frequente; evitar déficit hídrico','Adubação N (1ª dose); capinas','Adubação N+K (2ª dose); monitorar pragas','Controle de nematoides e fungos de solo','Reduzir N; aumentar K; adubação foliar Ca+Mg','Irrigação regular; cormos crescem no subsolo','Amarelamento das folhas indica maturação','Colheita manual; separação dos cormos-filhos'],
+    refs:'Embrapa Hortaliças; Leal et al. (2017); FAO Taro; IBGE-PAM MA',
+    defaultN:65, defaultP:40, defaultK:100, defaultS:20, defaultEsp:0.50,
+    recN:80, recP:50, recK:120, recS:20, mesIdeal:3, tblStep:1,
+  },
+  jerimum: {
+    nome:'Jerimum (Abóbora)', icon:'🎃', cor:'#e65100', cropType:'vine',
+    nomeCientifico:'Cucurbita moschata Duchesne / C. maxima Duchesne',
+    cicloBase:4, tempOpt:27, tempMin:18, tempMax:38,
+    aguaOpt:120, pHOtimo:[5.5,7.0], espOpt:4.0,
+    NOptimo:80, POptimo:60, KOptimo:100, SOptimo:15,
+    prodMin:15, prodMax:50, alturaMax:50, unidade:'t/ha (frutos frescos)',
+    bmPotencial:8.5, convFreshFactor:9.0, isFruitCrop:true,
+    variedades:[
+      {nome:'Moranga Exposição', ciclo:4, prodFator:1.0, tempOpt:27},
+      {nome:'Cucurbitão Paulista', ciclo:4, prodFator:0.95, tempOpt:27},
+      {nome:'BRS Jabuticaba (Embrapa)', ciclo:4, prodFator:1.05, tempOpt:27},
+    ],
+    extraLabel:['Brix (°Bx)','Peso médio (kg)'],
+    extraCalc:(p,fG)=>[+(6+3*fG).toFixed(1), +(3+7*fG).toFixed(1)],
+    fases:['Semeadura/emergência','Crescimento das ramas','Florescimento','Frutificação','Enchimento','Maturação','Colheita'],
+    recs:['Semeadura direta (2-3 sementes/cova); espaçamento 2×2m; calagem','Desbaste para 1 planta/cova; adubação N+K base','Polinização manual (flor masculina nas femininas)','Raleio para 2-3 frutos/planta; adubação K+Ca','Irrigação regular; adubação foliar micronutrientes','Reduzir irrigação; cortiça na casca indica maturação','Colheita quando pedúnculo seco; armazenamento seco a temp ambiente'],
+    refs:'Embrapa Hortaliças; Filgueira (2008); FAO Cucurbit; CEASA-MA; IBGE-PAM MA',
+    defaultN:65, defaultP:50, defaultK:80, defaultS:15, defaultEsp:4.0,
+    recN:80, recP:60, recK:100, recS:15, mesIdeal:3, tblStep:1,
+  },
+};
+
+/* ─────────── CATEGORIAS ─────────── */
+const CRESC_CAT = {
+  lavouras: { label:'🌾 Lavouras',  icon:'🌾', crops:['mandioca','feijao','milho','sorgo','arroz','soja','fava','cana'] },
+  nativas:  { label:'🌳 Nativas',   icon:'🌳', crops:['acai','cupuacu','buriti','caju','bacuri','pequi'] },
+  pomares:  { label:'🍌 Pomares',   icon:'🍌', crops:['banana','abacaxi','manga','melancia','laranja','mamao','limao','maracuja','acerola','goiaba','tamarindo','coco'] },
+  hortas:   { label:'🥬 Hortaliças',icon:'🥬', crops:['tomate','alface','couve','coentro','cebolinha','pimentao','quiabo','batata_doce','cara','inhame','jerimum'] },
 };
 
 /* ─────────── ESTADO ─────────── */
 let _crescCurrentCrop = 'mandioca';
+let _crescCurrentCat  = 'lavouras';
 let _crescCharts = {};
 
 /* ─────────── INICIALIZAÇÃO LAZY ─────────── */
@@ -297,25 +872,32 @@ function _buildCrescimentoHTML() {
   const munOpts = Object.entries(CRESC_MUN).map(([k,m]) =>
     `<option value="${k}">${m.nome}</option>`).join('');
 
-  const cropTabs = Object.keys(CRESC_CROPS).map((k,i) => {
+  const catTabs = Object.entries(CRESC_CAT).map(([k,cat],i) =>
+    `<button class="sim-itab${i===0?' active':''}" data-cresccat="${k}" onclick="showCrescCat('${k}')" style="font-size:12px">${cat.label}</button>`
+  ).join('');
+
+  const firstCatCrops = CRESC_CAT.lavouras.crops;
+  const cropTabs = firstCatCrops.map((k,i) => {
     const c = CRESC_CROPS[k];
-    return `<button class="sim-itab${i===0?' active':''}" data-croptab="${k}" onclick="showCrescTab('${k}')">${c.icon} ${c.nome}</button>`;
+    if (!c) return '';
+    return `<button class="sim-itab${i===0?' active':''}" data-croptab="${k}" onclick="showCrescTab('${k}')" style="font-size:11px">${c.icon} ${c.nome}</button>`;
   }).join('');
 
   return `
-<div style="margin-bottom:12px">
-  <div class="sec-title" style="margin-bottom:4px">🌿 Simuladores de Crescimento de Plantas</div>
-  <div style="font-size:12px;color:var(--text3)">Modelos baseados em DSSAT · Embrapa · FAO · CIAT · 10 culturas do Maranhão</div>
+<div style="margin-bottom:10px">
+  <div class="sec-title" style="margin-bottom:4px">🌱 Simuladores de Crescimento de Plantas e Culturas</div>
+  <div style="font-size:11px;color:var(--text3)">DSSAT · Embrapa · FAO · CIAT · 37 culturas do Maranhão em 4 categorias</div>
 </div>
 
-<div class="sim-tabs-inner" style="margin-bottom:14px">${cropTabs}</div>
+<div class="sim-tabs-inner" style="margin-bottom:6px;border-bottom:1px solid var(--border);padding-bottom:8px" id="cresc-cat-tabs">${catTabs}</div>
+<div class="sim-tabs-inner" style="margin-bottom:14px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px" id="cresc-crop-tabs">${cropTabs}</div>
 
 <div style="display:grid;grid-template-columns:minmax(240px,290px) 1fr;gap:16px;align-items:start">
 
   <!-- ═══ CONTROLES ═══ -->
   <div class="sim-card" style="margin:0">
     <div class="sim-card-title" id="cresc-panel-title">🌿 Mandioca</div>
-    <button onclick="crescAutoAjustar()" style="width:100%;margin-bottom:10px;padding:7px 10px;border-radius:7px;border:none;background:var(--accent,#2563eb);color:white;font-size:11px;font-weight:600;cursor:pointer;opacity:1;transition:opacity .2s" onmouseover="this.style.opacity='.82'" onmouseout="this.style.opacity='1'">⚡ Ajuste automático para esta cultura e local</button>
+    <button onclick="crescAutoAjustar()" style="width:100%;margin-bottom:10px;padding:7px 10px;border-radius:7px;border:1px solid var(--green2);background:var(--green3);color:var(--bg2);font-size:11px;font-weight:700;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">⚡ Ajuste automático para esta cultura e local</button>
 
     <div class="sim-param">
       <label style="font-size:11px;color:var(--text3)">Município do Maranhão</label>
@@ -525,8 +1107,29 @@ function _buildCrescimentoHTML() {
 `;
 }
 
+/* ─────────── NAVEGAÇÃO ENTRE CATEGORIAS ─────────── */
+function showCrescCat(catKey) {
+  _crescCurrentCat = catKey;
+  document.querySelectorAll('[data-cresccat]').forEach(b => b.classList.remove('active'));
+  const catBtn = document.querySelector(`[data-cresccat="${catKey}"]`);
+  if (catBtn) catBtn.classList.add('active');
+
+  const crops = CRESC_CAT[catKey].crops;
+  const container = document.getElementById('cresc-crop-tabs');
+  if (container) {
+    container.innerHTML = crops.map((k,i) => {
+      const c = CRESC_CROPS[k];
+      if (!c) return '';
+      return `<button class="sim-itab${i===0?' active':''}" data-croptab="${k}" onclick="showCrescTab('${k}')" style="font-size:11px;white-space:nowrap">${c.icon} ${c.nome}</button>`;
+    }).join('');
+  }
+  // Switch to first crop of this category
+  if (crops.length > 0 && CRESC_CROPS[crops[0]]) showCrescTab(crops[0]);
+}
+
 /* ─────────── NAVEGAÇÃO ENTRE CULTURAS ─────────── */
 function showCrescTab(cropKey) {
+  if (!CRESC_CROPS[cropKey]) return;
   _crescCurrentCrop = cropKey;
   document.querySelectorAll('[data-croptab]').forEach(b => b.classList.remove('active'));
   const btn = document.querySelector(`[data-croptab="${cropKey}"]`);
@@ -710,14 +1313,15 @@ function _updateCrescDiagnostico() {
   ];
 
   const icon = c => c.critical?'err':(!c.ok||(c.fv!==null&&c.fv<0.75))?'warn':'ok';
-  const bg   = c => ({err:'#fef2f2',warn:'#fffbeb',ok:'#f0fdf4'}[icon(c)]);
-  const col  = c => ({err:'#dc2626',warn:'#d97706',ok:'#15803d'}[icon(c)]);
+  const bg   = c => ({err:'#220a0a',warn:'#1a1300',ok:'var(--bg3)'}[icon(c)]);
+  const col  = c => ({err:'#f87171',warn:'#fcd34d',ok:'var(--green)'}[icon(c)]);
+  const bdr  = c => ({err:'#dc262640',warn:'#d9770640',ok:'var(--border)'}[icon(c)]);
   const ico  = c => ({err:'❌',warn:'⚠️',ok:'✅'}[icon(c)]);
 
-  el.innerHTML = `<div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px">🩺 Diagnóstico em tempo real<span style="font-size:10px;font-weight:400;color:var(--text3)">— ${crop.icon} ${crop.nome}</span></div>
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px">
-${checks.map(c=>`<div style="background:${bg(c)};border:1px solid ${col(c)}33;border-radius:6px;padding:6px 8px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px"><span style="font-size:10px;font-weight:600;color:var(--text2)">${c.label}</span><span style="font-size:13px">${ico(c)}</span></div>
+  el.innerHTML = `<div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:6px">🩺 Diagnóstico em tempo real<span style="font-size:10px;font-weight:400;color:var(--text3)">— ${crop.icon} ${crop.nome}</span></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:5px">
+${checks.map(c=>`<div style="background:${bg(c)};border:1px solid ${bdr(c)};border-radius:6px;padding:6px 8px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px"><span style="font-size:10px;font-weight:600;color:var(--text2)">${c.label}</span><span style="font-size:12px">${ico(c)}</span></div>
 <div style="font-size:11px;font-weight:700;color:${col(c)}">${c.value}</div>
 <div style="font-size:9px;color:var(--text3)">ideal: ${c.ideal}</div>
 ${icon(c)!=='ok'?`<div style="font-size:9px;color:${col(c)};margin-top:3px;line-height:1.3">${c.why}</div>`:''}</div>`).join('')}
@@ -867,8 +1471,39 @@ function _crescGrowthFrac(cropKey, m, ciclo) {
       if (t<=0.42) return 0.20+0.38*((t-0.14)/0.28);
       if (t<=0.70) return 0.58+0.32*((t-0.42)/0.28);
       return 0.90+0.10*((t-0.70)/0.30);
-    default:
+    default: {
+      const ct2 = (CRESC_CROPS[cropKey]||{}).cropType||'';
+      if (ct2==='cereal'||ct2==='legume') {
+        if (t<0.15) return t/0.15*0.15;
+        if (t<0.55) return 0.15+(t-0.15)/0.40*0.78;
+        if (t<0.85) return 0.93+(t-0.55)/0.30*0.05;
+        return 0.98;
+      }
+      if (ct2==='cane') {
+        if (t<0.20) return t/0.20*0.12;
+        if (t<0.70) return 0.12+(t-0.20)/0.50*0.80;
+        return 0.92+(t-0.70)/0.30*0.06;
+      }
+      if (ct2==='herb') {
+        if (t<0.30) return t/0.30*0.65;
+        if (t<0.75) return 0.65+(t-0.30)/0.45*0.33;
+        return 0.98;
+      }
+      if (ct2==='root') {
+        if (t<0.25) return t/0.25*0.25;
+        if (t<0.65) return 0.25+(t-0.25)/0.40*0.68;
+        return 0.93+(t-0.65)/0.35*0.05;
+      }
+      if (ct2==='palm'||ct2==='tree') {
+        return 1-Math.exp(-4*t);
+      }
+      if (ct2==='vine'||ct2==='shrub') {
+        if (t<0.30) return t/0.30*0.32;
+        if (t<0.70) return 0.32+(t-0.30)/0.40*0.62;
+        return 0.94+(t-0.70)/0.30*0.04;
+      }
       return t;
+    }
   }
 }
 
@@ -923,8 +1558,53 @@ function _crescPartition(cropKey, t) {
       const lf=Math.max(0.12,0.38-fr*0.22);
       return {root:0.08,leaf:lf,stem:Math.max(0.08,1-fr-lf-0.08),fruit:fr};
     }
-    default:
-      return {root:0.25, leaf:0.25, stem:0.25, fruit:0.25};
+    default: {
+      const ct3 = (CRESC_CROPS[cropKey]||{}).cropType||'';
+      if (ct3==='cereal') {
+        const gr=Math.min(0.60,Math.max(0,(t-0.45)/0.55)*0.65);
+        const lf=Math.max(0.08,0.38-gr*0.28);
+        return {root:0.06,leaf:lf,stem:Math.max(0.06,1-gr-lf-0.06),fruit:gr};
+      }
+      if (ct3==='legume') {
+        const pod=Math.min(0.55,Math.max(0,(t-0.40)/0.60)*0.60);
+        const lf=Math.max(0.10,0.40-pod*0.25);
+        return {root:0.10,leaf:lf,stem:Math.max(0.05,1-pod-lf-0.10),fruit:pod};
+      }
+      if (ct3==='cane') {
+        const sf=Math.min(0.72,0.10+0.62*t);
+        const lf=Math.max(0.08,0.30-sf*0.12);
+        return {root:0.08,leaf:lf,stem:sf,fruit:Math.max(0,1-sf-lf-0.08)};
+      }
+      if (ct3==='herb') {
+        return {root:0.12,leaf:Math.max(0.60,0.80-t*0.20),stem:0.08,fruit:Math.min(0.20,t*0.20)};
+      }
+      if (ct3==='root') {
+        const rf=Math.min(0.60,0.10+0.50*t);
+        const lf=Math.max(0.08,0.35-rf*0.25);
+        return {root:rf,leaf:lf,stem:Math.max(0.05,1-rf-lf),fruit:0};
+      }
+      if (ct3==='vine') {
+        const fr=Math.min(0.68,Math.max(0,(t-0.40)/0.60)*0.74);
+        const lf=Math.max(0.10,0.38-fr*0.22);
+        return {root:0.06,leaf:lf,stem:Math.max(0.04,1-fr-lf-0.06),fruit:fr};
+      }
+      if (ct3==='shrub') {
+        const fr=Math.min(0.52,Math.max(0,(t-0.35)/0.65)*0.58);
+        const lf=Math.max(0.12,0.40-fr*0.25);
+        return {root:0.08,leaf:lf,stem:Math.max(0.06,1-fr-lf-0.08),fruit:fr};
+      }
+      if (ct3==='tree') {
+        const fr=Math.min(0.50,Math.max(0,(t-0.55)/0.45)*0.55);
+        const lf=Math.max(0.15,0.38-fr*0.22);
+        return {root:0.10,leaf:lf,stem:Math.max(0.10,1-fr-lf-0.10),fruit:fr};
+      }
+      if (ct3==='palm') {
+        const fr=Math.min(0.42,Math.max(0,(t-0.65)/0.35)*0.48);
+        const lf=Math.max(0.15,0.35-fr*0.18);
+        return {root:0.12,leaf:lf,stem:Math.max(0.12,1-fr-lf-0.12),fruit:fr};
+      }
+      return {root:0.20,leaf:0.30,stem:0.25,fruit:0.25};
+    }
   }
 }
 
@@ -953,8 +1633,19 @@ function _crescHeight(cropKey, m, ciclo, maxH) {
       return Math.min(maxH, 20+maxH*0.85*Math.min(1,t*1.8));
     case 'manga':
       return Math.min(maxH, 25+maxH*0.88*Math.min(1,t*1.6));
-    default:
+    default: {
+      const ct4 = (CRESC_CROPS[cropKey]||{}).cropType||'';
+      if (ct4==='cereal') return Math.min(maxH, maxH*(1-Math.exp(-6*t)));
+      if (ct4==='legume') return Math.min(maxH, maxH*(1-Math.exp(-5*t)));
+      if (ct4==='cane')   return Math.min(maxH, maxH*(1-Math.exp(-4.5*t)));
+      if (ct4==='herb')   return Math.min(maxH, maxH*Math.min(1,t*2.5));
+      if (ct4==='root')   return Math.min(maxH, maxH*Math.min(1,t*1.8));
+      if (ct4==='vine')   return Math.min(maxH, maxH*Math.min(1,t*1.5));
+      if (ct4==='shrub')  return Math.min(maxH, maxH*(1-Math.exp(-4*t)));
+      if (ct4==='tree')   return Math.min(maxH, maxH*(1-Math.exp(-2.5*t)));
+      if (ct4==='palm')   return Math.min(maxH, maxH*(1-Math.exp(-2.0*t)));
       return Math.min(maxH, maxH*t);
+    }
   }
 }
 
@@ -1001,8 +1692,39 @@ function _crescLAI(cropKey, m, ciclo) {
       if (t<0.30) return t/0.30*3.0;
       if (t<0.65) return 3.0+(t-0.30)/0.35*1.5;
       return Math.max(2.0,4.5-(t-0.65)/0.35*0.8);
-    default:
+    default: {
+      const ct5 = (CRESC_CROPS[cropKey]||{}).cropType||'';
+      if (ct5==='cereal') return Math.max(0.2,Math.sin(t*Math.PI)*4.0);
+      if (ct5==='legume') return Math.max(0.2,Math.sin(t*Math.PI)*3.5);
+      if (ct5==='cane')   {
+        if (t<0.20) return t/0.20*3.0;
+        if (t<0.75) return 3.0+(t-0.20)/0.55*3.0;
+        return Math.max(2.5,6.0-(t-0.75)/0.25*1.5);
+      }
+      if (ct5==='herb')   return Math.max(0.1,Math.sin(t*Math.PI)*2.8);
+      if (ct5==='root')   {
+        if (t<0.40) return t/0.40*2.5;
+        if (t<0.75) return 2.5-(t-0.40)/0.35*0.8;
+        return Math.max(0.3,1.7-(t-0.75)/0.25*1.2);
+      }
+      if (ct5==='vine')   return Math.max(0.3,Math.sin(t*Math.PI)*3.2);
+      if (ct5==='shrub')  {
+        if (t<0.35) return t/0.35*3.0;
+        if (t<0.70) return 3.0+(t-0.35)/0.35*0.8;
+        return Math.max(1.5,3.8-(t-0.70)/0.30*1.0);
+      }
+      if (ct5==='tree') {
+        if (t<0.30) return t/0.30*2.5;
+        if (t<0.65) return 2.5+(t-0.30)/0.35*1.8;
+        return Math.max(2.0,4.3-(t-0.65)/0.35*0.8);
+      }
+      if (ct5==='palm') {
+        if (t<0.30) return t/0.30*3.0;
+        if (t<0.70) return 3.0+(t-0.30)/0.40*2.0;
+        return Math.max(2.5,5.0-(t-0.70)/0.30*0.5);
+      }
       return Math.sin(t*Math.PI)*3.5;
+    }
   }
 }
 
@@ -1161,6 +1883,8 @@ function _drawCrescPlant(cropKey, health, height, freshYield, ciclo) {
     gSoil.appendChild(l);
   });
 
+  const crop = CRESC_CROPS[cropKey];
+  const ct = crop ? crop.cropType : '';
   switch(cropKey) {
     case 'mandioca': _drawMandioca(ns,gRoots,gStem,gLeaves,health,height,freshYield); break;
     case 'tomate':   _drawTomate(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
@@ -1172,6 +1896,19 @@ function _drawCrescPlant(cropKey, health, height, freshYield, ciclo) {
     case 'buriti':   _drawBuriti(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
     case 'caju':     _drawCaju(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
     case 'manga':    _drawManga(ns,gStem,gLeaves,gFruit,health,height,freshYield); break;
+    default:
+      switch(ct) {
+        case 'cereal':  _drawCereal(ns,gStem,gLeaves,gFruit,health,height,freshYield,crop); break;
+        case 'legume':  _drawLegume(ns,gRoots,gStem,gLeaves,gFruit,health,height,freshYield,crop); break;
+        case 'cane':    _drawCane(ns,gStem,gLeaves,health,height,freshYield); break;
+        case 'herb':    _drawHerb(ns,gStem,gLeaves,gFruit,health,height,freshYield,crop); break;
+        case 'root':    _drawRootCrop(ns,gRoots,gStem,gLeaves,health,height,freshYield,crop); break;
+        case 'vine':    _drawVineCrop(ns,gStem,gLeaves,gFruit,health,height,freshYield,crop); break;
+        case 'shrub':   _drawShrubCrop(ns,gStem,gLeaves,gFruit,health,height,freshYield,crop); break;
+        case 'tree':    _drawTreeCrop(ns,gStem,gLeaves,gFruit,health,height,freshYield,crop); break;
+        case 'palm':    _drawPalmCrop(ns,gStem,gLeaves,gFruit,health,height,freshYield,crop); break;
+        default:        _drawShrubCrop(ns,gStem,gLeaves,gFruit,health,height,freshYield,crop); break;
+      }
   }
 }
 
@@ -1776,6 +2513,373 @@ function _drawManga(ns,gS,gL,gF,h,height,yld) {
       mg.setAttribute('fill',yld>15?'#ff8f00':'#ffa000'); mg.setAttribute('stroke','#e65100');
       mg.setAttribute('stroke-width','0.5'); mg.setAttribute('opacity',frOp.toFixed(2)); gF.appendChild(mg);
     });
+  }
+}
+
+/* ─────────── SVG GENÉRICOS POR TIPO ─────────── */
+
+function _drawCereal(ns,gS,gL,gF,h,height,yld,crop) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const cor = (crop&&crop.cor)||'#f9a825';
+  const sH=Math.min(155,12+height*0.55);
+  const sw=2.5+1.5*Math.min(1,height/200);
+  // Colmos (3-5 perfilhos)
+  const nC=h>0.5?5:h>0.25?3:1;
+  const offsets=[-22,-11,0,11,22].slice(0,nC).map((x,i)=>x+(i%2===0?0:3));
+  offsets.forEach(ox => {
+    const p=document.createElementNS(ns,'path');
+    const bend=ox*0.25;
+    p.setAttribute('d',`M${cx+ox},${cy} Q${cx+ox+bend},${cy-sH*0.5} ${_svgN(cx+ox+bend*1.5)},${_svgN(cy-sH)}`);
+    p.setAttribute('stroke','url(#cg-stem)'); p.setAttribute('stroke-width',sw+'');
+    p.setAttribute('fill','none'); p.setAttribute('opacity',Math.min(1,h+0.1)+''); gS.appendChild(p);
+    // Folhas
+    if (h>0.15) {
+      [0.35,0.65].forEach((t,li) => {
+        const ty=cy-sH*t, td=li%2===0?1:-1;
+        const lf=document.createElementNS(ns,'path');
+        lf.setAttribute('d',`M${_svgN(cx+ox+bend*t)},${_svgN(ty)} Q${_svgN(cx+ox+bend*t+td*28)},${_svgN(ty-12)} ${_svgN(cx+ox+bend*t+td*42)},${_svgN(ty+4)}`);
+        lf.setAttribute('stroke',h>0.55?'#3a8a10':'#5a9a20'); lf.setAttribute('stroke-width','1.8');
+        lf.setAttribute('fill','none'); lf.setAttribute('opacity','0.88'); gL.appendChild(lf);
+      });
+    }
+    // Espiga/panícula
+    if (h>0.4 && yld>0.1) {
+      const esc=Math.min(1,yld/(crop?crop.prodMax*0.5:5));
+      const eH=_svgN(8+18*esc), eW=_svgN(3+4*esc);
+      const ex=_svgN(cx+ox+bend*1.5), ey=_svgN(cy-sH-eH*0.5);
+      const grain=document.createElementNS(ns,'ellipse');
+      grain.setAttribute('cx',ex+''); grain.setAttribute('cy',ey+'');
+      grain.setAttribute('rx',eW+''); grain.setAttribute('ry',eH+'');
+      grain.setAttribute('fill',cor); grain.setAttribute('stroke','#a06010');
+      grain.setAttribute('stroke-width','0.5'); grain.setAttribute('opacity',(0.5+0.5*esc).toFixed(2)); gF.appendChild(grain);
+    }
+  });
+}
+
+function _drawLegume(ns,gR,gS,gL,gF,h,height,yld,crop) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const cor=(crop&&crop.cor)||'#795548';
+  const sH=Math.min(90,8+height*0.45);
+  const sw=2+1.5*Math.min(1,height/150);
+  // Nódulos radiculares (leguminosas)
+  if (h>0.2) {
+    [-18,-8,2,12,22].forEach((ox,i) => {
+      const ny=cy+6+i*3, nx=cx+ox;
+      const nd=document.createElementNS(ns,'circle');
+      nd.setAttribute('cx',nx+''); nd.setAttribute('cy',ny+''); nd.setAttribute('r','2.5');
+      nd.setAttribute('fill','#f87171'); nd.setAttribute('opacity',(0.4+0.5*Math.min(1,h)).toFixed(2)); gR.appendChild(nd);
+    });
+  }
+  // Caule principal
+  const st=document.createElementNS(ns,'path');
+  st.setAttribute('d',`M${cx},${cy} Q${cx-8},${cy-sH*0.5} ${cx},${_svgN(cy-sH)}`);
+  st.setAttribute('stroke','url(#cg-stem)'); st.setAttribute('stroke-width',sw+'');
+  st.setAttribute('fill','none'); st.setAttribute('opacity',Math.min(1,h+0.1)+''); gS.appendChild(st);
+  // Folhas trifolioladas
+  if (h>0.15) {
+    [0.3,0.55,0.8].forEach((t,ti) => {
+      const ty=_svgN(cy-sH*t), tx=_svgN(cx+(ti%2===0?-6:4));
+      [-1,0,1].forEach(d => {
+        const lf=document.createElementNS(ns,'ellipse');
+        lf.setAttribute('cx',_svgN(+tx+d*12)+''); lf.setAttribute('cy',_svgN(ty-d*5)+'');
+        lf.setAttribute('rx','6'); lf.setAttribute('ry','4');
+        lf.setAttribute('fill',h>0.55?'#2e7a14':'#4a9a24'); lf.setAttribute('opacity','0.85'); gL.appendChild(lf);
+      });
+    });
+  }
+  // Vagens
+  if (yld>0.1 && h>0.4) {
+    const sc=Math.min(1,yld/(crop?crop.prodMax*0.5:2));
+    const nV=Math.round(1+4*sc);
+    for (let i=0;i<nV;i++) {
+      const vx=_svgN(cx-20+i*12), vy=_svgN(cy-sH*0.35-i*8);
+      const vg=document.createElementNS(ns,'path');
+      vg.setAttribute('d',`M${vx},${vy} Q${_svgN(+vx+15)},${_svgN(vy-4)} ${_svgN(+vx+22)},${vy}`);
+      vg.setAttribute('stroke',cor); vg.setAttribute('stroke-width',_svgN(3+3*sc)+'');
+      vg.setAttribute('fill','none'); vg.setAttribute('stroke-linecap','round');
+      vg.setAttribute('opacity',(0.5+0.5*sc).toFixed(2)); gF.appendChild(vg);
+    }
+  }
+}
+
+function _drawCane(ns,gS,gL,h,height,yld) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const sH=Math.min(170,10+height*0.60);
+  const nC=h>0.6?7:h>0.35?5:3;
+  const offs=[-30,-18,-8,2,12,22,32].slice(0,nC);
+  offs.forEach((ox,i) => {
+    const sw=2.5+1.5*Math.min(1,height/350);
+    const bend=ox*0.15;
+    // Colmo da cana (com internós)
+    for (let seg=0;seg<5;seg++) {
+      const sy1=cy-sH*(seg/5), sy2=cy-sH*((seg+1)/5);
+      const r=document.createElementNS(ns,'rect');
+      r.setAttribute('x',_svgN(cx+ox-sw)+''); r.setAttribute('y',_svgN(sy2)+'');
+      r.setAttribute('width',_svgN(sw*2)+''); r.setAttribute('height',_svgN(sy1-sy2)+'');
+      r.setAttribute('fill',seg%2===0?'#4a8a20':'#5a9a28');
+      r.setAttribute('opacity',Math.min(1,h+0.15)+''); gS.appendChild(r);
+      // Nó (internó)
+      const nd=document.createElementNS(ns,'line');
+      nd.setAttribute('x1',_svgN(cx+ox-sw-1)+''); nd.setAttribute('y1',_svgN(sy1)+'');
+      nd.setAttribute('x2',_svgN(cx+ox+sw+1)+''); nd.setAttribute('y2',_svgN(sy1)+'');
+      nd.setAttribute('stroke','#2a5a08'); nd.setAttribute('stroke-width','1.5'); gS.appendChild(nd);
+    }
+    // Folhas longas na ponta
+    if (h>0.25) {
+      [-1,0,1].forEach(d => {
+        const lf=document.createElementNS(ns,'path');
+        lf.setAttribute('d',`M${_svgN(cx+ox)},${_svgN(cy-sH)} Q${_svgN(cx+ox+d*30)},${_svgN(cy-sH-15)} ${_svgN(cx+ox+d*50)},${_svgN(cy-sH+5)}`);
+        lf.setAttribute('stroke',h>0.55?'#2e8010':'#3a9a1a'); lf.setAttribute('stroke-width','1.6');
+        lf.setAttribute('fill','none'); lf.setAttribute('opacity','0.82'); gL.appendChild(lf);
+      });
+    }
+  });
+}
+
+function _drawHerb(ns,gS,gL,gF,h,height,yld,crop) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const cor=(crop&&crop.cor)||'#66bb6a';
+  const sH=Math.min(45,4+height*0.8);
+  const nF=h>0.6?8:h>0.3?5:3;
+  const angles=[];
+  for(let i=0;i<nF;i++) angles.push((i/(nF-1||1))*180-90);
+  angles.forEach((ang,i) => {
+    const rad=ang*Math.PI/180;
+    const lLen=10+sH*0.85;
+    const ex=_svgN(cx+Math.sin(rad)*lLen), ey=_svgN(cy-Math.cos(rad)*lLen*0.7);
+    const fw=_svgN(4+8*Math.min(1,h)), fh2=_svgN(6+18*Math.min(1,h));
+    // Caule da folha
+    const stem=document.createElementNS(ns,'line');
+    stem.setAttribute('x1',cx+''); stem.setAttribute('y1',cy+'');
+    stem.setAttribute('x2',ex+''); stem.setAttribute('y2',ey+'');
+    stem.setAttribute('stroke','#4a8a14'); stem.setAttribute('stroke-width','1.2');
+    stem.setAttribute('opacity',Math.min(1,h+0.1)+''); gS.appendChild(stem);
+    // Lâmina foliar
+    const lf=document.createElementNS(ns,'ellipse');
+    lf.setAttribute('cx',ex+''); lf.setAttribute('cy',ey+'');
+    lf.setAttribute('rx',fw+''); lf.setAttribute('ry',fh2+'');
+    lf.setAttribute('transform',`rotate(${ang},${ex},${ey})`);
+    lf.setAttribute('fill',h>0.6?cor:'#7acc7a'); lf.setAttribute('opacity','0.88'); gL.appendChild(lf);
+  });
+  // Cabeça de alface (se alto crescimento)
+  if (h>0.55 && (crop&&crop.nome&&crop.nome.toLowerCase().includes('alface'))) {
+    const hd=document.createElementNS(ns,'ellipse');
+    hd.setAttribute('cx',cx+''); hd.setAttribute('cy',_svgN(cy-4)+'');
+    hd.setAttribute('rx',_svgN(12+10*Math.min(1,h))+''); hd.setAttribute('ry',_svgN(8+6*Math.min(1,h))+'');
+    hd.setAttribute('fill',cor); hd.setAttribute('opacity','0.45'); gL.appendChild(hd);
+  }
+}
+
+function _drawRootCrop(ns,gR,gS,gL,h,height,yld,crop) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const cor=(crop&&crop.cor)||'#7b5ea7';
+  const sH=Math.min(60,6+height*0.55);
+  const sc=Math.min(1,yld/(crop?crop.prodMax*0.5:12));
+  // Tubérculos/raízes tuberosas
+  if (sc>0.05) {
+    [-24,-12,0,12,24].slice(0,Math.round(1+4*sc)).forEach((ox,i) => {
+      const tw=_svgN(5+7*sc), th=_svgN(8+14*sc);
+      const tx=_svgN(cx+ox+(i%2===0?0:4)), ty=_svgN(cy+8+i*2);
+      const tb=document.createElementNS(ns,'ellipse');
+      tb.setAttribute('cx',tx+''); tb.setAttribute('cy',ty+'');
+      tb.setAttribute('rx',tw+''); tb.setAttribute('ry',th+'');
+      tb.setAttribute('fill',cor); tb.setAttribute('stroke','#5a3080');
+      tb.setAttribute('stroke-width','0.6'); tb.setAttribute('opacity',(0.5+0.5*sc).toFixed(2)); gR.appendChild(tb);
+    });
+  }
+  // Folhas basais
+  const nF=h>0.5?6:h>0.25?4:2;
+  for(let i=0;i<nF;i++) {
+    const ang=((i/(nF-1||1))*160-80)*Math.PI/180;
+    const lLen=sH*0.9;
+    const ex=_svgN(cx+Math.sin(ang)*lLen), ey=_svgN(cy-Math.cos(ang)*lLen*0.55);
+    const lf=document.createElementNS(ns,'path');
+    lf.setAttribute('d',`M${cx},${cy} Q${_svgN(cx+Math.sin(ang)*lLen*0.5+Math.cos(ang)*8)},${_svgN(cy-Math.cos(ang)*lLen*0.3)} ${ex},${ey}`);
+    lf.setAttribute('stroke',h>0.55?'#2e7a14':'#4a9a24'); lf.setAttribute('stroke-width','2');
+    lf.setAttribute('fill','none'); lf.setAttribute('opacity','0.85'); gL.appendChild(lf);
+  }
+}
+
+function _drawVineCrop(ns,gS,gL,gF,h,height,yld,crop) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const cor=(crop&&crop.cor)||'#fbc02d';
+  const sH=Math.min(100,8+height*0.5);
+  // Ramas horizontais (trepadeira/rasteira)
+  const nR=h>0.5?3:2;
+  for(let r=0;r<nR;r++) {
+    const dir=r%2===0?1:-1;
+    const rY=_svgN(cy-sH*(0.2+r*0.3));
+    const rm=document.createElementNS(ns,'path');
+    rm.setAttribute('d',`M${cx},${rY} Q${_svgN(cx+dir*30)},${_svgN(+rY-12)} ${_svgN(cx+dir*55)},${rY}`);
+    rm.setAttribute('stroke','#4a7a14'); rm.setAttribute('stroke-width','2');
+    rm.setAttribute('fill','none'); rm.setAttribute('opacity',Math.min(1,h+0.1)+''); gS.appendChild(rm);
+    // Gavinhas
+    if (h>0.3) {
+      const gv=document.createElementNS(ns,'path');
+      gv.setAttribute('d',`M${_svgN(cx+dir*35)},${rY} Q${_svgN(cx+dir*42)},${_svgN(+rY-10)} ${_svgN(cx+dir*38)},${_svgN(+rY-16)}`);
+      gv.setAttribute('stroke','#4a7a14'); gv.setAttribute('stroke-width','1');
+      gv.setAttribute('fill','none'); gS.appendChild(gv);
+    }
+    // Folhas na rama
+    [0.3,0.7].forEach(t => {
+      const lx=_svgN(cx+dir*55*t), ly=_svgN(+rY-12*t);
+      const lf=document.createElementNS(ns,'circle');
+      lf.setAttribute('cx',lx+''); lf.setAttribute('cy',ly+'');
+      lf.setAttribute('r',_svgN(6+6*Math.min(1,h))+'');
+      lf.setAttribute('fill',h>0.55?'#2e7a14':'#4a9a24'); lf.setAttribute('opacity','0.80'); gL.appendChild(lf);
+    });
+  }
+  // Caule principal
+  const st=document.createElementNS(ns,'line');
+  st.setAttribute('x1',cx+''); st.setAttribute('y1',cy+'');
+  st.setAttribute('x2',cx+''); st.setAttribute('y2',_svgN(cy-sH)+'');
+  st.setAttribute('stroke','url(#cg-stem)'); st.setAttribute('stroke-width','3');
+  st.setAttribute('opacity',Math.min(1,h+0.1)+''); gS.appendChild(st);
+  // Frutos na rama
+  if (yld>0.5 && h>0.4) {
+    const sc=Math.min(1,yld/(crop?crop.prodMax*0.5:15));
+    [[-45,0],[35,-10]].slice(0,Math.round(1+sc)).forEach(([dx,dy]) => {
+      const fEl=document.createElementNS(ns,'ellipse');
+      fEl.setAttribute('cx',_svgN(cx+dx)+''); fEl.setAttribute('cy',_svgN(cy-sH*0.25+dy)+'');
+      fEl.setAttribute('rx',_svgN(8+10*sc)+''); fEl.setAttribute('ry',_svgN(6+8*sc)+'');
+      fEl.setAttribute('fill',cor); fEl.setAttribute('stroke','#a06010');
+      fEl.setAttribute('stroke-width','0.6'); fEl.setAttribute('opacity',(0.6+0.4*sc).toFixed(2)); gF.appendChild(fEl);
+    });
+  }
+}
+
+function _drawShrubCrop(ns,gS,gL,gF,h,height,yld,crop) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const cor=(crop&&crop.cor)||'#43a047';
+  const sH=Math.min(120,8+height*0.5);
+  const sw=3+2.5*Math.min(1,height/200);
+  // Múltiplos ramos principais
+  const branches=[[-18,-1],[0,0],[18,1]];
+  branches.forEach(([bx,bd]) => {
+    const tx=_svgN(cx+bx+bd*15), ty=_svgN(cy-sH);
+    const br=document.createElementNS(ns,'path');
+    br.setAttribute('d',`M${cx},${cy} Q${_svgN(cx+bx*0.5)},${_svgN(cy-sH*0.5)} ${tx},${ty}`);
+    br.setAttribute('stroke','url(#cg-stem)'); br.setAttribute('stroke-width',sw+'');
+    br.setAttribute('fill','none'); br.setAttribute('opacity',Math.min(1,h+0.15)+''); gS.appendChild(br);
+    // Copa arbustiva
+    if (h>0.1) {
+      const cr=_svgN(14+22*Math.min(1,h));
+      const cp=document.createElementNS(ns,'circle');
+      cp.setAttribute('cx',tx+''); cp.setAttribute('cy',_svgN(+ty-cr*0.3)+'');
+      cp.setAttribute('r',cr+'');
+      cp.setAttribute('fill',h>0.6?'#1a5e08':'#2a7a12'); cp.setAttribute('opacity','0.82'); gL.appendChild(cp);
+    }
+  });
+  // Frutos
+  if (yld>0.5 && h>0.35) {
+    const sc=Math.min(1,yld/(crop?crop.prodMax*0.5:25));
+    const nFr=Math.round(2+6*sc);
+    for(let i=0;i<nFr;i++) {
+      const angle=((i/nFr)*2*Math.PI);
+      const r=_svgN(12+25*sc);
+      const fx=_svgN(cx+Math.cos(angle)*r*0.9);
+      const fy=_svgN(cy-sH*0.6+Math.sin(angle)*r*0.5);
+      const fr=document.createElementNS(ns,'circle');
+      fr.setAttribute('cx',fx+''); fr.setAttribute('cy',fy+'');
+      fr.setAttribute('r',_svgN(3+5*sc)+'');
+      fr.setAttribute('fill',cor); fr.setAttribute('stroke','#a06010');
+      fr.setAttribute('stroke-width','0.5'); fr.setAttribute('opacity',(0.55+0.45*sc).toFixed(2)); gF.appendChild(fr);
+    }
+  }
+}
+
+function _drawTreeCrop(ns,gS,gL,gF,h,height,yld,crop) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const cor=(crop&&crop.cor)||'#388e3c';
+  const sH=Math.min(160,15+height*0.08);
+  const sw=5+6*Math.min(1,height/1200);
+  // Tronco
+  const tr=document.createElementNS(ns,'path');
+  tr.setAttribute('d',`M${_svgN(cx-sw)},${cy} L${_svgN(cx-sw*0.65)},${_svgN(cy-sH)} L${_svgN(cx+sw*0.65)},${_svgN(cy-sH)} L${_svgN(cx+sw)},${cy} Z`);
+  tr.setAttribute('fill','#4a2c10'); tr.setAttribute('stroke','#2a1408');
+  tr.setAttribute('stroke-width','0.7'); tr.setAttribute('opacity',Math.min(1,h+0.2)+''); gS.appendChild(tr);
+  // Copa
+  if (h>0.08) {
+    const cr=_svgN(22+60*Math.min(1,h));
+    const ch=_svgN(18+68*Math.min(1,h));
+    const lc=h>0.6?'#1a5e08':'#2a7a12';
+    [[0,0],[1,0.35],[0,0.65],[-1,0.35]].forEach(([dx,dy]) => {
+      const el=document.createElementNS(ns,'ellipse');
+      el.setAttribute('cx',_svgN(cx+dx*cr*0.4)+''); el.setAttribute('cy',_svgN(cy-sH-ch*0.35+dy*ch*0.3)+'');
+      el.setAttribute('rx',_svgN(cr*(0.7+Math.abs(dy)*0.3))+''); el.setAttribute('ry',_svgN(ch*(0.5+dy*0.2))+'');
+      el.setAttribute('fill',lc); el.setAttribute('opacity',(0.70+dy*0.15).toFixed(2)); gL.appendChild(el);
+    });
+  }
+  // Frutos
+  if (yld>0.5 && h>0.3) {
+    const sc=Math.min(1,yld/(crop?crop.prodMax*0.5:15));
+    const nFr=Math.round(2+8*sc);
+    for(let i=0;i<nFr;i++) {
+      const ang=(i/nFr)*2*Math.PI;
+      const r=_svgN(18+35*sc);
+      const fx=_svgN(cx+Math.cos(ang)*r); const fy=_svgN(cy-sH*0.55+Math.sin(ang)*r*0.4);
+      const fr=document.createElementNS(ns,'circle');
+      fr.setAttribute('cx',fx+''); fr.setAttribute('cy',fy+'');
+      fr.setAttribute('r',_svgN(3+6*sc)+'');
+      fr.setAttribute('fill',cor); fr.setAttribute('stroke','#5a3010');
+      fr.setAttribute('stroke-width','0.5'); fr.setAttribute('opacity',(0.55+0.45*sc).toFixed(2)); gF.appendChild(fr);
+    }
+  }
+}
+
+function _drawPalmCrop(ns,gS,gL,gF,h,height,yld,crop) {
+  const cy=CRESC_GY, cx=CRESC_CX;
+  const cor=(crop&&crop.cor)||'#4e342e';
+  const sH=Math.min(165,12+height*0.09);
+  const sw=5+4*Math.min(1,height/1500);
+  // Estipe (tronco de palmeira)
+  const nSegs=6;
+  for(let s=0;s<nSegs;s++) {
+    const sy1=_svgN(cy-sH*(s/nSegs)), sy2=_svgN(cy-sH*((s+1)/nSegs));
+    const w1=_svgN(sw*(1-s/nSegs*0.25)), w2=_svgN(sw*(1-(s+1)/nSegs*0.25));
+    const seg=document.createElementNS(ns,'path');
+    seg.setAttribute('d',`M${_svgN(cx-w1)},${sy1} L${_svgN(cx-w2)},${sy2} L${_svgN(cx+w2)},${sy2} L${_svgN(cx+w1)},${sy1} Z`);
+    seg.setAttribute('fill',s%2===0?'#5a3a18':'#6a4a20'); seg.setAttribute('opacity',Math.min(1,h+0.15)+''); gS.appendChild(seg);
+    const ring=document.createElementNS(ns,'line');
+    ring.setAttribute('x1',_svgN(cx-w1-1)+''); ring.setAttribute('y1',sy1+'');
+    ring.setAttribute('x2',_svgN(cx+w1+1)+''); ring.setAttribute('y2',sy1+'');
+    ring.setAttribute('stroke','#3a2008'); ring.setAttribute('stroke-width','1'); gS.appendChild(ring);
+  }
+  // Folhas pinadas
+  if (h>0.12) {
+    const nLeaves=h>0.55?7:h>0.3?5:3;
+    for(let i=0;i<nLeaves;i++) {
+      const ang=((i/(nLeaves-1||1))*160-80)*Math.PI/180;
+      const lLen=_svgN(20+75*Math.min(1,h));
+      const ex=_svgN(cx+Math.sin(ang)*lLen), ey=_svgN(cy-sH-Math.cos(ang)*lLen*0.5);
+      const lf=document.createElementNS(ns,'path');
+      lf.setAttribute('d',`M${cx},${_svgN(cy-sH)} Q${_svgN(cx+Math.sin(ang)*lLen*0.5)},${_svgN(cy-sH-Math.cos(ang)*lLen*0.35)} ${ex},${ey}`);
+      lf.setAttribute('stroke',h>0.55?'#1e6e04':'#2e8a12'); lf.setAttribute('stroke-width','2.5');
+      lf.setAttribute('fill','none'); lf.setAttribute('opacity','0.88'); gL.appendChild(lf);
+      // Pinas ao longo da folha
+      if (h>0.3) {
+        for(let p=1;p<=4;p++) {
+          const t=p/5;
+          const px=_svgN(cx+Math.sin(ang)*lLen*t);
+          const py=_svgN(cy-sH-Math.cos(ang)*lLen*t*0.5);
+          const pn=document.createElementNS(ns,'line');
+          const perpAng=ang+Math.PI/2;
+          pn.setAttribute('x1',px+''); pn.setAttribute('y1',py+'');
+          pn.setAttribute('x2',_svgN(+px+Math.sin(perpAng)*12)+'');
+          pn.setAttribute('y2',_svgN(+py+Math.cos(perpAng)*6)+'');
+          pn.setAttribute('stroke','#2e8a12'); pn.setAttribute('stroke-width','1'); gL.appendChild(pn);
+        }
+      }
+    }
+  }
+  // Cachos/frutos
+  if (yld>0.5 && h>0.4) {
+    const sc=Math.min(1,yld/(crop?Math.max(crop.prodMax*0.5,80):80));
+    const cacheEl=document.createElementNS(ns,'ellipse');
+    cacheEl.setAttribute('cx',cx+''); cacheEl.setAttribute('cy',_svgN(cy-sH+8)+'');
+    cacheEl.setAttribute('rx',_svgN(12+14*sc)+''); cacheEl.setAttribute('ry',_svgN(8+10*sc)+'');
+    cacheEl.setAttribute('fill',cor); cacheEl.setAttribute('stroke','#2a1808');
+    cacheEl.setAttribute('stroke-width','0.8'); cacheEl.setAttribute('opacity',(0.55+0.45*sc).toFixed(2)); gF.appendChild(cacheEl);
   }
 }
 
