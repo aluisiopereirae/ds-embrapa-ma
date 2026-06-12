@@ -892,115 +892,161 @@ function _buildCrescimentoHTML() {
 <div class="sim-tabs-inner" style="margin-bottom:6px;border-bottom:1px solid var(--border);padding-bottom:8px" id="cresc-cat-tabs">${catTabs}</div>
 <div class="sim-tabs-inner" style="margin-bottom:14px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px" id="cresc-crop-tabs">${cropTabs}</div>
 
-<div style="display:grid;grid-template-columns:minmax(240px,290px) 1fr;gap:16px;align-items:start">
+<style>
+  #cresc-sim-wrapper {
+    display: grid;
+    grid-template-columns: minmax(250px,280px) minmax(0,1fr);
+    gap: 14px;
+    align-items: start;
+  }
+  #cresc-ctrl-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  @media (max-width: 660px) {
+    #cresc-sim-wrapper { grid-template-columns: 1fr; }
+    #cresc-ctrl-sections {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  }
+</style>
 
-  <!-- ═══ CONTROLES ═══ -->
-  <div class="sim-card" style="margin:0">
-    <div class="sim-card-title" id="cresc-panel-title">🌿 Mandioca</div>
-    <button onclick="crescAutoAjustar()" style="width:100%;margin-bottom:10px;padding:7px 10px;border-radius:7px;border:1px solid var(--green2);background:var(--green3);color:var(--bg2);font-size:11px;font-weight:700;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">⚡ Ajuste automático para esta cultura e local</button>
+<div id="cresc-sim-wrapper">
 
-    <div class="sim-param">
-      <label style="font-size:11px;color:var(--text3)">Município do Maranhão</label>
-      <select class="sim-select" id="cresc-mun" onchange="onCrescMunicipioChange()">${munOpts}</select>
-    </div>
-    <div style="font-size:10px;color:var(--text3);margin-bottom:10px;padding:5px 8px;background:var(--bg3);border-radius:6px" id="cresc-mun-desc">São Luís · Tropical úmido · 28°C</div>
-
-    <div class="sim-param">
-      <label style="font-size:11px;color:var(--text3)">Cultivar / Variedade</label>
-      <select class="sim-select" id="cresc-var" onchange="updateCrescent()"></select>
-    </div>
-
-    <div style="font-size:10px;font-weight:600;color:var(--text2);margin:8px 0 6px;text-transform:uppercase;letter-spacing:.05em">☀️ Clima</div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>Temperatura média (°C)</span><strong id="cresc-lbl-temp">28</strong></label>
-      <input type="range" class="sim-slider" id="cresc-temp" min="15" max="40" value="28" step="0.5" oninput="updateCrescLabels();updateCrescent()">
-    </div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>Precipitação mensal (mm)</span><strong id="cresc-lbl-chuva">175</strong></label>
-      <input type="range" class="sim-slider" id="cresc-chuva" min="0" max="600" value="175" step="5" oninput="updateCrescLabels();updateCrescent()">
-    </div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>Radiação solar (MJ/m²/dia)</span><strong id="cresc-lbl-rad">18</strong></label>
-      <input type="range" class="sim-slider" id="cresc-rad" min="5" max="30" value="18" step="0.5" oninput="updateCrescLabels();updateCrescent()">
-    </div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>Umidade relativa (%)</span><strong id="cresc-lbl-ur">75</strong></label>
-      <input type="range" class="sim-slider" id="cresc-ur" min="30" max="100" value="75" step="1" oninput="updateCrescLabels();updateCrescent()">
+  <!-- ═══ CONTROLES (painel esquerdo compacto) ═══ -->
+  <div class="sim-card" style="margin:0;min-width:0">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+      <div class="sim-card-title" id="cresc-panel-title" style="margin:0;flex:1;font-size:11px;min-width:80px">🌿 Mandioca</div>
+      <button onclick="crescAutoAjustar()" style="padding:4px 8px;border-radius:6px;border:1px solid var(--green2);background:var(--green3);color:var(--bg2);font-size:9px;font-weight:700;cursor:pointer;white-space:nowrap" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">⚡ Auto-ajustar</button>
     </div>
 
-    <div style="font-size:10px;font-weight:600;color:var(--text2);margin:8px 0 6px;text-transform:uppercase;letter-spacing:.05em">🪨 Solo & Nutrientes (CHONPS)</div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>pH do solo</span><strong id="cresc-lbl-ph">5.8</strong></label>
-      <input type="range" class="sim-slider" id="cresc-ph" min="3.5" max="8.5" value="5.8" step="0.1" oninput="updateCrescLabels();updateCrescent()">
-    </div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>Nitrogênio — N (kg/ha)</span><strong id="cresc-lbl-N">80</strong></label>
-      <input type="range" class="sim-slider" id="cresc-N" min="0" max="300" value="80" step="5" oninput="updateCrescLabels();updateCrescent()">
-    </div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>Fósforo — P₂O₅ (kg/ha)</span><strong id="cresc-lbl-P">60</strong></label>
-      <input type="range" class="sim-slider" id="cresc-P" min="0" max="200" value="60" step="5" oninput="updateCrescLabels();updateCrescent()">
-    </div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>Potássio — K₂O (kg/ha)</span><strong id="cresc-lbl-K">80</strong></label>
-      <input type="range" class="sim-slider" id="cresc-K" min="0" max="600" value="80" step="5" oninput="updateCrescLabels();updateCrescent()">
-    </div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>Enxofre — S (kg/ha)</span><strong id="cresc-lbl-S">20</strong></label>
-      <input type="range" class="sim-slider" id="cresc-S" min="0" max="80" value="20" step="2" oninput="updateCrescLabels();updateCrescent()">
-    </div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>Cálcio — Ca (cmolc/dm³)</span><strong id="cresc-lbl-Ca">2.5</strong></label>
-      <input type="range" class="sim-slider" id="cresc-Ca" min="0" max="8" value="2.5" step="0.1" oninput="updateCrescLabels();updateCrescent()">
-    </div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>Matéria orgânica (%)</span><strong id="cresc-lbl-MO">2.0</strong></label>
-      <input type="range" class="sim-slider" id="cresc-MO" min="0.5" max="6" value="2.0" step="0.1" oninput="updateCrescLabels();updateCrescent()">
-    </div>
+    <div id="cresc-ctrl-sections">
 
-    <div style="font-size:10px;font-weight:600;color:var(--text2);margin:8px 0 6px;text-transform:uppercase;letter-spacing:.05em">🌾 Manejo</div>
-    <div class="sim-param">
-      <label style="font-size:11px;color:var(--text3)">Mês de plantio</label>
-      <select class="sim-select" id="cresc-mes" onchange="updateCrescent()">
-        <option value="1">Janeiro (início chuvas)</option><option value="2">Fevereiro</option>
-        <option value="3">Março</option><option value="4">Abril</option>
-        <option value="5">Maio (início seca)</option><option value="6">Junho</option>
-        <option value="7">Julho (seco)</option><option value="8">Agosto</option>
-        <option value="9">Setembro</option><option value="10">Outubro (início chuvas)</option>
-        <option value="11">Novembro</option><option value="12">Dezembro</option>
-      </select>
-    </div>
-    <div class="sim-param">
-      <label style="display:flex;justify-content:space-between"><span>Espaçamento (m²/planta)</span><strong id="cresc-lbl-esp">1.0</strong></label>
-      <input type="range" class="sim-slider" id="cresc-esp" min="0.1" max="8" value="1.0" step="0.1" oninput="updateCrescLabels();updateCrescent()">
-    </div>
-    <div class="sim-param">
-      <label style="font-size:11px;color:var(--text3)">Irrigação suplementar</label>
-      <select class="sim-select" id="cresc-irrig" onchange="updateCrescent()">
-        <option value="0">Não (sequeiro)</option>
-        <option value="1">Sim (quando necessário)</option>
-        <option value="2">Sim (gotejamento permanente)</option>
-      </select>
-    </div>
-    <div class="sim-param">
-      <label style="font-size:11px;color:var(--text3)">Pragas / Doenças</label>
-      <select class="sim-select" id="cresc-praga" onchange="updateCrescent()">
-        <option value="0">Nenhuma</option>
-        <option value="1">Leve (monitorada)</option>
-        <option value="2">Moderada (sem controle)</option>
-        <option value="3">Severa (alta pressão)</option>
-      </select>
-    </div>
+      <!-- 📍 Local -->
+      <div style="flex:1;min-width:140px">
+        <div class="sim-param">
+          <label style="font-size:10px;color:var(--text3)">Município do Maranhão</label>
+          <select class="sim-select" id="cresc-mun" onchange="onCrescMunicipioChange()">${munOpts}</select>
+        </div>
+        <div style="font-size:9px;color:var(--text3);margin-bottom:6px;padding:3px 6px;background:var(--bg3);border-radius:4px;line-height:1.3" id="cresc-mun-desc">São Luís · Tropical úmido · 28°C</div>
+        <div class="sim-param">
+          <label style="font-size:10px;color:var(--text3)">Cultivar / Variedade</label>
+          <select class="sim-select" id="cresc-var" onchange="updateCrescent()"></select>
+        </div>
+      </div>
+
+      <!-- ☀️ Clima -->
+      <div style="flex:1;min-width:155px">
+        <div style="font-size:9px;font-weight:600;color:var(--text2);margin:0 0 4px;text-transform:uppercase;letter-spacing:.04em">☀️ Clima</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+          <div class="sim-param" style="margin:0">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>Temp(°C)</span><strong id="cresc-lbl-temp">28</strong></label>
+            <input type="range" class="sim-slider" id="cresc-temp" min="15" max="40" value="28" step="0.5" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+          <div class="sim-param" style="margin:0">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>Precip(mm)</span><strong id="cresc-lbl-chuva">175</strong></label>
+            <input type="range" class="sim-slider" id="cresc-chuva" min="0" max="600" value="175" step="5" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+          <div class="sim-param" style="margin:0">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>Rad(MJ/m²)</span><strong id="cresc-lbl-rad">18</strong></label>
+            <input type="range" class="sim-slider" id="cresc-rad" min="5" max="30" value="18" step="0.5" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+          <div class="sim-param" style="margin:0">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>UR(%)</span><strong id="cresc-lbl-ur">75</strong></label>
+            <input type="range" class="sim-slider" id="cresc-ur" min="30" max="100" value="75" step="1" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+        </div>
+      </div>
+
+      <!-- 🪨 Solo & Nutrientes -->
+      <div style="flex:1.5;min-width:195px">
+        <div style="font-size:9px;font-weight:600;color:var(--text2);margin:0 0 4px;text-transform:uppercase;letter-spacing:.04em">🪨 Solo & Nutrientes</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+          <div class="sim-param" style="margin:0">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>pH</span><strong id="cresc-lbl-ph">5.8</strong></label>
+            <input type="range" class="sim-slider" id="cresc-ph" min="3.5" max="8.5" value="5.8" step="0.1" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+          <div class="sim-param" style="margin:0">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>N(kg/ha)</span><strong id="cresc-lbl-N">80</strong></label>
+            <input type="range" class="sim-slider" id="cresc-N" min="0" max="300" value="80" step="5" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+          <div class="sim-param" style="margin:0">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>P₂O₅(kg/ha)</span><strong id="cresc-lbl-P">60</strong></label>
+            <input type="range" class="sim-slider" id="cresc-P" min="0" max="200" value="60" step="5" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+          <div class="sim-param" style="margin:0">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>K₂O(kg/ha)</span><strong id="cresc-lbl-K">80</strong></label>
+            <input type="range" class="sim-slider" id="cresc-K" min="0" max="600" value="80" step="5" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+          <div class="sim-param" style="margin:0">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>S(kg/ha)</span><strong id="cresc-lbl-S">20</strong></label>
+            <input type="range" class="sim-slider" id="cresc-S" min="0" max="80" value="20" step="2" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+          <div class="sim-param" style="margin:0">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>Ca(cmolc)</span><strong id="cresc-lbl-Ca">2.5</strong></label>
+            <input type="range" class="sim-slider" id="cresc-Ca" min="0" max="8" value="2.5" step="0.1" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+          <div class="sim-param" style="margin:0;grid-column:1/-1">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>M.O.(%)</span><strong id="cresc-lbl-MO">2.0</strong></label>
+            <input type="range" class="sim-slider" id="cresc-MO" min="0.5" max="6" value="2.0" step="0.1" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+        </div>
+      </div>
+
+      <!-- 🌾 Manejo -->
+      <div style="flex:1;min-width:140px">
+        <div style="font-size:9px;font-weight:600;color:var(--text2);margin:0 0 4px;text-transform:uppercase;letter-spacing:.04em">🌾 Manejo</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+          <div class="sim-param" style="margin:0">
+            <label style="font-size:9px;color:var(--text3)">Mês de plantio</label>
+            <select class="sim-select" id="cresc-mes" onchange="updateCrescent()">
+              <option value="1">Jan</option><option value="2">Fev</option>
+              <option value="3">Mar</option><option value="4">Abr</option>
+              <option value="5">Mai</option><option value="6">Jun</option>
+              <option value="7">Jul</option><option value="8">Ago</option>
+              <option value="9">Set</option><option value="10">Out</option>
+              <option value="11">Nov</option><option value="12">Dez</option>
+            </select>
+          </div>
+          <div class="sim-param" style="margin:0">
+            <label style="display:flex;justify-content:space-between;font-size:9px"><span>Espaç.(m²)</span><strong id="cresc-lbl-esp">1.0</strong></label>
+            <input type="range" class="sim-slider" id="cresc-esp" min="0.1" max="8" value="1.0" step="0.1" oninput="updateCrescLabels();updateCrescent()">
+          </div>
+          <div class="sim-param" style="margin:0">
+            <label style="font-size:9px;color:var(--text3)">Irrigação</label>
+            <select class="sim-select" id="cresc-irrig" onchange="updateCrescent()">
+              <option value="0">Não (sequeiro)</option>
+              <option value="1">Quando necessário</option>
+              <option value="2">Gotejamento</option>
+            </select>
+          </div>
+          <div class="sim-param" style="margin:0">
+            <label style="font-size:9px;color:var(--text3)">Pragas / Doenças</label>
+            <select class="sim-select" id="cresc-praga" onchange="updateCrescent()">
+              <option value="0">Nenhuma</option>
+              <option value="1">Leve</option>
+              <option value="2">Moderada</option>
+              <option value="3">Severa</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- #cresc-ctrl-sections -->
   </div>
 
-  <!-- ═══ RESULTADOS ═══ -->
-  <div style="display:flex;flex-direction:column;gap:14px">
+  <!-- ═══ VISUALIZAÇÃO DA PLANTA + CONDIÇÕES ═══ -->
+  <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
 
-    <!-- Status + SVG da planta -->
+    <!-- Status + SVG + Stats -->
     <div class="chart-card" style="padding:14px">
       <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
         <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px">
-          <svg id="cresc-plant-svg" viewBox="0 0 200 320" width="150" height="240" xmlns="http://www.w3.org/2000/svg">
+          <svg id="cresc-plant-svg" viewBox="0 0 200 320" style="width:160px;height:256px;display:block" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="cg-soil" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#7a5230"/><stop offset="100%" stop-color="#3d2a14"/>
@@ -1014,84 +1060,100 @@ function _buildCrescimentoHTML() {
             <g id="cg-stem-g"></g>
             <g id="cg-leaves-g"></g>
             <g id="cg-fruit-g"></g>
-            <circle id="cg-health-dot" cx="183" cy="16" r="9" fill="#3b6d11"/>
-            <text id="cg-health-lbl" x="183" y="20" text-anchor="middle" font-size="9" fill="white" font-weight="bold">✓</text>
+            <circle id="cg-health-dot" cx="181" cy="17" r="13" fill="#3b6d11"/>
+            <text id="cg-health-lbl" x="181" y="17" text-anchor="middle" dominant-baseline="central" font-size="13" fill="white" font-weight="bold">✓</text>
           </svg>
-          <div style="font-size:10px;color:var(--text3);text-align:center;max-width:150px" id="cresc-stage-lbl">Aguardando simulação</div>
+          <div style="font-size:10px;color:var(--text3);text-align:center;max-width:160px;line-height:1.3" id="cresc-stage-lbl">Aguardando simulação</div>
         </div>
-        <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:180px">
-          <div style="background:var(--bg3);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Produtividade prevista</div>
-            <div style="font-size:1.15rem;font-weight:700;color:var(--green)" id="cresc-stat-prod">—</div>
-            <div style="font-size:10px;color:var(--text3)" id="cresc-prod-unit">t/ha</div>
-            <div style="height:3px;background:var(--border);border-radius:2px;margin-top:5px"><div id="cresc-bar-prod" style="height:3px;border-radius:2px;background:var(--green);width:0%;transition:width .4s"></div></div>
+        <div style="flex:1;min-width:0">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px">
+            <div style="background:var(--bg3);border-radius:7px;padding:8px 10px">
+              <div style="font-size:9px;color:var(--text3);margin-bottom:1px">Produtividade</div>
+              <div style="font-size:1.1rem;font-weight:700;color:var(--green)" id="cresc-stat-prod">—</div>
+              <div style="font-size:9px;color:var(--text3)" id="cresc-prod-unit">t/ha</div>
+              <div style="height:2px;background:var(--border);border-radius:2px;margin-top:4px"><div id="cresc-bar-prod" style="height:2px;border-radius:2px;background:var(--green);width:0%;transition:width .4s"></div></div>
+            </div>
+            <div style="background:var(--bg3);border-radius:7px;padding:8px 10px">
+              <div style="font-size:9px;color:var(--text3);margin-bottom:1px">Saúde da planta</div>
+              <div style="font-size:1.1rem;font-weight:700" id="cresc-stat-saude">—</div>
+              <div style="font-size:9px;color:var(--text3)">/ 100</div>
+              <div style="height:2px;background:var(--border);border-radius:2px;margin-top:4px"><div id="cresc-bar-saude" style="height:2px;border-radius:2px;background:#1d9e75;width:0%;transition:width .4s"></div></div>
+            </div>
+            <div style="background:var(--bg3);border-radius:7px;padding:8px 10px">
+              <div style="font-size:9px;color:var(--text3);margin-bottom:1px">Altura estimada</div>
+              <div style="font-size:1.1rem;font-weight:700;color:var(--text)" id="cresc-stat-altura">—</div>
+              <div style="font-size:9px;color:var(--text3)" id="cresc-altura-unit">cm</div>
+              <div style="height:2px;background:var(--border);border-radius:2px;margin-top:4px"><div id="cresc-bar-altura" style="height:2px;border-radius:2px;background:#60a5fa;width:0%;transition:width .4s"></div></div>
+            </div>
+            <div style="background:var(--bg3);border-radius:7px;padding:8px 10px">
+              <div style="font-size:9px;color:var(--text3);margin-bottom:1px">Ciclo / Colheita</div>
+              <div style="font-size:1.1rem;font-weight:700;color:var(--text)" id="cresc-stat-ciclo">—</div>
+              <div style="font-size:9px;color:var(--text3)">meses</div>
+              <div style="height:2px;background:var(--border);border-radius:2px;margin-top:4px"><div id="cresc-bar-ciclo" style="height:2px;border-radius:2px;background:#f59e0b;width:0%;transition:width .4s"></div></div>
+            </div>
+            <div style="background:var(--bg3);border-radius:7px;padding:8px 10px">
+              <div style="font-size:9px;color:var(--text3);margin-bottom:1px" id="cresc-extra1-lbl">Extra 1</div>
+              <div style="font-size:1.1rem;font-weight:700;color:var(--text)" id="cresc-stat-extra1">—</div>
+              <div style="font-size:9px;color:var(--text3)" id="cresc-extra1-unit"></div>
+              <div style="height:2px;background:var(--border);border-radius:2px;margin-top:4px"><div id="cresc-bar-extra1" style="height:2px;border-radius:2px;background:#a78bfa;width:0%;transition:width .4s"></div></div>
+            </div>
+            <div style="background:var(--bg3);border-radius:7px;padding:8px 10px">
+              <div style="font-size:9px;color:var(--text3);margin-bottom:1px" id="cresc-extra2-lbl">Extra 2</div>
+              <div style="font-size:1.1rem;font-weight:700;color:var(--text)" id="cresc-stat-extra2">—</div>
+              <div style="font-size:9px;color:var(--text3)" id="cresc-extra2-unit"></div>
+              <div style="height:2px;background:var(--border);border-radius:2px;margin-top:4px"><div id="cresc-bar-extra2" style="height:2px;border-radius:2px;background:#fb923c;width:0%;transition:width .4s"></div></div>
+            </div>
           </div>
-          <div style="background:var(--bg3);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Saúde da planta</div>
-            <div style="font-size:1.15rem;font-weight:700" id="cresc-stat-saude">—</div>
-            <div style="font-size:10px;color:var(--text3)">/ 100</div>
-            <div style="height:3px;background:var(--border);border-radius:2px;margin-top:5px"><div id="cresc-bar-saude" style="height:3px;border-radius:2px;background:#1d9e75;width:0%;transition:width .4s"></div></div>
-          </div>
-          <div style="background:var(--bg3);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Altura estimada</div>
-            <div style="font-size:1.15rem;font-weight:700;color:var(--text)" id="cresc-stat-altura">—</div>
-            <div style="font-size:10px;color:var(--text3)" id="cresc-altura-unit">cm</div>
-            <div style="height:3px;background:var(--border);border-radius:2px;margin-top:5px"><div id="cresc-bar-altura" style="height:3px;border-radius:2px;background:#60a5fa;width:0%;transition:width .4s"></div></div>
-          </div>
-          <div style="background:var(--bg3);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Ciclo / Colheita</div>
-            <div style="font-size:1.15rem;font-weight:700;color:var(--text)" id="cresc-stat-ciclo">—</div>
-            <div style="font-size:10px;color:var(--text3)">meses</div>
-            <div style="height:3px;background:var(--border);border-radius:2px;margin-top:5px"><div id="cresc-bar-ciclo" style="height:3px;border-radius:2px;background:#f59e0b;width:0%;transition:width .4s"></div></div>
-          </div>
-          <div style="background:var(--bg3);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:var(--text3);margin-bottom:2px" id="cresc-extra1-lbl">Extra 1</div>
-            <div style="font-size:1.15rem;font-weight:700;color:var(--text)" id="cresc-stat-extra1">—</div>
-            <div style="font-size:10px;color:var(--text3)" id="cresc-extra1-unit"></div>
-            <div style="height:3px;background:var(--border);border-radius:2px;margin-top:5px"><div id="cresc-bar-extra1" style="height:3px;border-radius:2px;background:#a78bfa;width:0%;transition:width .4s"></div></div>
-          </div>
-          <div style="background:var(--bg3);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:var(--text3);margin-bottom:2px" id="cresc-extra2-lbl">Extra 2</div>
-            <div style="font-size:1.15rem;font-weight:700;color:var(--text)" id="cresc-stat-extra2">—</div>
-            <div style="font-size:10px;color:var(--text3)" id="cresc-extra2-unit"></div>
-            <div style="height:3px;background:var(--border);border-radius:2px;margin-top:5px"><div id="cresc-bar-extra2" style="height:3px;border-radius:2px;background:#fb923c;width:0%;transition:width .4s"></div></div>
+          <div id="cresc-alert" style="display:none;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:500"></div>
+          <!-- 🩺 Diagnóstico em tempo real — dentro do card da visualização -->
+          <div id="cresc-diagnostico" style="margin-top:8px;padding:8px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg3)">
+            <div style="font-size:11px;color:var(--text3);text-align:center">Aguardando simulação...</div>
           </div>
         </div>
       </div>
-      <div id="cresc-alert" style="display:none;margin-top:10px;padding:8px 12px;border-radius:6px;font-size:11px;font-weight:500"></div>
     </div>
 
-    <!-- Diagnóstico -->
-    <div class="chart-card" style="padding:10px 14px" id="cresc-diagnostico">
-      <div style="font-size:11px;color:var(--text3);text-align:center;padding:8px">Aguardando simulação...</div>
-    </div>
-
-    <!-- 4 Gráficos -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <!-- 🥧 Distribuição + 🎯 Fatores — após diagnóstico, mesma coluna direita -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
       <div class="chart-card">
-        <div class="chart-title" style="font-size:12px">📈 Biomassa acumulada (t/ha MS) · LAI</div>
-        <div class="chart-wrap" style="height:190px"><canvas id="cresc-chart-bio"></canvas></div>
+        <div class="chart-title" style="font-size:11px">🥧 Distribuição da biomassa</div>
+        <div class="chart-wrap" style="height:185px"><canvas id="cresc-chart-dist"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="chart-title" style="font-size:12px">🌿 Absorção de N · P · K (kg/ha)</div>
-        <div class="chart-wrap" style="height:190px"><canvas id="cresc-chart-npk"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title" style="font-size:12px">🥧 Distribuição da biomassa na colheita</div>
-        <div class="chart-wrap" style="height:190px"><canvas id="cresc-chart-dist"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title" style="font-size:12px">🎯 Fatores limitantes ao crescimento</div>
-        <div class="chart-wrap" style="height:190px"><canvas id="cresc-chart-radar"></canvas></div>
+        <div class="chart-title" style="font-size:11px">🎯 Fatores limitantes</div>
+        <div class="chart-wrap" style="height:185px"><canvas id="cresc-chart-radar"></canvas></div>
       </div>
     </div>
 
-    <!-- Base científica -->
-    <div class="chart-card" style="padding:10px 14px">
-      <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">📚 Base científica</div>
-      <div style="font-size:10px;color:var(--text3)" id="cresc-refs">—</div>
-    </div>
   </div>
+
+</div>
+
+<!-- 📈 Biomassa · LAI e 🌿 Absorção NPK (responsivos) -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:14px">
+  <div class="chart-card">
+    <div class="chart-title" style="font-size:12px">📈 Biomassa acumulada (t/ha MS) · LAI</div>
+    <div class="chart-wrap" style="height:200px"><canvas id="cresc-chart-bio"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title" style="font-size:12px">🌿 Absorção de N · P · K (kg/ha)</div>
+    <div class="chart-wrap" style="height:200px"><canvas id="cresc-chart-npk"></canvas></div>
+  </div>
+</div>
+
+<!-- 🌍 GEE — por último (largura total) -->
+<div class="chart-card" style="margin-top:14px">
+  <div class="chart-title" style="font-size:12px">🌍 Balanço de Gases de Efeito Estufa (GEE) — kg CO₂eq/ha/ciclo</div>
+  <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
+    <div class="chart-wrap" style="height:230px;flex:1;min-width:260px"><canvas id="cresc-chart-ghg"></canvas></div>
+    <div id="cresc-ghg-summary" style="min-width:140px;max-width:185px;padding:10px;background:var(--bg3);border-radius:8px;font-size:10px;line-height:1.7;flex-shrink:0">—</div>
+  </div>
+</div>
+
+<!-- Base científica -->
+<div class="chart-card" style="padding:10px 14px;margin-top:14px">
+  <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">📚 Base científica</div>
+  <div style="font-size:10px;color:var(--text3)" id="cresc-refs">—</div>
 </div>
 
 <!-- Cronograma mês a mês -->
@@ -1188,24 +1250,41 @@ function onCrescMunicipioChange() {
 function crescAutoAjustar() {
   const cropKey = _crescCurrentCrop;
   const crop = CRESC_CROPS[cropKey];
+  if (!crop) return;
   const munKey = document.getElementById('cresc-mun').value;
   const mun = CRESC_MUN[munKey];
+  if (!mun) return;
   const setV = (id,v) => { const el=document.getElementById(id); if(el) el.value=v; };
 
+  // Clima real do município
   setV('cresc-temp', mun.temp);
   setV('cresc-chuva', mun.chuva);
   setV('cresc-rad', mun.rad);
   setV('cresc-ur', mun.ur);
-  setV('cresc-ph', ((crop.pHOtimo[0]+crop.pHOtimo[1])/2).toFixed(1));
-  setV('cresc-N', crop.recN || crop.NOptimo);
-  setV('cresc-P', crop.recP || crop.POptimo);
-  setV('cresc-K', crop.recK || crop.KOptimo);
-  setV('cresc-S', crop.recS || crop.SOptimo);
-  setV('cresc-esp', crop.espOpt);
+
+  // pH: ponto médio ótimo da cultura (meta de manejo independente do pH natural do município)
+  const phMid = (crop.pHOtimo[0] + crop.pHOtimo[1]) / 2;
+  setV('cresc-ph', phMid.toFixed(1));
+
+  // Nutrientes recomendados para a cultura (N menor em leguminosas — fixação biológica)
+  setV('cresc-N', crop.recN !== undefined ? crop.recN : crop.NOptimo);
+  setV('cresc-P', crop.recP !== undefined ? crop.recP : crop.POptimo);
+  setV('cresc-K', crop.recK !== undefined ? crop.recK : crop.KOptimo);
+  setV('cresc-S', crop.recS !== undefined ? crop.recS : crop.SOptimo);
+
+  // Ca e M.O. por tipo de cultura — valores que maximizam fMO e nutrição
+  const caRef = {root:2.0, legume:3.0, cereal:2.5, tree:3.5, vine:2.5, shrub:2.8, cane:2.0};
+  setV('cresc-Ca', (caRef[crop.cropType] ?? 2.5).toFixed(1));
+  setV('cresc-MO', '4.5');  // fMO=1.0 com a fórmula calibrada para trópicos
+
+  // Manejo — espaçamento no centro do intervalo ótimo (1.3–2.5× espOpt = fEsp=1.0)
+  setV('cresc-esp', (crop.espOpt * 1.6).toFixed(2));
   setV('cresc-mes', crop.mesIdeal || 1);
   setV('cresc-praga', '0');
+
+  // Irrigação: baseada na chuva mensal vs necessidade hídrica da cultura
   const irrigEl = document.getElementById('cresc-irrig');
-  if (irrigEl) irrigEl.value = mun.chuva < crop.aguaOpt*0.4 ? '2' : mun.chuva < crop.aguaOpt*0.8 ? '1' : '0';
+  if (irrigEl) irrigEl.value = mun.chuva < crop.aguaOpt * 0.4 ? '2' : mun.chuva < crop.aguaOpt * 0.75 ? '1' : '0';
 
   updateCrescLabels();
   updateCrescent();
@@ -1371,40 +1450,43 @@ function _calcCrescFactors(p, crop) {
   else if (p.temp <= tMax-5) fTemp = 1.0 - (p.temp-tOpt)/(tMax-5-tOpt)*0.4;
   else fTemp = Math.max(0, 0.6 - (p.temp-(tMax-5))/5*0.6);
 
-  // Água
+  // Água — pico de eficiência em aguaOpt (Doorenbos & Kassam, FAO-33)
   let wMm = p.chuva;
   if (p.irrig>=1) wMm = Math.max(wMm, crop.aguaOpt*0.75);
   if (p.irrig>=2) wMm = Math.max(wMm, crop.aguaOpt);
   const wO = crop.aguaOpt;
   let fWater;
-  if (wMm < 10) fWater = 0;
+  if (wMm < 10)          fWater = 0;
   else if (wMm < wO*0.25) fWater = wMm/(wO*0.25)*0.25;
-  else if (wMm < wO*0.65) fWater = 0.25 + (wMm-wO*0.25)/(wO*0.4)*0.55;
-  else if (wMm <= wO*1.8) fWater = 0.80 + (wMm-wO*0.65)/(wO*1.15)*0.20;
-  else fWater = Math.max(0.45, 1.0-(wMm-wO*1.8)/(wO*2)*0.55);
+  else if (wMm < wO*0.65) fWater = 0.25 + (wMm-wO*0.25)/(wO*0.40)*0.55;
+  else if (wMm <= wO)     fWater = 0.80 + (wMm-wO*0.65)/(wO*0.35)*0.20;
+  else if (wMm <= wO*1.4) fWater = 1.00 - (wMm-wO)/(wO*0.40)*0.12;
+  else fWater = Math.max(0.50, 0.88-(wMm-wO*1.40)/(wO*1.50)*0.38);
 
-  // pH
+  // pH — fator 1.0 dentro da faixa ótima da cultura (Black, 1993)
   const [phLo, phHi] = crop.pHOtimo;
   let fPH;
-  if (p.ph < phLo-1.5) fPH = 0.2;
-  else if (p.ph < phLo) fPH = 0.2 + (p.ph-(phLo-1.5))/1.5*0.6;
-  else if (p.ph <= phHi) fPH = 0.8 + (p.ph-phLo)/(phHi-phLo)*0.2;
-  else if (p.ph <= phHi+1) fPH = 1.0 - (p.ph-phHi)*0.4;
-  else fPH = Math.max(0.2, 0.6-(p.ph-phHi-1)*0.35);
+  if (p.ph >= phLo && p.ph <= phHi) fPH = 1.0;
+  else if (p.ph < phLo-1.5) fPH = 0.20;
+  else if (p.ph < phLo) fPH = 0.20 + (p.ph-(phLo-1.5))/1.5*0.80;
+  else if (p.ph <= phHi+1.0) fPH = 1.00 - (p.ph-phHi)*0.35;
+  else fPH = Math.max(0.20, 0.65-(p.ph-phHi-1.0)*0.35);
 
   // NPK — Liebig
   const fN  = p.N<=0 ? 0.15 : Math.min(1, 0.15+0.85*Math.min(1, p.N/crop.NOptimo));
   const fP  = p.P<=0 ? 0.20 : Math.min(1, 0.20+0.80*Math.min(1, p.P/crop.POptimo));
   const fK  = p.K<=0 ? 0.15 : Math.min(1, 0.15+0.85*Math.min(1, p.K/crop.KOptimo));
   const fS  = p.S<=0 ? 0.70 : Math.min(1, 0.70+0.30*Math.min(1, p.S/crop.SOptimo));
-  const fMO = Math.min(1, 0.6+p.MO/6.0*0.4);
+  // M.O. — pico em 4.5% (valor alcançável com bom manejo tropical)
+  const fMO = Math.min(1, 0.60 + p.MO/4.5*0.40);
 
-  // Radiação
+  // Radiação — pico em 18-20 MJ/m²/dia (adequado para trópicos)
   let fRad;
-  if (p.rad<8) fRad=0.4;
-  else if (p.rad<15) fRad=0.4+(p.rad-8)/7*0.35;
-  else if (p.rad<=22) fRad=0.75+(p.rad-15)/7*0.25;
-  else fRad=Math.max(0.7,1.0-(p.rad-22)/8*0.3);
+  if (p.rad < 8)        fRad = 0.40;
+  else if (p.rad < 12)  fRad = 0.40 + (p.rad-8)/4*0.30;
+  else if (p.rad <= 20) fRad = 0.70 + (p.rad-12)/8*0.30;
+  else if (p.rad <= 25) fRad = Math.max(0.85, 1.00-(p.rad-20)/5*0.15);
+  else fRad = Math.max(0.70, 0.85-(p.rad-25)/5*0.15);
 
   // Pragas
   const fPraga = [1.0, 0.88, 0.72, 0.45][p.praga] || 1.0;
@@ -1812,24 +1894,30 @@ function updateCrescent() {
   const sEl = document.getElementById('cresc-bar-saude');
   if (sEl) sEl.style.background = last.health>70?'#1d9e75':last.health>40?'#e97c2a':'#dc2626';
 
-  // Alerta
+  // Alerta — mensagens calibradas para os limiares do modelo melhorado
   const alertEl = document.getElementById('cresc-alert');
   if (alertEl) {
-    if (result.fGlobal < 0.30) {
-      alertEl.style.cssText='display:block;margin-top:10px;padding:8px 12px;border-radius:6px;font-size:11px;font-weight:500;background:#fef2f2;color:#dc2626';
-      alertEl.textContent='⚠️ RISCO CRÍTICO. Múltiplos fatores limitantes severos. Produtividade muito baixa ou perda da lavoura.';
+    if (result.fGlobal < 0.28) {
+      alertEl.style.cssText='display:block;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:500;background:#fef2f2;color:#dc2626';
+      alertEl.textContent='⚠️ RISCO CRÍTICO. Condições muito adversas para esta cultura neste local. Considere outra cultura ou melhore solo e irrigação.';
     } else if (result.fGlobal < 0.55) {
-      const lim=[];
-      if(f.fTemp<0.7)lim.push('temperatura'); if(f.fWater<0.7)lim.push('hídrico');
-      if(f.fN<0.7)lim.push('N'); if(f.fP<0.7)lim.push('P'); if(f.fK<0.7)lim.push('K');
-      if(f.fPH<0.7)lim.push('pH');
-      alertEl.style.cssText='display:block;margin-top:10px;padding:8px 12px;border-radius:6px;font-size:11px;font-weight:500;background:#fffbeb;color:#d97706';
-      alertEl.textContent='⚠️ Crescimento limitado. Fatores críticos: '+lim.join(', ')+'.';
-    } else if (result.fGlobal > 0.80) {
-      alertEl.style.cssText='display:block;margin-top:10px;padding:8px 12px;border-radius:6px;font-size:11px;font-weight:500;background:#f0fdf4;color:#15803d';
-      alertEl.textContent='✓ Condições favoráveis. Produção esperada: '+last.freshYield.toFixed(1)+' '+crop.unidade+'.';
+      const lim=[], cLim=[];
+      if(f.fTemp<0.72){lim.push('temperatura');cLim.push('clima');}
+      if(f.fWater<0.72){lim.push('hídrico');cLim.push('clima/irrig.');}
+      if(f.fN<0.72)lim.push('N'); if(f.fP<0.72)lim.push('P');
+      if(f.fK<0.72)lim.push('K'); if(f.fPH<0.72)lim.push('pH');
+      if(f.fMO<0.72)lim.push('M.O.'); if(f.fEsp<0.90)lim.push('espaçamento');
+      const isCLim = cLim.length > 0 && lim.filter(l=>!['N','P','K','pH','M.O.','espaçamento'].includes(l)).length >= lim.length/2;
+      alertEl.style.cssText='display:block;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:500;background:#fffbeb;color:#b45309';
+      alertEl.textContent= isCLim
+        ? '⚠️ Clima limita esta cultura aqui. Fator(es): '+lim.join(', ')+'. Manejo de solo otimizado.'
+        : '⚠️ Crescimento limitado. Ajuste: '+lim.join(', ')+'. Use ⚡ ajuste automático.';
+    } else if (result.fGlobal >= 0.75) {
+      alertEl.style.cssText='display:block;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:500;background:#f0fdf4;color:#15803d';
+      alertEl.textContent='✓ Condições favoráveis para '+crop.nome+'. Produção estimada: '+last.freshYield.toFixed(1)+' '+crop.unidade+'.';
     } else {
-      alertEl.style.display='none';
+      alertEl.style.cssText='display:block;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:500;background:#f8fafc;color:#475569';
+      alertEl.textContent='ℹ️ Crescimento moderado. Otimize nutrição e irrigação para melhores resultados.';
     }
   }
 
@@ -1843,13 +1931,16 @@ function updateCrescent() {
   // Saúde badge SVG
   const hDot = document.getElementById('cg-health-dot');
   const hLbl = document.getElementById('cg-health-lbl');
-  if (hDot) hDot.setAttribute('fill', last.health>70?'#3b6d11':last.health>40?'#d97706':'#dc2626');
-  if (hLbl) hLbl.textContent = last.health>70?'✓':last.health>40?'!':'✗';
+  if (hDot) hDot.setAttribute('fill', last.health>65?'#3b6d11':last.health>38?'#d97706':'#dc2626');
+  if (hLbl) hLbl.textContent = last.health>65?'✓':last.health>38?'!':'✗';
 
   _drawCrescPlant(cropKey, result.fGlobal, last.height, last.freshYield, result.ciclo);
   _updateCrescCharts(result, crop, cropKey);
   _updateCrescTable(result, crop, cropKey);
   _updateCrescDiagnostico();
+
+  const ghg = _calcGHGBalance(cropKey, p, result);
+  _updateGHGPanel(ghg, cropKey, crop);
 }
 
 /* ─────────── DESENHO SVG DA PLANTA ─────────── */
@@ -2209,6 +2300,104 @@ function _drawLobeLeaf(ns,g,cx,cy,col,size,h) {
 }
 
 /* ─────────── GRÁFICOS ─────────── */
+/* ─────────── GHG — BALANÇO DE GASES DE EFEITO ESTUFA ─────────── */
+function _calcGHGBalance(cropKey, p, result) {
+  const crop = CRESC_CROPS[cropKey];
+  const cycleYrs = Math.max(0.08, crop.cicloBase / 12);
+
+  // Emissões de N₂O por fertilização nitrogenada (IPCC 2006, EF=1%, GWP N₂O=298, fator 44/28)
+  const n2oFert = p.N * 0.01 * (44/28) * 298;
+
+  // Emissões de produção de fertilizantes (Lal 2004: N=4.4, P=1.5, K=0.7, S=0.5 kg CO₂/kg)
+  const fertProd = p.N * 4.4 + p.P * 1.5 + p.K * 0.7 + p.S * 0.5;
+
+  // Preparo do solo e operações (estimativa por tipologia de cultura · ciclo)
+  const soilBase = {root:320, legume:180, cereal:230, tree:80, vine:260, shrub:200, cane:280, palm:70}[crop.cropType] ?? 200;
+  const soilCO2 = soilBase * cycleYrs;
+
+  // CH₄ de arroz inundado (IPCC 2006: ~20 kg CH₄/ha·season, GWP=28)
+  const ch4 = cropKey === 'arroz' ? 5600 * cycleYrs : 0;
+
+  const totalEmit = n2oFert + fertProd + soilCO2 + ch4;
+
+  // Sequestro de C pela biomassa residual (Lal 2004, IPCC 2019)
+  // Biomassa real = potencial × eficiência global
+  const bmActual = crop.bmPotencial * result.fGlobal;
+  const bmCO2 = bmActual * 1000 * 0.45 * (44/12); // t → kg, fração C=0.45, mol CO₂/C
+  const retFrac = {root:0.20, legume:0.15, cereal:0.12, tree:0.35, vine:0.18, shrub:0.22, cane:0.18, palm:0.30}[crop.cropType] ?? 0.18;
+  const cSeq = bmCO2 * retFrac * cycleYrs;
+
+  return {
+    n2o:       Math.round(n2oFert),
+    fertProd:  Math.round(fertProd),
+    soilCO2:   Math.round(soilCO2),
+    ch4:       Math.round(ch4),
+    totalEmit: Math.round(totalEmit),
+    cSeq:      Math.round(cSeq),
+    netBalance:Math.round(totalEmit - cSeq)
+  };
+}
+
+function _updateGHGPanel(ghg, cropKey, crop) {
+  if (_crescCharts['ghg']) { try { _crescCharts['ghg'].destroy(); } catch(e){} }
+  const el = document.getElementById('cresc-chart-ghg');
+  if (el) {
+    const hasCH4 = ghg.ch4 > 0;
+    // Horizontal stacked bar: Y = categories, X = kg CO₂eq
+    const datasets = [
+      { label:'N₂O fertilizante',    data:[ghg.n2o,      0], backgroundColor:'rgba(185,28,28,0.85)',  borderColor:'#b91c1c', borderWidth:1 },
+      { label:'Prod. fertilizantes', data:[ghg.fertProd,  0], backgroundColor:'rgba(234,88,12,0.82)',  borderColor:'#ea580c', borderWidth:1 },
+      { label:'Preparo solo / ops.', data:[ghg.soilCO2,   0], backgroundColor:'rgba(202,138,4,0.80)',  borderColor:'#ca8a04', borderWidth:1 },
+    ];
+    if (hasCH4) datasets.push(
+      { label:'CH₄ arroz paddy',     data:[ghg.ch4,       0], backgroundColor:'rgba(109,40,217,0.82)', borderColor:'#7c3aed', borderWidth:1 }
+    );
+    datasets.push(
+      { label:'Sequestro C biomassa',data:[0, ghg.cSeq],      backgroundColor:'rgba(22,163,74,0.85)',  borderColor:'#16a34a', borderWidth:1 }
+    );
+
+    _crescCharts['ghg'] = new Chart(el, {
+      type: 'bar',
+      data: { labels:['📤 Emissões totais','📥 Sequestro C'], datasets },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position:'bottom', labels:{ font:{size:9}, boxWidth:10, padding:5 } },
+          tooltip: { callbacks: { label: ctx => ctx.raw > 0 ? ` ${ctx.dataset.label}: ${ctx.raw.toLocaleString()} kg CO₂eq` : null } }
+        },
+        scales: {
+          x: { stacked:true, beginAtZero:true, ticks:{ font:{size:9} }, title:{ display:true, text:'kg CO₂eq / ha / ciclo', font:{size:8} } },
+          y: { stacked:true, ticks:{ font:{size:10}, color:'var(--text)' } }
+        }
+      }
+    });
+  }
+
+  // Painel resumo GHG
+  const sumEl = document.getElementById('cresc-ghg-summary');
+  if (!sumEl) return;
+  const net = ghg.netBalance;
+  const isSink   = net <= 0;
+  const isMod    = net > 0 && net < 800;
+  const netColor = isSink ? '#15803d' : isMod ? '#b45309' : '#dc2626';
+  const netBg    = isSink ? '#f0fdf4' : isMod ? '#fffbeb' : '#fef2f2';
+  const netLabel = isSink ? '🌿 Sumidouro líquido' : isMod ? '⚠️ Emissão moderada' : '🔴 Emissor líquido';
+  sumEl.innerHTML = `
+    <div style="font-weight:700;color:var(--text);margin-bottom:6px;font-size:11px;border-bottom:1px solid var(--border);padding-bottom:5px">Balanço GEE</div>
+    <div style="color:#b91c1c;font-weight:600;font-size:10px;margin-bottom:2px">📤 Emissões</div>
+    <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--text3)"><span>N₂O fertil.</span><b>${ghg.n2o.toLocaleString()}</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--text3)"><span>Prod. fertil.</span><b>${ghg.fertProd.toLocaleString()}</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--text3)"><span>Solo/ops.</span><b>${ghg.soilCO2.toLocaleString()}</b></div>
+    ${ghg.ch4>0?`<div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--text3)"><span>CH₄ arroz</span><b>${ghg.ch4.toLocaleString()}</b></div>`:''}
+    <div style="display:flex;justify-content:space-between;font-size:9.5px;font-weight:600;color:#b91c1c;border-top:1px solid var(--border);margin-top:2px;padding-top:2px"><span>Total emitido</span><b>${ghg.totalEmit.toLocaleString()}</b></div>
+    <div style="color:#15803d;font-weight:600;font-size:10px;margin:6px 0 2px">📥 Sequestro C</div>
+    <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#15803d"><span>Biomassa retida</span><b>${ghg.cSeq.toLocaleString()}</b></div>
+    <div style="margin-top:8px;padding:6px 8px;border-radius:7px;background:${netBg};color:${netColor};font-weight:700;font-size:10px;text-align:center;line-height:1.4">${netLabel}<br><span style="font-size:13px">${Math.abs(net).toLocaleString()}</span> kg CO₂eq</div>
+    <div style="font-size:8.5px;color:var(--text3);margin-top:3px;text-align:center">${isSink?'Balanço negativo (favorável ao clima)':'Emissão líquida por ha por ciclo'}</div>
+  `;
+}
+
 function _updateCrescCharts(result, crop, cropKey) {
   const months = result.months;
   const labels = months.map(m => 'M'+m.m);
