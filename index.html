@@ -5775,7 +5775,7 @@ function buildDataContext() {
   const totalRenda = DB.reduce((a,d) => a+(d.renda_total||0), 0);
   const avgCarbon  = DB.reduce((a,d) => a+(d.balanco_carbono||0), 0) / DB.length;
 
-  let ctx = `=== CONTEXTO: PLATAFORMA EMBRAPA MARANHÃO ===
+  let ctx = `=== CONTEXTO: Plataforma EmbrapAI Maranhão ===
 
 RESUMO:
 - Registros totais: ${DB.length} unidades produtivas
@@ -5863,7 +5863,7 @@ async function sendChat() {
 
   const loadingEl = appendChatMsg('assistant', '', true);
 
-  const systemPrompt = `Você é um assistente especializado nos dados da plataforma Embrapa Maranhão — sistemas produtivos sustentáveis. Analise os dados fornecidos no contexto e responda com precisão as perguntas do usuário sobre unidades produtivas, sistemas (ILPF, ILP, SAF, Apicultura, Piscicultura, Fruticultura, Extrativismo, Roça, Sisteminha, Meliponicultura), municípios, indicadores ambientais e econômicos do Maranhão.
+  const systemPrompt = `Você é um assistente especializado nos dados da plataforma EmbrapAI Maranhão — sistemas produtivos sustentáveis. Analise os dados fornecidos no contexto e responda com precisão as perguntas do usuário sobre unidades produtivas, sistemas (ILPF, ILP, SAF, Apicultura, Piscicultura, Fruticultura, Extrativismo, Roça, Sisteminha, Meliponicultura), municípios, indicadores ambientais e econômicos do Maranhão.
 
 Regras:
 - Use apenas os dados do contexto abaixo; não invente informações.
