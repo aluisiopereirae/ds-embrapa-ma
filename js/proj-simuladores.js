@@ -89,7 +89,7 @@ const SIM_SYSTEMS = {
 // Emissão basal de área degradada (t CO₂eq/ha/ano)
 const DEGRADED_EMISSION = 2.5;
 // Área degradada total estimada no MA (ha) — Embrapa/MapBiomas
-const MA_DEGRADED_HA = 7500000;
+const MA_DEGRADED_HA = 6800000; // total de áreas degradas no Maranhão
 // GEE total atual MA (kt CO₂eq/ano) — SEEG 2024
 const MA_GEE_KT = 98000;
 
