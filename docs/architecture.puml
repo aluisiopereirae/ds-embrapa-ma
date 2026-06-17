@@ -335,7 +335,7 @@ package "Sub-tab: Simuladores (#proj-simuladores)" {
     component "MetricasConversao\n👷 Empregos\n💰 Renda anual\n💨 Sequestro CO2eq\n🌫 GEE evitado\n🌡 Reducao temp\n💸 Investimento" as CONV_M
     component "Trajetoria Temporal\n(Line Chart)" as CONV_T
     component "Comparativo Sistemas\n(Horiz. Bar Chart)" as CONV_C
-    component "runConversaoSim()\nareaHa = pct/100 * 1.800.000ha\ntempRed = sys.temp_red * frac\ngeeEvit = areaHa * sys.seq_co2\nMA_DEGRADED_HA = 1.800.000ha" as RUN_CONV
+    component "runConversaoSim()\nareaHa = pct/100 * 6.800.000ha\ntempRed = sys.temp_red * frac\ngeeEvit = areaHa * sys.seq_co2\nMA_DEGRADED_HA = 6.800.000ha" as RUN_CONV
   }
 
   package "Simulador: Plantio Agronomico" {
@@ -779,7 +779,7 @@ package "proj-simuladores.js — Conversao de Areas" {
     +[key].biodiv    : Number
   }
   class ConversaoSim {
-    ' MA_DEGRADED_HA = 1.800.000 ha
+    ' MA_DEGRADED_HA = 6.800.000 ha
     +runConversaoSim() : void
     +calcImpacto(pct, sys, anos) : Impacto
   }
