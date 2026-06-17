@@ -586,7 +586,7 @@ function _buildSimHTML() {
       </div>
       <div class="sim-param">
         <label>% de área degradada convertida: <strong id="conv-pct-val">${convState.pct}%</strong>
-          <br><small style="color:var(--text3)">Área degradada total estimada: 7,5 M ha</small>
+          <br><small style="color:var(--text3)">Área degradada total estimada: 6,8 M ha</small>
         </label>
         <input type="range" class="sim-slider" id="conv-pct" min="1" max="100" value="${convState.pct}" oninput="updateConvSlider()">
       </div>
