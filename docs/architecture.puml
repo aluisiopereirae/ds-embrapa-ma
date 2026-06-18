@@ -23,7 +23,7 @@ System(ds, "DS Embrapa MA\n(Dashboard Cientifico)", "SPA estatica GitHub Pages.\
 System_Ext(bq, "Google BigQuery", "BD em nuvem: GEE (SEEG),\nPRODES, MapBiomas, IBGE.\n[integracao planejada]")
 System_Ext(claude, "Anthropic Claude API", "LLM - respostas contextuais\nvia chat integrado.\nContexto: municipio + GEE.")
 System_Ext(esri, "Esri ArcGIS Online", "Tiles de satelite para\nprojecao de plantio\nno terreno real (Leaflet).")
-System_Ext(ibge, "IBGE / SEEG / PRODES\n/ MapBiomas", "Fontes compiladas em\nMUNIC_DATA (221 municipios)\ncom 22 indicadores cada.")
+System_Ext(ibge, "IBGE / SEEG / PRODES\n/ MapBiomas", "Fontes compiladas em\nMUNIC_DATA (217 municipios)\ncom 22 indicadores cada.")
 System_Ext(ls, "Browser LocalStorage", "Persistencia local dos\nregistros de URTs\n(chave: ds_embrapa_ma_v2).")
 
 Rel(usr_p, ds, "Analisa, simula\ne registra", "HTTPS / Browser")
@@ -83,7 +83,7 @@ cloud "Esri ArcGIS\nOnline" as ESRI
 
 package "DS Embrapa MA — GitHub Pages (SPA Estatica)" {
   component "Shell / Roteador\n(index.html)\n\nHTML5 + CSS3 + JS inline\nHeader nav (6 views), sidebar,\nchat flutuante, modal cadastro" as SHELL
-  component "Dados Embutidos\n(INITIAL_DATA + MUNIC_DATA)\n\n221 municipios MA (IBGE 2024)\n22 indicadores por municipio\nRegistros URTs + GEE historico" as DATA
+  component "Dados Embutidos\n(INITIAL_DATA + MUNIC_DATA)\n\n217 municipios MA (IBGE 2024)\n22 indicadores por municipio\nRegistros URTs + GEE historico" as DATA
   component "Motor de Analise\n(proj-simuladores.js)\n\nComparacao Municipal\nClassificacao GEE\nConversao de Areas\nProjecoes 2025-2050" as PROJSIM
   component "Simulador de Plantio\n(simuladores/simulador.js)\n\nOrquestra Vista Canvas\ne Projecao Satelite\ndebounce + drag resize" as PLSIM
   component "Geradores de Layout\n(simuladores/layouts.js)\n\n7 algoritmos: linear, hexagonal,\ncircular, faixas, grid,\naleatório, mosaico" as LAY
@@ -158,12 +158,12 @@ package "Modulo Visao Geral (#view-overview)" {
   package "Sub-tab: Indicadores do Estado (GEE e socioeconomicos)" {
     component "FiltrosEstado\nSeletor municipio\nSeletor indicador:\nGEE / IDH / PIB / Pobreza\nFome / Desmat / Queimadas\nPrecip / Temp / Lavoura" as FILT
     component "StatsEstado\nKPIs: media MA, max, min,\nmunicípio destacado" as STATS_E
-    component "Indicador por Municipio\n221 municipios (full width)\nComparacao visual entre\ntodos os municipios do MA" as CH_MUN
+    component "Indicador por Municipio\n217 municipios (full width)\nComparacao visual entre\ntodos os municipios do MA" as CH_MUN
     component "Top 10 Municipios\n(Horiz. Bar)" as CH_TOP
     component "Distribuicao por Bioma\nAmazonia / Cerrado / Transicao\n(Doughnut)" as CH_BIO
     component "IDH x PIB per capita\n(Scatter)" as CH_SCAT
     component "Cobertura Vegetal x GEE\n(Scatter)" as CH_VEG
-    component "Tabela Municipios (221)\nBusca + filtro bioma/regiao\nColunas: pop, IDH, PIB,\npobreza, desmat, GEE,\nlavoura, bovinos, pesca" as TAB_MUN
+    component "Tabela Municipios (217)\nBusca + filtro bioma/regiao\nColunas: pop, IDH, PIB,\npobreza, desmat, GEE,\nlavoura, bovinos, pesca" as TAB_MUN
     component "Exportador CSV\nexportData('munic')" as EXP_MUN
   }
 
@@ -491,7 +491,7 @@ package "Modulo Dados" {
   component "Apicultura\nmel kg/ano / tipo" as TAB_APIC
   component "Fruticultura\nfruta / producao / valor" as TAB_FRUT
   component "Extrativismo\nproduto / producao / valor" as TAB_EXT
-  component "Municipios\n221 municipios IBGE 2024\npop, IDH, PIB, GEE..." as TAB_MUN
+  component "Municipios\n217 municipios IBGE 2024\npop, IDH, PIB, GEE..." as TAB_MUN
   component "ExportEngine\nexportData(type)\nCSV: db/munic/apic\npisc/frut/extrat" as EXP_E
 }
 
@@ -700,7 +700,7 @@ title "DS Embrapa MA — C4 Level 4b: Codigo — Classificacao de Indicadores GE
 
 package "index.html — Dados Municipais (IBGE 2024)" {
   class MUNIC_DATA {
-    ' Array[221] — 22 colunas por municipio
+    ' Array[217] — 22 colunas por municipio
     +[0]  name          : String
     +[1]  lat           : Number
     +[2]  lng           : Number
@@ -770,6 +770,11 @@ package "proj-simuladores.js — Classificacao e Comparacao" {
 package "proj-simuladores.js — Conversao de Areas" {
   class SIM_SYSTEMS {
     ' 10 sistemas produtivos
+    +ilp, ilpf, saf
+    +apicultura, meliponicultura
+    +sisteminha, piscicultura
+    +extrativismo, fruticultura, roca
+    --
     +[key].seq_co2   : Number
     +[key].invest_ha : Number
     +[key].renda_ha  : Number
@@ -779,7 +784,7 @@ package "proj-simuladores.js — Conversao de Areas" {
     +[key].biodiv    : Number
   }
   class ConversaoSim {
-    ' MA_DEGRADED_HA = 6.800.000 ha
+    ' MA_DEGRADED_HA = 7.500.000 ha
     +runConversaoSim() : void
     +calcImpacto(pct, sys, anos) : Impacto
   }
