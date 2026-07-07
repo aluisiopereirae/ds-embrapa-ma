@@ -6,10 +6,14 @@
 <title>EmbrapAI  |  Dados - Maranhão</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root {
   --bg: #0a0f0a;
@@ -1437,6 +1441,16 @@ document.addEventListener('click', function(e) {
           </div>
         </div>
 
+        <!-- Insights Automáticos -->
+        <div class="form-section" style="margin-top:8px;">
+          <div class="form-section-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <span>💡 Insights Automáticos <span class="badge-pendente" title="Insights determinísticos calculados diretamente sobre os dados cadastrados; a análise via IA depende de chave de API configurada">⚠</span></span>
+            <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px" onclick="renderInsightsIA(true)">🔄 Atualizar análise IA</button>
+          </div>
+          <div id="insights-deterministicos" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:12px"></div>
+          <div id="insights-ia" style="font-size:12px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px"></div>
+        </div>
+
         <!-- Casos de Referência por Sistema -->
       <div class="form-section" style="margin-top:8px;">
         <div class="form-section-title">⭐ Casos de Referência por Sistema — Embrapa Maranhão <span class="badge-pendente" title="Dados de campo Embrapa — necessita validação com publicações científicas ou relatórios técnicos oficiais">⚠</span></div>
@@ -1584,6 +1598,8 @@ document.addEventListener('click', function(e) {
         <div style="width:1px;height:24px;background:var(--border);flex-shrink:0"></div>
         <button class="map-btn" id="btn-toggle-sys-panel" onclick="toggleSysPanel()">🌿 Sistemas ▾</button>
         <button class="map-btn" id="btn-toggle-hm-panel" onclick="toggleHeatmapPanel()">🌡 Heatmaps ▾</button>
+        <button class="map-btn" id="btn-toggle-land-risk" onclick="rf_toggleLandRiskLayer()" title="Sobrepor Unidades de Conservação, Terras Indígenas e Quilombos">⚠️ Risco Fundiário</button>
+        <button class="map-btn" id="btn-toggle-draw-talhao" onclick="pg_toggleDrawMode()" title="Desenhar polígono de talhão e calcular área real">▱ Desenhar Talhão</button>
         <div style="flex:1"></div>
         <button class="map-btn" onclick="clearAllHeatmaps()" style="color:var(--red)">✕ Limpar Layers</button>
         <button class="map-btn" onclick="openAddPointModal()">➕ Adicionar Ponto</button>
@@ -2823,6 +2839,8 @@ function initMap() {
   }).addTo(map);
   markersGroup = L.layerGroup().addTo(map);
   renderMapMarkers();
+  if (typeof pg_initDrawControl === 'function') pg_initDrawControl();
+  if (typeof rf_initLandRiskLayer === 'function') rf_initLandRiskLayer();
 }
 
 function setMapLayer(type) {
@@ -2947,9 +2965,13 @@ function renderMapMarkers() {
       </div>` : ''}
       ${d.produtor ? `<div style="margin-top:5px;font-size:11px;color:#2a5a2a"><strong>Produtor:</strong> ${d.produtor}</div>` : ''}
       ${d.obs?`<div style="margin-top:4px;font-size:11px;color:#4a6a4a;font-style:italic">${d.obs}</div>`:''}
-      <div style="margin-top:8px;display:flex;gap:6px;">
-        <button onclick="openEditModal(${d.id})" style="flex:1;padding:5px;background:#16a34a;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:11px">✏ Editar</button>
-        <button onclick="deleteRecord(${d.id})" style="flex:1;padding:5px;background:#dc2626;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:11px">🗑 Excluir</button>
+      ${typeof rec_renderLandRiskBadge === 'function' ? rec_renderLandRiskBadge(d.lat, d.lng) : ''}
+      ${typeof lg_renderEscoamentoBadge === 'function' ? lg_renderEscoamentoBadge(d.lat, d.lng) : ''}
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="openEditModal(${d.id})" style="flex:1;min-width:70px;padding:5px;background:#16a34a;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:11px">✏ Editar</button>
+        <button onclick="deleteRecord(${d.id})" style="flex:1;min-width:70px;padding:5px;background:#dc2626;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:11px">🗑 Excluir</button>
+        <button onclick="vz_abrirModal(${d.id})" style="flex:1;min-width:70px;padding:5px;background:#0891b2;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:11px">👥 Similares</button>
+        <button onclick="pdf_gerarFichaUnidade(${d.id})" style="flex:1;min-width:70px;padding:5px;background:#7c3aed;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:11px">📄 PDF</button>
       </div>
     </div>`;
     marker.bindPopup(popupHTML, {maxWidth:280});
@@ -4066,6 +4088,7 @@ function renderOverview() {
   `;
   updateSidebarCounts();
   renderCharts();
+  if (typeof renderInsights === 'function') renderInsights();
   // Initialize estado munic dropdown if sub-tab visible
   if (currentOverviewTab === 'estado') {
     populateMunicSelect();
@@ -4357,6 +4380,11 @@ function renderFormFields(sys) {
           <select class="form-select" id="f_bioma"><option>Amazônia</option><option>Cerrado</option><option>Transição</option></select></div>
         <div class="form-group"><label class="form-label">Latitude *</label><input class="form-input" id="f_lat" type="number" step="0.0001" placeholder="-4.9022"></div>
         <div class="form-group"><label class="form-label">Longitude *</label><input class="form-input" id="f_lng" type="number" step="0.0001" placeholder="-45.1234"></div>
+        <div class="form-group full" style="display:flex;align-items:flex-end;gap:10px;">
+          <button type="button" class="btn btn-secondary" onclick="rf_verificarFormulario()">🔍 Verificar restrições fundiárias (UC/TI/Quilombo)</button>
+          <span style="font-size:11px;color:var(--text3)">Confere se as coordenadas caem em área legalmente protegida</span>
+        </div>
+        <div class="form-group full" id="rf-form-alert"></div>
         <div class="form-group"><label class="form-label">Altitude (m)</label><input class="form-input" id="f_altitude" type="number" placeholder="150"></div>
         <div class="form-group"><label class="form-label">Área Total (ha) *</label><input class="form-input" id="f_area_total" type="number" step="0.1" placeholder="10.5"></div>
         <div class="form-group"><label class="form-label">Ano Implantação</label><input class="form-input" id="f_ano_implantacao" type="number" placeholder="2022"></div>
@@ -4697,6 +4725,9 @@ function saveRecord(editId) {
   const mun = get('f_municipio');
   if (!mun || !lat || !lng) { showToast('⚠ Preencha Município, Latitude e Longitude!', true); return; }
 
+  const _prevRec = editId ? DB.find(d=>d.id===editId) : null;
+  const _pendingPoligono = (typeof _pgPendingPoligono !== 'undefined' && _pgPendingPoligono) ? _pgPendingPoligono : null;
+
   const rec = {
     id: editId || (Math.max(0,...DB.map(d=>d.id))+1),
     sistema: currentSystem,
@@ -4739,6 +4770,8 @@ function saveRecord(editId) {
     beneficios_sociais: get('f_beneficios_sociais'), score_ebia: getI('f_score_ebia'),
     aversao_risco: getI('f_aversao_risco'), satisfacao_atividade: getI('f_satisfacao_atividade'),
     intencao_inovacao: getI('f_intencao_inovacao'), medo_credito: getI('f_medo_credito'),
+    poligono: _pendingPoligono ? _pendingPoligono.coords : (_prevRec ? (_prevRec.poligono||null) : null),
+    area_poligono_ha: _pendingPoligono ? _pendingPoligono.area_ha : (_prevRec ? (_prevRec.area_poligono_ha||null) : null),
     status: 'Ativo'
   };
 
@@ -4749,6 +4782,7 @@ function saveRecord(editId) {
     DB.push(rec);
   }
   saveData(DB);
+  if (_pendingPoligono) { _pgPendingPoligono = null; if (typeof pg_renderTalhaoLayers === 'function') pg_renderTalhaoLayers(); }
   showToast('✅ Registro salvo com sucesso!');
   if (markersGroup) renderMapMarkers();
   updateSidebarCounts();
@@ -5418,6 +5452,14 @@ loadSettings();
 <script src="./js/simuladores/exportacao.js"></script>
 <script src="./js/simuladores/simulador.js"></script>
 <script src="./js/simuladores/recomendador.js"></script>
+<script src="./js/simuladores/vizinhos.js"></script>
+<script src="./js/simuladores/relatorio-pdf.js"></script>
+<script src="./js/simuladores/poligonos.js"></script>
+<script src="./js/simuladores/logistica.js"></script>
+<script src="./js/simuladores/risco-fundiario.js"></script>
+<script src="./js/simuladores/financeiro.js"></script>
+<script src="./js/simuladores/calendario-manejo.js"></script>
+<script src="./js/simuladores/comparador-sistemas.js"></script>
 
 <!-- ═══ SETTINGS MODAL ═══ -->
 <div id="settings-overlay" onclick="if(event.target===this)closeSettings()">
@@ -5623,6 +5665,7 @@ loadSettings();
       <h3>Assistente de Dados</h3>
       <span>Embrapa Maranhão — análise com IA</span>
     </div>
+    <button class="chat-hbtn" onclick="exportarConversaPDF()" title="Exportar conversa como PDF">⬇</button>
     <button class="chat-hbtn" onclick="clearChat()" title="Limpar conversa">🗑</button>
     <button class="chat-hbtn" onclick="openApiSetup()" title="Configurar chave de API">⚙</button>
     <button class="chat-hbtn" onclick="openChatHelp()" title="Ajuda e instruções">❓</button>
@@ -5821,6 +5864,102 @@ ${JSON.stringify(DB.map(d => ({
   return ctx;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// INSIGHTS AUTOMÁTICOS — Painel Visão Geral
+// Nível 1: calculado diretamente sobre DB, sem custo de API, sempre disponível.
+// Nível 2: gerado via Claude API (buildDataContext + resolveClaudeEndpoint,
+// reaproveitados do chat), cacheado por 24h em localStorage para não repetir
+// a chamada a cada abertura da aba.
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderInsights() {
+  const el = document.getElementById('insights-deterministicos');
+  if (!el || !DB || !DB.length) return;
+
+  // Sistema com maior número de novas implantações no último ano registrado
+  const anoMax = Math.max(...DB.map(d => d.ano_implantacao || 0));
+  const novosNoAno = DB.filter(d => d.ano_implantacao === anoMax);
+  const contagemPorSistema = {};
+  novosNoAno.forEach(d => { contagemPorSistema[d.sistema] = (contagemPorSistema[d.sistema]||0)+1; });
+  const sistemaDestaque = Object.entries(contagemPorSistema).sort((a,b)=>b[1]-a[1])[0];
+
+  // Município com maior concentração de unidades produtivas
+  const contagemPorMunic = {};
+  DB.forEach(d => { contagemPorMunic[d.municipio] = (contagemPorMunic[d.municipio]||0)+1; });
+  const municDestaque = Object.entries(contagemPorMunic).sort((a,b)=>b[1]-a[1])[0];
+
+  // Maior sequestro de carbono (registro individual)
+  const maiorSequestro = DB.reduce((best, d) => (d.sequestro_carbono||0) > (best?.sequestro_carbono||-Infinity) ? d : best, null);
+
+  // Sistema com melhor payback médio (usando REC_COMPAT como referência, se disponível)
+  let sistemaPayback = null;
+  if (typeof REC_COMPAT !== 'undefined') {
+    sistemaPayback = Object.entries(REC_COMPAT).sort((a,b) => a[1].payback - b[1].payback)[0];
+  }
+
+  const cards = [
+    sistemaDestaque ? { icone:'📈', titulo:'Sistema em maior expansão', valor:`${SYSTEM_ICONS[sistemaDestaque[0]]||''} ${sistemaDestaque[0].toUpperCase()}`, nota:`${sistemaDestaque[1]} nova(s) unidade(s) em ${anoMax}` } : null,
+    municDestaque ? { icone:'📍', titulo:'Município com maior concentração', valor:municDestaque[0], nota:`${municDestaque[1]} unidade(s) produtiva(s)` } : null,
+    maiorSequestro ? { icone:'🌳', titulo:'Maior sequestro de carbono', valor:`${(maiorSequestro.sequestro_carbono||0).toFixed(1)} t C/ano`, nota:`${SYSTEM_ICONS[maiorSequestro.sistema]||''} ${maiorSequestro.municipio} #${maiorSequestro.id}` } : null,
+    sistemaPayback ? { icone:'💰', titulo:'Melhor payback médio (referência)', valor:`${SYSTEM_ICONS[sistemaPayback[0]]||''} ${sistemaPayback[0].toUpperCase()}`, nota:`${sistemaPayback[1].payback} anos (Embrapa)` } : null,
+  ].filter(Boolean);
+
+  el.innerHTML = cards.map(c => `
+    <div class="sim-card" style="padding:10px">
+      <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">${c.icone} ${c.titulo}</div>
+      <div style="font-size:15px;font-weight:700;margin:3px 0">${c.valor}</div>
+      <div style="font-size:10px;color:var(--text3)">${c.nota}</div>
+    </div>`).join('');
+
+  renderInsightsIA(false);
+}
+
+const INSIGHTS_IA_CACHE_KEY = 'insights_ia_cache';
+
+async function renderInsightsIA(forcar) {
+  const el = document.getElementById('insights-ia');
+  if (!el) return;
+
+  const cache = JSON.parse(localStorage.getItem(INSIGHTS_IA_CACHE_KEY) || 'null');
+  const hoje = new Date().toDateString();
+  if (!forcar && cache && cache.dia === hoje) {
+    el.innerHTML = cache.html;
+    return;
+  }
+
+  const apiKey = localStorage.getItem('claude_api_key');
+  if (!apiKey) {
+    el.innerHTML = '<span style="color:var(--text3)">🤖 Configure sua chave de API do Claude (ícone de chat) para gerar análises automáticas de tendências, riscos e oportunidades.</span>';
+    return;
+  }
+
+  el.innerHTML = '<span style="color:var(--text3)">⏳ Gerando análise com IA...</span>';
+
+  try {
+    const { API_URL, isLocal, activeProxy } = resolveClaudeEndpoint();
+    const reqHeaders = { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' };
+    if (!isLocal && !activeProxy) reqHeaders['anthropic-dangerous-client-side-request-allow'] = 'true';
+
+    const response = await fetch(API_URL, {
+      method: 'POST', headers: reqHeaders,
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 700,
+        system: `Você é um analista de dados da plataforma EmbrapAI Maranhão. Gere de 3 a 5 insights objetivos em português, em formato de lista (bullets com "•"), sobre tendências, riscos e oportunidades nos dados abaixo. Seja específico (cite números/sistemas/municípios). Não invente dados fora do contexto.\n\n${buildDataContext()}`,
+        messages: [{ role: 'user', content: 'Gere os insights.' }],
+      })
+    });
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+    const texto = data.content?.[0]?.text || '';
+    const html = texto.split('\n').filter(l => l.trim()).map(l => `<div style="margin-bottom:4px">${l}</div>`).join('');
+    el.innerHTML = html || '<span style="color:var(--text3)">Sem insights disponíveis no momento.</span>';
+    localStorage.setItem(INSIGHTS_IA_CACHE_KEY, JSON.stringify({ dia: hoje, html }));
+  } catch (e) {
+    el.innerHTML = '<span style="color:var(--text3)">⚠ Não foi possível gerar a análise via IA agora. Tente novamente mais tarde ou verifique a configuração da chave de API no Chat.</span>';
+  }
+}
+
 function appendChatMsg(role, text, isTyping=false) {
   const msgs = document.getElementById('chat-messages');
   if (!msgs) return null;
@@ -5845,6 +5984,17 @@ function showBadge() {
 function hideBadge() {
   const b = document.getElementById('chat-badge');
   if (b) b.style.display = 'none';
+}
+
+// Resolução do endpoint da API Claude (proxy local em dev, Cloudflare Worker/proxy do usuário em produção)
+// — compartilhada entre o chat e os insights automáticos da Visão Geral.
+function resolveClaudeEndpoint() {
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const activeProxy = localStorage.getItem('chat_proxy_url') || CLOUDFLARE_PROXY;
+  const API_URL = isLocal
+    ? '/proxy/messages'
+    : (activeProxy || 'https://api.anthropic.com/v1/messages');
+  return { API_URL, isLocal, activeProxy };
 }
 
 async function sendChat() {
@@ -5874,11 +6024,7 @@ Regras:
 
 ${buildDataContext()}`;
 
-  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  const activeProxy = localStorage.getItem('chat_proxy_url') || CLOUDFLARE_PROXY;
-  const API_URL = isLocal
-    ? '/proxy/messages'
-    : (activeProxy || 'https://api.anthropic.com/v1/messages');
+  const { API_URL, isLocal, activeProxy } = resolveClaudeEndpoint();
 
   const reqHeaders = {
     'content-type': 'application/json',
@@ -5979,6 +6125,48 @@ function clearChat() {
   const msgs = document.getElementById('chat-messages');
   if (msgs) msgs.innerHTML = '';
   showWelcomeMessage();
+}
+
+function exportarConversaPDF() {
+  if (!chatHistory.length) { showToast('⚠ Não há conversa para exportar ainda.'); return; }
+  if (typeof window.jspdf === 'undefined') { showToast('❌ Biblioteca de PDF não carregada'); return; }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  let y = 15;
+
+  doc.setFontSize(16); doc.setTextColor(20, 83, 45);
+  doc.text('EmbrapAI Maranhão — Relatório da Conversa com o Assistente de Dados', 15, y);
+  y += 6;
+  doc.setFontSize(9); doc.setTextColor(100);
+  doc.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`, 15, y);
+  y += 6;
+  doc.setDrawColor(200); doc.line(15, y, pageW - 15, y);
+  y += 8;
+
+  chatHistory.forEach(msg => {
+    const rotulo = msg.role === 'user' ? '🧑 Você:' : '🌿 Assistente:';
+    const cor = msg.role === 'user' ? [22, 101, 52] : [60, 60, 60];
+    doc.setFontSize(10); doc.setTextColor(...cor);
+    const rotuloLines = doc.splitTextToSize(rotulo, pageW - 30);
+    if (y + rotuloLines.length*5 > pageH - 15) { doc.addPage(); y = 15; }
+    doc.text(rotuloLines, 15, y);
+    y += rotuloLines.length * 5 + 1;
+
+    doc.setFontSize(9.5); doc.setTextColor(30);
+    const corpoLines = doc.splitTextToSize(String(msg.content || ''), pageW - 30);
+    corpoLines.forEach(linha => {
+      if (y > pageH - 15) { doc.addPage(); y = 15; }
+      doc.text(linha, 18, y);
+      y += 4.5;
+    });
+    y += 4;
+  });
+
+  doc.save(`conversa_embrapai_${new Date().toISOString().slice(0,10)}.pdf`);
+  showToast('✅ Conversa exportada em PDF');
 }
 
 function openChatHelp() {

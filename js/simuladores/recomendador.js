@@ -621,8 +621,8 @@ function rec_renderEnv(env) {
 }
 
 // ─── Render: restrições legais ────────────────────────────────────────────
-function rec_renderConstraints(constraints) {
-  const el = document.getElementById('rec-constraints-panel');
+function rec_renderConstraints(constraints, targetId) {
+  const el = document.getElementById(targetId || 'rec-constraints-panel');
   if (!el) return;
   if (!constraints.length) {
     el.innerHTML = '<div style="color:var(--green);font-size:11px">✅ Nenhuma restrição legal detectada neste ponto.</div>';
@@ -888,8 +888,12 @@ function rec_renderAll() {
 }
 
 // ─── Adicionar overlay de UCs e TIs no mapa ───────────────────────────────
-function rec_addProtectedLayers() {
-  if (!_recMap || !_recUcLayer) return;
+// targetLayer opcional: permite reaproveitar este desenho em qualquer L.layerGroup
+// (ex: mapa principal da aplicação), mantendo o comportamento padrão do simulador
+// quando chamado sem argumentos.
+function rec_addProtectedLayers(targetLayer) {
+  const layer = targetLayer || _recUcLayer;
+  if (!layer) return;
 
   // UCs
   REC_UC.forEach(uc => {
@@ -897,7 +901,7 @@ function rec_addProtectedLayers() {
       radius: uc.r * 1000, color: uc.c, fillColor: uc.c,
       fillOpacity: 0.08, weight: 1.5, dashArray: '5,4', interactive: true
     }).bindTooltip(`<b>${uc.t}</b><br>${uc.n}`, { permanent: false })
-      .addTo(_recUcLayer);
+      .addTo(layer);
   });
 
   // TIs
@@ -906,7 +910,7 @@ function rec_addProtectedLayers() {
       radius: ti.r * 1000, color: '#a855f7', fillColor: '#a855f7',
       fillOpacity: 0.06, weight: 1.5, dashArray: '3,4', interactive: true
     }).bindTooltip(`<b>Terra Indígena</b><br>${ti.n}`, { permanent: false })
-      .addTo(_recUcLayer);
+      .addTo(layer);
   });
 
   // Quilombos
@@ -915,7 +919,7 @@ function rec_addProtectedLayers() {
       radius: q.r * 1000, color: '#7c3aed', fillColor: '#7c3aed',
       fillOpacity: 0.08, weight: 1, dashArray: '2,5', interactive: true
     }).bindTooltip(`<b>Território Quilombola</b><br>${q.n}`, { permanent: false })
-      .addTo(_recUcLayer);
+      .addTo(layer);
   });
 }
 

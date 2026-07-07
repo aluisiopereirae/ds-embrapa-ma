@@ -138,6 +138,18 @@ function _buildSaHTML() {
           style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 14px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s">
           🧠 Recomendação
         </button>
+        <button id="sa-vtab-fin" onclick="sa_switchView('fin')"
+          style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 14px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s">
+          💰 Financeiro
+        </button>
+        <button id="sa-vtab-cal" onclick="sa_switchView('cal')"
+          style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 14px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s">
+          📅 Calendário
+        </button>
+        <button id="sa-vtab-comp" onclick="sa_switchView('comp')"
+          style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 14px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s">
+          🔀 Comparador
+        </button>
       </div>
 
       <!-- ── Vista Superior (canvas existente) ───────────────────────────── -->
@@ -364,6 +376,15 @@ function _buildSaHTML() {
           </div>
         </div>
       </div>
+
+      <!-- ── Simulador Financeiro (payback, VPL, TIR) ────────────────────── -->
+      <div id="sa-view-fin" style="display:none">${typeof fin_buildHTML === 'function' ? fin_buildHTML() : ''}</div>
+
+      <!-- ── Calendário de Manejo / Mão-de-obra ──────────────────────────── -->
+      <div id="sa-view-cal" style="display:none">${typeof cal_buildHTML === 'function' ? cal_buildHTML() : ''}</div>
+
+      <!-- ── Comparador lado a lado de sistemas ──────────────────────────── -->
+      <div id="sa-view-comp" style="display:none">${typeof cmp_buildHTML === 'function' ? cmp_buildHTML() : ''}</div>
 
     </div>
   </div>
@@ -967,34 +988,46 @@ const _SAT_PROVIDERS = {
 // ─── Troca de subaba ─────────────────────────────────────────────────────────
 function sa_switchView(view) {
   _saSatView = view;
-  const cvDiv  = document.getElementById('sa-view-canvas');
-  const satDiv = document.getElementById('sa-view-sat');
-  const recDiv = document.getElementById('sa-view-rec');
-  const btnCv  = document.getElementById('sa-vtab-canvas');
-  const btnSat = document.getElementById('sa-vtab-sat');
-  const btnRec = document.getElementById('sa-vtab-rec');
+  const divs = {
+    canvas: document.getElementById('sa-view-canvas'),
+    sat:    document.getElementById('sa-view-sat'),
+    rec:    document.getElementById('sa-view-rec'),
+    fin:    document.getElementById('sa-view-fin'),
+    cal:    document.getElementById('sa-view-cal'),
+    comp:   document.getElementById('sa-view-comp'),
+  };
+  const btns = {
+    canvas: document.getElementById('sa-vtab-canvas'),
+    sat:    document.getElementById('sa-vtab-sat'),
+    rec:    document.getElementById('sa-vtab-rec'),
+    fin:    document.getElementById('sa-vtab-fin'),
+    cal:    document.getElementById('sa-vtab-cal'),
+    comp:   document.getElementById('sa-vtab-comp'),
+  };
 
   const ON  = { background:'var(--green3)', borderColor:'var(--green3)', color:'#fff', fontWeight:'600' };
   const OFF = { background:'none', borderColor:'var(--border)', color:'var(--text2)', fontWeight:'normal' };
 
-  if (cvDiv)  cvDiv.style.display  = view === 'canvas' ? 'block' : 'none';
-  if (satDiv) satDiv.style.display = view === 'sat'    ? 'block' : 'none';
-  if (recDiv) recDiv.style.display = view === 'rec'    ? 'block' : 'none';
-  if (btnCv)  Object.assign(btnCv.style,  view === 'canvas' ? ON : OFF);
-  if (btnSat) Object.assign(btnSat.style, view === 'sat'    ? ON : OFF);
-  if (btnRec) Object.assign(btnRec.style, view === 'rec'    ? ON : OFF);
+  Object.entries(divs).forEach(([k, el]) => { if (el) el.style.display = (view === k) ? 'block' : 'none'; });
+  Object.entries(btns).forEach(([k, el]) => { if (el) Object.assign(el.style, view === k ? ON : OFF); });
 
-  // Oculta painel esquerdo na aba Recomendação IA (botões de sistema estão dentro dele)
+  // Oculta painel esquerdo nas abas que usam layout de página inteira
   const leftCol = document.getElementById('sa-left-col');
   const grid    = document.getElementById('sa-main-grid');
-  const isRec   = view === 'rec';
-  if (leftCol) leftCol.style.display         = isRec ? 'none' : 'block';
-  if (grid)    grid.style.gridTemplateColumns = isRec ? '1fr'  : '300px 1fr';
+  const fullWidth = (view === 'rec' || view === 'cal' || view === 'comp');
+  if (leftCol) leftCol.style.display         = fullWidth ? 'none' : 'block';
+  if (grid)    grid.style.gridTemplateColumns = fullWidth ? '1fr'  : '300px 1fr';
 
   if (view === 'sat') {
     sa_satInit();
   } else if (view === 'rec') {
     if (typeof rec_init === 'function') rec_init();
+  } else if (view === 'fin') {
+    if (typeof fin_init === 'function') fin_init();
+  } else if (view === 'cal') {
+    if (typeof cal_init === 'function') cal_init();
+  } else if (view === 'comp') {
+    if (typeof cmp_init === 'function') cmp_init();
   } else {
     // Redesenha canvas (pode ter perdido tamanho enquanto estava oculto)
     requestAnimationFrame(sa_redrawCanvas);
