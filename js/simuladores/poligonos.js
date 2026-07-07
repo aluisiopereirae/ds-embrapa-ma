@@ -133,17 +133,44 @@ function pg_confirmarAssociacao() {
     pg_renderTalhaoLayers();
     closeModal();
   } else {
-    // Novo cadastro: preenche lat/lng com o centróide e abre o formulário de Registrar
+    // Novo cadastro: preenche lat/lng/área com os dados do talhão e abre o formulário de Registrar
     const c = _pgPendingPoligono.centroid;
+    const areaHa = _pgPendingPoligono.area_ha;
     closeModal();
     showView('register');
     setTimeout(() => {
       const flat = document.getElementById('f_lat'), flng = document.getElementById('f_lng');
+      const farea = document.getElementById('f_area_total');
       if (flat) flat.value = c.lat.toFixed(5);
       if (flng) flng.value = c.lng.toFixed(5);
-      showToast(`▱ Coordenadas do talhão preenchidas — complete o cadastro (${_pgPendingPoligono.area_ha} ha)`);
+      if (farea && !farea.value) farea.value = areaHa;
+      pg_refreshFormBanner();
+      showToast(`▱ Coordenadas e área do talhão preenchidas — complete o cadastro (${areaHa} ha)`);
     }, 300);
   }
+}
+
+// Mostra/atualiza um aviso persistente no formulário de Registrar informando que há um
+// talhão desenhado pendente de associação — sobrevive à troca de sistema produtivo,
+// pois é atualizado toda vez que o formulário é reconstruído (ver renderRegisterForm/selectFormSystem em index.html).
+function pg_refreshFormBanner() {
+  const el = document.getElementById('pg-poligono-banner');
+  if (!el) return;
+  el.innerHTML = _pgPendingPoligono
+    ? `<div style="font-size:11px;background:#fbbf241a;border:1px solid #fbbf2455;border-radius:6px;padding:8px;color:#fbbf24">
+        ▱ Talhão desenhado anexado a este cadastro — área real: <strong>${_pgPendingPoligono.area_ha} ha</strong>
+        (será salva junto com o registro ao clicar em "Salvar Registro")
+      </div>`
+    : '';
+}
+
+// Remove do mapa qualquer polígono desenhado que ainda não foi associado a um cadastro salvo
+// (chamado por "✕ Limpar Layers" no mapa principal — index.html)
+function pg_limparPendentes() {
+  _pgPendingPoligono = null;
+  pg_renderTalhaoLayers();
+  const banner = document.getElementById('pg-poligono-banner');
+  if (banner) banner.innerHTML = '';
 }
 
 // Redesenha no mapa todos os polígonos já salvos em DB (chamado após init e após salvar registro)

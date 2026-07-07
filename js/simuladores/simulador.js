@@ -757,6 +757,8 @@ function sa_runSimulation() {
   sa_renderDesc();
   sa_renderCompChart();
   if (_saSatView === 'sat') sa_satDrawPlants();
+  if (_saSatView === 'fin' && typeof fin_calcular === 'function') fin_calcular();
+  if (_saSatView === 'cal' && typeof cal_calcular === 'function') cal_calcular();
 
   const info = g('sa-canvas-info');
   if (info) {

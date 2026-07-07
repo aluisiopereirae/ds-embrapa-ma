@@ -30,7 +30,7 @@ function sa_compararSistemas(systemKeys, areaHa, variantIds) {
 function cmp_buildHTML() {
   const sysOptions = Object.entries(SA_SYSTEMS).map(([k,v]) => `<option value="${k}">${v.icon} ${v.label}</option>`).join('');
   const seletor = (id, defaultIdx) => `
-    <select class="form-select" id="${id}">
+    <select class="form-select" id="${id}" onchange="cmp_calcular()">
       <option value="">— nenhum —</option>
       ${sysOptions}
     </select>`;
@@ -44,7 +44,7 @@ function cmp_buildHTML() {
       <div class="form-group"><label class="form-label">Sistema B</label>${seletor('cmp-sys-b')}</div>
       <div class="form-group"><label class="form-label">Sistema C (opcional)</label>${seletor('cmp-sys-c')}</div>
       <div class="form-group"><label class="form-label">Área comum (ha)</label>
-        <input class="form-input" id="cmp-area" type="number" value="10" min="0.1" step="0.5"></div>
+        <input class="form-input" id="cmp-area" type="number" value="10" min="0.1" step="0.5" oninput="cmp_calcular()"></div>
       <div style="display:flex;align-items:flex-end">
         <button class="btn btn-primary" style="width:100%" onclick="cmp_calcular()">🔄 Comparar</button>
       </div>

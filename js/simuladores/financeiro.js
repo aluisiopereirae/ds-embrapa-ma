@@ -19,15 +19,15 @@ function fin_buildHTML() {
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
       <div class="form-group"><label class="form-label">Margem líquida (%)</label>
-        <input class="form-input" id="fin-margem" type="number" value="65" min="1" max="99" step="1"></div>
+        <input class="form-input" id="fin-margem" type="number" value="65" min="1" max="99" step="1" oninput="fin_calcular()"></div>
       <div class="form-group"><label class="form-label">Taxa de desconto anual (%)</label>
-        <input class="form-input" id="fin-taxa" type="number" value="10" min="0" max="50" step="0.5"></div>
+        <input class="form-input" id="fin-taxa" type="number" value="10" min="0" max="50" step="0.5" oninput="fin_calcular()"></div>
       <div class="form-group"><label class="form-label">Horizonte de análise (anos)</label>
-        <input class="form-input" id="fin-anos" type="number" value="10" min="3" max="30" step="1"></div>
+        <input class="form-input" id="fin-anos" type="number" value="10" min="3" max="30" step="1" oninput="fin_calcular()"></div>
       <div class="form-group"><label class="form-label">Produção ano 1 (% da plena)</label>
-        <input class="form-input" id="fin-ramp1" type="number" value="30" min="0" max="100" step="5"></div>
+        <input class="form-input" id="fin-ramp1" type="number" value="30" min="0" max="100" step="5" oninput="fin_calcular()"></div>
       <div class="form-group"><label class="form-label">Produção ano 2 (% da plena)</label>
-        <input class="form-input" id="fin-ramp2" type="number" value="65" min="0" max="100" step="5"></div>
+        <input class="form-input" id="fin-ramp2" type="number" value="65" min="0" max="100" step="5" oninput="fin_calcular()"></div>
       <div style="display:flex;align-items:flex-end">
         <button class="btn btn-primary" style="width:100%" onclick="fin_calcular()">🔄 Recalcular</button>
       </div>

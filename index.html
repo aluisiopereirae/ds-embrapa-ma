@@ -2784,6 +2784,8 @@ function clearAllHeatmaps() {
   // Hide legends
   const fl = document.getElementById('frut-legend-box'); if (fl) fl.style.display = 'none';
   const elb = document.getElementById('extrat-legend-box'); if (elb) elb.style.display = 'none';
+  if (typeof rf_landRiskActive !== 'undefined' && rf_landRiskActive && typeof rf_toggleLandRiskLayer === 'function') rf_toggleLandRiskLayer();
+  if (typeof pg_limparPendentes === 'function') pg_limparPendentes();
   renderMapMarkers();
   updateLegend();
   if (typeof updateActiveSysDisplay === 'function') updateActiveSysDisplay();
@@ -4355,13 +4357,35 @@ function renderRegisterForm() {
     </div>
   `;
   renderFormFields(currentSystem);
+  if (typeof pg_refreshFormBanner === 'function') pg_refreshFormBanner();
+}
+
+// Campos comuns a todos os sistemas — precisam sobreviver à troca de sistema produtivo,
+// já que renderFormFields() reconstrói o HTML do zero a cada troca.
+const COMMON_FORM_FIELD_IDS = [
+  'f_municipio','f_mesorregiao','f_bioma','f_lat','f_lng','f_altitude','f_area_total',
+  'f_ano_implantacao','f_escala','f_produtor','f_temperatura_media','f_precipitacao',
+  'f_renda_total','f_balanco_carbono','f_sequestro_carbono','f_emissao_total_co2e','f_obs',
+];
+
+function snapshotCommonFormFields() {
+  const snap = {};
+  COMMON_FORM_FIELD_IDS.forEach(id => { const el = document.getElementById(id); if (el) snap[id] = el.value; });
+  return snap;
+}
+
+function restoreCommonFormFields(snap) {
+  Object.entries(snap).forEach(([id, v]) => { const el = document.getElementById(id); if (el && v) el.value = v; });
 }
 
 function selectFormSystem(s) {
+  const snap = snapshotCommonFormFields();
   currentSystem = s;
   document.querySelectorAll('[id^=fsys-]').forEach(b=>b.classList.remove('active'));
   document.getElementById('fsys-'+s)?.classList.add('active');
   renderFormFields(s);
+  restoreCommonFormFields(snap);
+  if (typeof pg_refreshFormBanner === 'function') pg_refreshFormBanner();
 }
 
 function renderFormFields(sys) {
@@ -4385,6 +4409,7 @@ function renderFormFields(sys) {
           <span style="font-size:11px;color:var(--text3)">Confere se as coordenadas caem em área legalmente protegida</span>
         </div>
         <div class="form-group full" id="rf-form-alert"></div>
+        <div class="form-group full" id="pg-poligono-banner"></div>
         <div class="form-group"><label class="form-label">Altitude (m)</label><input class="form-input" id="f_altitude" type="number" placeholder="150"></div>
         <div class="form-group"><label class="form-label">Área Total (ha) *</label><input class="form-input" id="f_area_total" type="number" step="0.1" placeholder="10.5"></div>
         <div class="form-group"><label class="form-label">Ano Implantação</label><input class="form-input" id="f_ano_implantacao" type="number" placeholder="2022"></div>

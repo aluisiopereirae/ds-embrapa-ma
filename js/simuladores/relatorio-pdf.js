@@ -87,8 +87,10 @@ function pdf_graficoComparativo(d) {
     const vals = mesmoSistema.map(x => Number(x[campo])).filter(isFinite);
     return vals.length ? vals.reduce((a,b)=>a+b,0) / vals.length : 0;
   };
+  // Canvas em alta resolução (2x da área de exibição no PDF) para que os textos
+  // dos rótulos/legenda saiam nítidos e legíveis quando incorporados ao PDF.
   const canvas = document.createElement('canvas');
-  canvas.width = 480; canvas.height = 240;
+  canvas.width = 1440; canvas.height = 720;
   const chart = new Chart(canvas.getContext('2d'), {
     type: 'bar',
     data: {
@@ -100,8 +102,14 @@ function pdf_graficoComparativo(d) {
     },
     options: {
       responsive: false, animation: false,
-      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } }, title: { display: true, text: 'Comparação com a média do sistema produtivo' } },
-      scales: { y: { beginAtZero: true } }
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 26 }, padding: 20, boxWidth: 30 } },
+        title: { display: true, text: 'Comparação com a média do sistema produtivo', font: { size: 30 }, padding: 20 },
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { font: { size: 22 } } },
+        x: { ticks: { font: { size: 24 } } },
+      }
     }
   });
   const img = chart.toBase64Image();
@@ -191,19 +199,21 @@ async function pdf_gerarFichaUnidade(id) {
     y += obsLines.length * 4 + 6;
   }
 
-  if (y > 190) { doc.addPage(); y = 15; }
-  doc.setFontSize(11); doc.setTextColor(20, 83, 45);
-  doc.text('Comparação com o sistema produtivo', 15, y); y += 4;
+  if (y > 170) { doc.addPage(); y = 15; }
+  doc.setFontSize(13); doc.setTextColor(20, 83, 45);
+  doc.text('Comparação com o sistema produtivo', 15, y); y += 6;
   try { doc.addImage(graficoImg, 'PNG', 15, y, 180, 90); y += 96; } catch(e) {}
 
   if (mapaImg) {
-    if (y > 170) { doc.addPage(); y = 15; }
-    doc.setFontSize(11); doc.setTextColor(20, 83, 45);
-    doc.text('Localização no mapa', 15, y); y += 4;
+    // Seção sempre em página nova, com espaço reservado generoso — evita que o
+    // título e a imagem do mapa fiquem espremidos no rodapé da página anterior.
+    doc.addPage(); y = 15;
+    doc.setFontSize(13); doc.setTextColor(20, 83, 45);
+    doc.text('Localização no mapa', 15, y); y += 8;
     try {
       const imgProps = doc.getImageProperties(mapaImg);
-      const w = 180, h = (imgProps.height * w) / imgProps.width;
-      doc.addImage(mapaImg, 'PNG', 15, y, w, Math.min(h, 110));
+      const w = pageW - 30, h = (imgProps.height * w) / imgProps.width;
+      doc.addImage(mapaImg, 'PNG', 15, y, w, Math.min(h, 220));
     } catch(e) {}
   }
 
