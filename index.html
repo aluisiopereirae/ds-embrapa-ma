@@ -5889,6 +5889,45 @@ ${JSON.stringify(DB.map(d => ({
   return ctx;
 }
 
+// Conversor leve de Markdown → HTML (usado nas respostas do Chat IA e nos Insights
+// Automáticos) — suporta **negrito**, *itálico*, `código`, cabeçalhos (#..######)
+// e listas (•, - ou *). Escapa HTML antes de aplicar as tags, para não quebrar o
+// layout nem interpretar conteúdo vindo da API como marcação arbitrária.
+function mdLiteToHtml(texto) {
+  const escapeHtml = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const aplicarInline = s => s
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:3px;font-family:monospace">$1</code>')
+    .replace(/(^|[^*])\*([^*\s][^*]*?)\*(?!\*)/g, '$1<em>$2</em>');
+
+  const linhas = String(texto || '').split('\n');
+  let html = '', emLista = false;
+  linhas.forEach(linhaRaw => {
+    const linha = linhaRaw.trim();
+    if (!linha) { if (emLista) { html += '</ul>'; emLista = false; } return; }
+
+    const headerMatch = linha.match(/^(#{1,6})\s+(.*)$/);
+    if (headerMatch) {
+      if (emLista) { html += '</ul>'; emLista = false; }
+      const nivel = Math.min(4, headerMatch[1].length);
+      html += `<div style="font-weight:700;font-size:${15 - nivel}px;margin:6px 0 3px">${aplicarInline(escapeHtml(headerMatch[2]))}</div>`;
+      return;
+    }
+
+    const bulletMatch = linha.match(/^[•\-\*]\s+(.*)$/);
+    if (bulletMatch) {
+      if (!emLista) { html += '<ul style="margin:4px 0 4px 18px;padding:0">'; emLista = true; }
+      html += `<li style="margin-bottom:4px">${aplicarInline(escapeHtml(bulletMatch[1]))}</li>`;
+      return;
+    }
+
+    if (emLista) { html += '</ul>'; emLista = false; }
+    html += `<div style="margin-bottom:4px">${aplicarInline(escapeHtml(linha))}</div>`;
+  });
+  if (emLista) html += '</ul>';
+  return html;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // INSIGHTS AUTOMÁTICOS — Painel Visão Geral
 // Nível 1: calculado diretamente sobre DB, sem custo de API, sempre disponível.
@@ -5977,7 +6016,7 @@ async function renderInsightsIA(forcar) {
     if (!response.ok) throw new Error('HTTP ' + response.status);
     const data = await response.json();
     const texto = data.content?.[0]?.text || '';
-    const html = texto.split('\n').filter(l => l.trim()).map(l => `<div style="margin-bottom:4px">${l}</div>`).join('');
+    const html = mdLiteToHtml(texto);
     el.innerHTML = html || '<span style="color:var(--text3)">Sem insights disponíveis no momento.</span>';
     localStorage.setItem(INSIGHTS_IA_CACHE_KEY, JSON.stringify({ dia: hoje, html }));
   } catch (e) {
@@ -5993,9 +6032,7 @@ function appendChatMsg(role, text, isTyping=false) {
   if (isTyping) {
     div.innerHTML = '<div class="chat-typing-dots"><span></span><span></span><span></span></div>';
   } else {
-    div.innerHTML = text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\n/g, '<br>');
+    div.innerHTML = mdLiteToHtml(text);
   }
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
