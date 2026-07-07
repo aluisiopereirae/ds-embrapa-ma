@@ -70,10 +70,13 @@ function pg_onPolygonCreated(e) {
   const areaHa = areaM2 / 10000;
   const centro = layer.getBounds().getCenter();
   const coords = latlngs.map(ll => [ll.lat, ll.lng]);
-
-  _pgPendingPoligono = { coords, area_ha: +areaHa.toFixed(3), centroid: { lat: centro.lat, lng: centro.lng } };
-
   const munic = pg_nearestMunicipio(centro.lat, centro.lng);
+
+  _pgPendingPoligono = {
+    coords, area_ha: +areaHa.toFixed(3), centroid: { lat: centro.lat, lng: centro.lng },
+    municipio: munic ? munic.nome : null,
+  };
+
   const proximos = DB.filter(d => pg_distKm(centro.lat, centro.lng, d.lat, d.lng) < 30)
     .sort((a,b) => pg_distKm(centro.lat, centro.lng, a.lat, a.lng) - pg_distKm(centro.lat, centro.lng, b.lat, b.lng))
     .slice(0, 10);
@@ -133,19 +136,22 @@ function pg_confirmarAssociacao() {
     pg_renderTalhaoLayers();
     closeModal();
   } else {
-    // Novo cadastro: preenche lat/lng/área com os dados do talhão e abre o formulário de Registrar
+    // Novo cadastro: preenche lat/lng/área/município com os dados do talhão e abre o formulário de Registrar
     const c = _pgPendingPoligono.centroid;
     const areaHa = _pgPendingPoligono.area_ha;
+    const municipio = _pgPendingPoligono.municipio;
     closeModal();
     showView('register');
     setTimeout(() => {
       const flat = document.getElementById('f_lat'), flng = document.getElementById('f_lng');
       const farea = document.getElementById('f_area_total');
+      const fmun = document.getElementById('f_municipio');
       if (flat) flat.value = c.lat.toFixed(5);
       if (flng) flng.value = c.lng.toFixed(5);
       if (farea && !farea.value) farea.value = areaHa;
+      if (fmun && !fmun.value && municipio) fmun.value = municipio;
       pg_refreshFormBanner();
-      showToast(`▱ Coordenadas e área do talhão preenchidas — complete o cadastro (${areaHa} ha)`);
+      showToast(`▱ Coordenadas, área e município do talhão preenchidos — complete o cadastro (${areaHa} ha)`);
     }, 300);
   }
 }
