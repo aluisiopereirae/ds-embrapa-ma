@@ -63,8 +63,9 @@ function pdf_fmtValor(campo, v) {
 function pdf_wait(ms) { return new Promise(res => setTimeout(res, ms)); }
 
 function pdf_getViewAtiva() {
-  const painel = document.querySelector('.panel.active');
-  return painel ? painel.id.replace('view-', '') : 'overview';
+  // showView() não marca classe "active" nos painéis (só alterna style.display) —
+  // a variável global currentView é a fonte confiável da aba realmente visível.
+  return (typeof currentView !== 'undefined' && currentView) ? currentView : 'overview';
 }
 
 async function pdf_logoDataUrl() {
