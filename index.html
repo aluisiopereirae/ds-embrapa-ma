@@ -11,6 +11,13 @@
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Charts live inside fixed-height .chart-wrap containers; without this, Chart.js
+// computes canvas height from aspect ratio, which can fight the container size
+// and re-trigger its own resize observer in a loop (visible as chart "trembling").
+Chart.defaults.maintainAspectRatio = false;
+Chart.defaults.resizeDelay = 100;
+</script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -267,7 +274,7 @@ header {
   overflow-wrap: break-word; word-break: break-word;
   align-items: center; gap: 8px;
 }
-.chart-wrap { position: relative; }
+.chart-wrap { position: relative; height: 260px; }
 
 .chart-menu-btn {
   position: absolute; top: 8px; right: 8px;
