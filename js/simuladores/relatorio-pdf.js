@@ -164,7 +164,7 @@ async function pdf_gerarFichaUnidade(id) {
 
   if (logoImg) { try { doc.addImage(logoImg, 'PNG', 15, 10, 22, 22); } catch(e) {} }
   doc.setFontSize(16); doc.setTextColor(20, 83, 45);
-  doc.text('EmbrapAI Maranhão (Por Dr. Aluisio Pereira) — Ficha Técnica de Unidade Produtiva', logoImg ? 42 : 15, 18);
+  doc.text(' — Ficha Técnica de Unidade Produtiva (por Dr. Aluisio Pereira)', logoImg ? 42 : 15, 18);
   doc.setFontSize(10); doc.setTextColor(100);
   doc.text(`${SYSTEM_ICONS[d.sistema]||''} ${d.sistema.toUpperCase()} · ${d.municipio} · Registro #${d.id}`, logoImg ? 42 : 15, 25);
   doc.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`, logoImg ? 42 : 15, 30);
