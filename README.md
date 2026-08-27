@@ -2,7 +2,7 @@
 
 > Plataforma interativa de levantamento, visualização e análise de dados de sistemas produtivos sustentáveis no estado do Maranhão.
 
-**Acesso:** [aluisiopereirae.github.io/ds-embrapa-ma](https://aluisiopereirae.github.io/ds-embrapa-ma/)
+**Acesso:** [aluisiopereirae.github.io/embrapa-ma](https://aluisiopereirae.github.io/embrapa-ma/)
 
 ---
 
